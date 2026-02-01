@@ -1,0 +1,19 @@
+---
+import Greeting from '../components/Greeting';
+import BaseLayout from '../layouts/BaseLayout.astro';
+const pageTitle = "";
+---
+
+ <section class="hero w-full aspect-video relative z-0 min-h-[70vh]">
+    <img src="/img.png" class="w-full h-full object-cover" alt="Hero" />
+    <div class="absolute inset-0 flex items-center justify-center z-10">
+      <h1 class="text-white text-5xl font-bold drop-shadow-lg text-center">
+        欢迎来到我的网站
+      </h1>
+    </div>
+  </section>
+<BaseLayout pageTitle={pageTitle}>
+	<p>欢迎来到我的 Astro 网站的首页！这是我使用 Astro 框架创建的第一个页面。</p>
+	<h2>我超棒的博客副标题</h2>
+	<Greeting client:load messages={["Hi", "Hello", "Howdy", "Hey there"]} />
+</BaseLayout>
