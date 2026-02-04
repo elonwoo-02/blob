@@ -1,13 +1,22 @@
 ---
+import TwitterIcon from "./icon/TwitterIcon.astro";
+import YoutobeIcon from "./icon/YoutobeIcon.astro";
+import FacebookIcon from "./icon/FacebookIcon.astro";
+
 const { platform, username } = Astro.props;
 ---
-<a href={`https://www.${platform}.com/${username}`}>{platform}</a>
-
+<!--<a href={`https://www.${platform}.com/${username}`}></a>-->
+<div class="grid grid-flow-col gap-4">
+  <a>
+    <TwitterIcon/>
+  </a>
+  <a>
+    <YoutobeIcon/>
+  </a>
+  <a>
+    <FacebookIcon/>
+  </a>
+</div>
 <style>
-  a {
-    padding: 0.5rem 1rem;
-    color: white;
-    background-color: #4c1d95;
-    text-decoration: none;
-  }
+
 </style>
