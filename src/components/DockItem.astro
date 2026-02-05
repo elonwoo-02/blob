@@ -1,20 +1,49 @@
 ---
 // src/components/DockItem.astro
 interface Props {
-  icon: string;
+  href: string;
   label: string;
-  active?: boolean;
-  onClick?: () => void;
+  icon?: string;
+  isExternal?: boolean;
 }
 
-const { icon, label, active = false, onClick } = Astro.props;
+const { href, label, icon, isExternal = false } = Astro.props;
 ---
 
-<div
-  class={`flex flex-col items-center justify-center m-2 cursor-pointer transition-transform duration-200 transform hover:scale-125 ${active ? 'text-primary' : 'text-gray-500'}`}
-  onClick={onClick}
-  title={label}
->
-  <img src={icon} alt={label} class="w-10 h-10 mb-1" />
-  <span class="text-xs">{label}</span>
+<div class="tooltip tooltip-top" data-tip={label}>
+  <a
+    href={href}
+    target={isExternal ? "_blank" : "_self"}
+    rel={isExternal ? "noopener noreferrer" : ""}
+    class="flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 transition-all duration-300 ease-out hover:scale-135 hover:-translate-y-2 group relative"
+  >
+    {icon ? (
+      <img src={icon} alt={label} class="w-10 h-10 object-contain" />
+    ) : (
+      <div class="w-10 h-10 bg-neutral text-neutral-content rounded-xl flex items-center justify-center text-xl font-mono group-hover:bg-primary transition-colors">
+        {label.charAt(0).toUpperCase()}
+      </div>
+    )}
+    
+    <!-- Active Indicator (optional) -->
+    <div class="absolute -bottom-1 w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+  </a>
 </div>
+
+<style>
+  /* 模仿 macOS 的图标阴影 */
+  img, div {
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  }
+  
+  .tooltip:before {
+    background-color: var(--color-neutral);
+    opacity: 0.8;
+    backdrop-filter: blur(4px);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+</style>

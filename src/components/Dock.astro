@@ -1,34 +1,115 @@
 ---
-// Dock.astro
-// props:
-//   leftNav: 左侧固定导航 [{title, icon, link}]
-//   rightApps: 右侧动态内容 [{title, icon, link}]
-const { leftNav = [], rightApps = [] } = Astro.props;
+// src/components/Dock.astro
+interface NavItem {
+  title: string;
+  link: string;
+  icon?: string;
+}
+
+interface Props {
+  leftNav?: NavItem[];
+  rightApps?: NavItem[];
+}
+
+const { 
+  leftNav = [
+    { title: '首页', link: '/', icon: '🏠' },
+    { title: '博客', link: '/blog', icon: '📝' },
+    { title: '关于', link: '/about', icon: '👤' }
+  ], 
+  rightApps = [
+    { title: 'GitHub', link: 'https://github.com', icon: '🐙' }
+  ] 
+} = Astro.props;
+
+import DockItem from './DockItem.astro';
 ---
 
-<div class="fixed bottom-4 left-0 w-full flex justify-center items-end z-50">
-  <div class="flex items-center bg-white/70 backdrop-blur-md rounded-3xl px-4 py-2 shadow-lg">
-    <!-- 左侧固定导航 -->
-    <div class="flex space-x-4">
-      {leftNav.map(nav => (
-        <a href={nav.link} class="flex flex-col items-center justify-center p-2 rounded-xl shadow-md hover:scale-110 transition-transform duration-200">
-          <img src={nav.icon} alt={nav.title} class="w-8 h-8"/>
-          <span class="text-xs">{nav.title}</span>
-        </a>
+<!-- 触发区域：用于鼠标触底呼出 -->
+<div id="dock-trigger" class="fixed bottom-0 left-0 w-full h-4 z-[49]"></div>
+
+<!-- Dock 主体 -->
+<div id="dock-container" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-in-out">
+  <div class="flex items-center gap-2 p-2 rounded-2xl bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/20 shadow-2xl">
+    
+    <!-- 左侧系统导航 -->
+    <div class="flex items-center px-1">
+      {leftNav.map(item => (
+        <DockItem href={item.link} label={item.title} />
       ))}
     </div>
 
-    <!-- 中间竖线 -->
-    <div class="border-l border-gray-300 mx-4 h-10"></div>
+    <!-- 中竖线 -->
+    <div class="w-[1px] h-8 bg-white/20 mx-1"></div>
 
     <!-- 右侧动态内容 -->
-    <div class="flex space-x-4">
-      {rightApps.map(app => (
-        <a href={app.link} class="flex flex-col items-center justify-center p-2 rounded-xl shadow-md hover:scale-110 transition-transform duration-200">
-          <img src={app.icon} alt={app.title} class="w-8 h-8"/>
-          <span class="text-xs">{app.title}</span>
-        </a>
+    <div class="flex items-center px-1">
+      {rightApps.map(item => (
+        <DockItem href={item.link} label={item.title} isExternal={item.link.startsWith('http')} />
       ))}
     </div>
   </div>
 </div>
+
+<script>
+  const dock = document.getElementById('dock-container');
+  const trigger = document.getElementById('dock-trigger');
+  let hideTimeout: ReturnType<typeof setTimeout>;
+
+  const showDock = () => {
+    if (dock) {
+      dock.style.transform = 'translateX(-50%) translateY(0)';
+      dock.style.opacity = '1';
+      resetHideTimer();
+    }
+  };
+
+  const hideDock = () => {
+    if (dock) {
+      dock.style.transform = 'translateX(-50%) translateY(120%)';
+      dock.style.opacity = '0';
+    }
+  };
+
+  const resetHideTimer = () => {
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(hideDock, 3000);
+  };
+
+  // 初始化
+  if (dock && trigger) {
+    // 鼠标进入 Dock 区域，显示并重置计时器
+    dock.addEventListener('mouseenter', () => {
+      clearTimeout(hideTimeout);
+      showDock();
+    });
+
+    // 鼠标离开 Dock 区域，开始 3 秒倒计时
+    dock.addEventListener('mouseleave', resetHideTimer);
+
+    // 鼠标移动到触发区域（屏幕底部），呼出 Dock
+    trigger.addEventListener('mouseenter', showDock);
+    
+    // 全局鼠标移动监控，如果靠近底部也显示
+    document.addEventListener('mousemove', (e) => {
+      if (window.innerHeight - e.clientY < 50) {
+        showDock();
+      }
+    });
+
+    // 初始 3 秒后自动隐藏
+    resetHideTimer();
+  }
+</script>
+
+<style>
+  #dock-container {
+    /* 初始状态 */
+    will-change: transform, opacity;
+  }
+  
+  /* 确保图标在 Dock 内部不会被截断 */
+  .flex {
+    align-items: flex-end;
+  }
+</style>
