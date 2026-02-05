@@ -2,6 +2,20 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
+// src/layouts/MainLayout.astro
+import Dock from '../components/Dock.astro';
+
+const leftNav = [
+  { title: '首页', icon: '/icons/home.svg', link: '/' },
+  { title: '博客', icon: '/icons/categories.svg', link: '/blog' },
+  { title: '关于', icon: '/icons/about.svg', link: '/about' }
+];
+
+const rightApps = [
+  { title: '文章1', icon: '/icons/doc1.svg', link: '/blog/post-1' },
+  { title: '文章2', icon: '/icons/doc2.svg', link: '/blog/post-2' }
+];
+
 const {pageTitle} = Astro.props;
 const {skillColor = 'green', fontWeight = 'normal', textCase = 'none'} = Astro.props;
 ---
@@ -31,7 +45,9 @@ const {skillColor = 'green', fontWeight = 'normal', textCase = 'none'} = Astro.p
 <body>
   <Header />
   <h1>{pageTitle}</h1>
-  <slot></slot>
+  <slot/>
+  <Dock {leftNav} {rightApps} />
+
   <Footer />
   <script>
     import "../scripts/menu.js";

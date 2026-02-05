@@ -1,0 +1,20 @@
+---
+// src/components/DockItem.astro
+interface Props {
+  icon: string;
+  label: string;
+  active?: boolean;
+  onClick?: () => void;
+}
+
+const { icon, label, active = false, onClick } = Astro.props;
+---
+
+<div
+  class={`flex flex-col items-center justify-center m-2 cursor-pointer transition-transform duration-200 transform hover:scale-125 ${active ? 'text-primary' : 'text-gray-500'}`}
+  onClick={onClick}
+  title={label}
+>
+  <img src={icon} alt={label} class="w-10 h-10 mb-1" />
+  <span class="text-xs">{label}</span>
+</div>
