@@ -1,266 +1,50 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 
-interface Heading {
-  depth: number;
-  slug: string;
-  text: string;
-}
-
-const { frontmatter, headings = [] } = Astro.props as {
+const { frontmatter } = Astro.props as {
   frontmatter: {
     title: string;
     pubDate: Date;
     description: string;
     author: string;
-    image: {
+    image?: {
       url: string;
       alt: string;
     };
-    tags: string[];
+    tags?: string[];
   };
-  headings: Heading[];
 };
-
-const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
 ---
 
 <BaseLayout pageTitle={frontmatter.title}>
-  <div class="chapter-drawer">
-    <input id="chapter-drawer" type="checkbox" class="chapter-drawer-toggle" />
-    <div class="chapter-drawer-content">
-      <article class="post-layout">
-        <main class="post-content">
-          <div class="chapter-drawer-trigger">
-            <label for="chapter-drawer" class="chapter-drawer-button" aria-label="���½ڵ���">
-              <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true">
-                <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
-              </svg>
-            </label>
-          </div>
-          <div class="post-meta">
-            <p class="publish-date">{frontmatter.pubDate.toLocaleDateString()}</p>
-            <p class="description"><em>{frontmatter.description}</em></p>
-            <p class="author">Written by: {frontmatter.author}</p>
-          </div>
-          <img class="hero-image" src={frontmatter.image.url} width="300" alt={frontmatter.image.alt} />
+  <article class="post-layout">
+    <main class="post-content">
+      <div class="post-meta">
+        <p class="publish-date">{frontmatter.pubDate.toLocaleDateString()}</p>
+        <p class="description"><em>{frontmatter.description}</em></p>
+        <p class="author">Written by: {frontmatter.author}</p>
+      </div>
+      {frontmatter.image?.url && (
+        <img class="hero-image" src={frontmatter.image.url} width="300" alt={frontmatter.image.alt || ''} />
+      )}
 
-          <div class="tags">
-            {frontmatter.tags.map((tag: string) => (
-              <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
-            ))}
-          </div>
+      <div class="tags">
+        {(frontmatter.tags ?? []).map((tag: string) => (
+          <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
+        ))}
+      </div>
 
-          <div class="markdown-body">
-            <slot />
-          </div>
-        </main>
-      </article>
-    </div>
-    <div class="chapter-drawer-side" aria-hidden="true">
-      <label for="chapter-drawer" class="chapter-drawer-overlay" aria-label="�ر��½ڵ���"></label>
-      <aside class="chapter-nav" aria-label="章節導航">
-        <details class="chapter-panel" open>
-          <summary>
-            <span class="chapter-summary-icon" aria-hidden="true">
-            <!--  <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true">-->
-            <!--    <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>-->
-            <!--  </svg>-->
-            <!--</span>-->
-            # 章節導航
-            <span class="chapter-summary-chevron" aria-hidden="true"></span>
-          </summary>
-          <nav>
-            <ul>
-              {navigationHeadings.length > 0 ? (
-                navigationHeadings.map((heading) => (
-                  <li class={`depth-${heading.depth}`}>
-                    <a href={`#${heading.slug}`}>{heading.text}</a>
-                  </li>
-                ))
-              ) : (
-                <li class="empty-state">本篇文章暫無章節</li>
-              )}
-            </ul>
-          </nav>
-        </details>
-      </aside>
-    </div>
-  </div>
+      <div class="markdown-body">
+        <slot />
+      </div>
+    </main>
+  </article>
 </BaseLayout>
 
 <style>
   .post-layout {
     display: block;
     min-width: 0;
-  }
-
-  .chapter-drawer {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 1.5rem;
-    align-items: start;
-  }
-
-  .chapter-drawer-content {
-    min-width: 0;
-  }
-
-  .chapter-drawer-toggle {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .chapter-drawer-trigger {
-    display: none;
-    justify-content: flex-end;
-    margin-bottom: 0.75rem;
-  }
-
-  .chapter-drawer-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 999px;
-    border: 1px solid hsl(var(--bc) / 0.2);
-    background: hsl(var(--p) / 0.05);
-    color: hsl(var(--bc));
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-  }
-
-  .chapter-drawer-button:hover {
-    border-color: hsl(var(--p) / 0.4);
-    background: hsl(var(--p) / 0.08);
-    color: hsl(var(--p));
-  }
-
-  .chapter-drawer-side {
-    position: static;
-    pointer-events: auto;
-  }
-
-  .chapter-drawer-overlay {
-    display: none;
-  }
-
-  .chapter-drawer-side .chapter-nav {
-    position: sticky;
-    top: 5.5rem;
-    width: min(18rem, 28vw);
-    height: auto;
-    padding: 0;
-    background: transparent;
-    transform: none;
-  }
-
-  .chapter-panel {
-    width: min(18rem, 28vw);
-    border: 0;
-    border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
-    background: transparent;
-    box-shadow: none;
-    transition: width 180ms ease;
-    overflow: hidden;
-  }
-
-  .chapter-panel summary {
-    cursor: pointer;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 0.8rem;
-    border-radius: 0.75rem;
-    border: 1px solid hsl(var(--bc) / 0.2);
-    background: hsl(var(--p) / 0.05);
-    color: hsl(var(--bc));
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-  }
-
-  .chapter-panel summary:hover {
-    border-color: hsl(var(--p) / 0.4);
-    background: hsl(var(--p) / 0.08);
-    color: hsl(var(--p));
-  }
-
-  .chapter-panel[open] summary {
-    border-color: hsl(var(--p) / 0.4);
-    background: hsl(var(--p) / 0.08);
-    color: hsl(var(--p));
-  }
-
-  .chapter-summary-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .chapter-summary-chevron {
-    margin-left: auto;
-    transition: transform 0.2s ease;
-  }
-
-  .chapter-panel[open] .chapter-summary-chevron {
-    transform: rotate(180deg);
-  }
-
-  .chapter-panel:not([open]) {
-    width: 3.25rem;
-    padding: 0.75rem;
-  }
-
-  .chapter-panel:not([open]) summary {
-    margin-bottom: 0;
-  }
-
-  .chapter-nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .chapter-nav li + li {
-    margin-top: 0.4rem;
-  }
-
-  .chapter-nav a {
-    color: hsl(var(--bc));
-    text-decoration: none;
-  }
-
-  .chapter-nav a:hover {
-    text-decoration: none;
-  }
-
-  .chapter-nav .depth-3 {
-    padding-left: 1rem;
-  }
-
-  .chapter-nav li > a {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.5rem 0.8rem;
-    border-radius: 0.75rem;
-    border: 1px solid hsl(var(--bc) / 0.2);
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-  }
-
-  .chapter-nav li > a:hover {
-    border-color: hsl(var(--p) / 0.4);
-    background: hsl(var(--p) / 0.08);
-    color: hsl(var(--p));
-  }
-
-  .chapter-nav .empty-state {
-    color: #6b7280;
-    font-size: 0.95rem;
   }
 
   .post-content {
@@ -370,72 +154,4 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
     font-size: 1rem;
     background-color: transparent;
   }
-
-  @media (max-width: 900px) {
-    .chapter-drawer {
-      display: block;
-    }
-
-    .chapter-drawer-trigger {
-      display: flex;
-    }
-
-    .chapter-drawer-side {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 40;
-    }
-
-    .chapter-drawer-overlay {
-      display: block;
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.35);
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .chapter-drawer-side .chapter-nav {
-      position: absolute;
-      right: 0;
-      top: 0;
-      height: 100%;
-      width: min(20rem, 82vw);
-      padding: 1rem;
-      background: hsl(var(--b1));
-      transform: translateX(100%);
-      transition: transform 0.2s ease;
-    }
-
-    .chapter-drawer-toggle:checked ~ .chapter-drawer-side {
-      pointer-events: auto;
-    }
-
-    .chapter-drawer-toggle:checked ~ .chapter-drawer-side .chapter-nav {
-      transform: translateX(0);
-    }
-
-    .chapter-drawer-toggle:checked ~ .chapter-drawer-side .chapter-drawer-overlay {
-      opacity: 1;
-    }
-
-    .chapter-panel,
-    .chapter-panel:not([open]) {
-      width: 100%;
-      padding: 0.75rem 1rem;
-    }
-
-    .chapter-panel:not([open]) summary {
-      margin-bottom: 0;
-    }
-
-    .chapter-panel summary {
-      width: 100%;
-      justify-content: space-between;
-    }
-  }
 </style>
-
-
-
