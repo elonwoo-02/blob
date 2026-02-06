@@ -120,7 +120,8 @@ const pageTitle = "";
       color: #111827;
     }
 
-    :global(html[data-theme='dark']) .cli-shell {
+    :global(html[data-theme='dark']) .cli-shell,
+    :global(body[data-theme='dark']) .cli-shell {
       color: #ffffff !important;
     }
 
@@ -129,24 +130,65 @@ const pageTitle = "";
     :global(html[data-theme='dark']) .command,
     :global(html[data-theme='dark']) .cli-title,
     :global(html[data-theme='dark']) .cli-text,
-    :global(html[data-theme='dark']) .cli-line {
+    :global(html[data-theme='dark']) .cli-line,
+    :global(body[data-theme='dark']) .prompt,
+    :global(body[data-theme='dark']) .symbol,
+    :global(body[data-theme='dark']) .command,
+    :global(body[data-theme='dark']) .cli-title,
+    :global(body[data-theme='dark']) .cli-text,
+    :global(body[data-theme='dark']) .cli-line {
       color: #ffffff !important;
     }
 
-    :global(html[data-theme='dark']) .path {
+    :global(html[data-theme='dark']) .path,
+    :global(body[data-theme='dark']) .path {
       color: #22c55e !important;
     }
 
-    :global(html[data-theme='dark']) .cli-block {
+    :global(html[data-theme='dark']) .cli-block,
+    :global(body[data-theme='dark']) .cli-block {
       color: #e5e7eb !important;
     }
 
-    :global(html[data-theme='dark']) .cli-link {
+    :global(html[data-theme='dark']) .cli-link,
+    :global(body[data-theme='dark']) .cli-link {
       color: #ef4444 !important;
     }
 
-    :global(html[data-theme='dark']) .cursor {
+    :global(html[data-theme='dark']) .cursor,
+    :global(body[data-theme='dark']) .cursor {
       color: #ffffff !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .cli-shell {
+        color: #ffffff;
+      }
+
+      .prompt,
+      .symbol,
+      .command,
+      .cli-title,
+      .cli-text,
+      .cli-line {
+        color: #ffffff;
+      }
+
+      .path {
+        color: #22c55e;
+      }
+
+      .cli-block {
+        color: #e5e7eb;
+      }
+
+      .cli-link {
+        color: #ef4444;
+      }
+
+      .cursor {
+        color: #ffffff;
+      }
     }
 
     @keyframes blink {
