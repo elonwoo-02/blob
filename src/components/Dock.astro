@@ -66,12 +66,13 @@ const dockPayload = {
       <div class="dock-traffic-lights">
         <button class="dock-control dock-control-close" type="button" data-action="close" aria-label="关闭"></button>
         <button class="dock-control dock-control-minimize" type="button" data-action="minimize" aria-label="缩小"></button>
-        <button class="dock-control dock-control-fullscreen" type="button" data-action="fullscreen" aria-label="全屏"></button>
+        <button class="dock-control dock-control-fullscreen" type="button" data-action="open" aria-label="打开文章"></button>
       </div>
       <p id="dock-activity-title" class="dock-activity-title"></p>
     </div>
     <div class="dock-activity-body">
-      <p class="dock-activity-text">准备打开文章页面，点击左上角绿色按钮进入全屏后打开。</p>
+      <p class="dock-activity-text">正在载入文章内容…</p>
+      <iframe class="dock-activity-frame" title="文章预览" loading="lazy"></iframe>
     </div>
   </div>
 </div>
@@ -84,6 +85,8 @@ const dockPayload = {
     const removeButtons = dock.querySelectorAll('.dock-remove');
     const activityWindow = document.querySelector('#dock-activity');
     const activityTitle = activityWindow?.querySelector('#dock-activity-title');
+    const activityText = activityWindow?.querySelector('.dock-activity-text');
+    const activityFrame = activityWindow?.querySelector('.dock-activity-frame');
     const hideDelay = 3000;
     const showBoundary = 100;
     let hideTimer;
@@ -115,6 +118,13 @@ const dockPayload = {
       if (activityTitle) {
         activityTitle.textContent = item.label || '文章';
       }
+      if (activityText) {
+        activityText.textContent = `正在预览《${item.label || '文章'}》`;
+      }
+      if (activityFrame) {
+        activityFrame.setAttribute('src', item.href || '');
+      }
+      activityWindow.classList.remove('dock-activity-fullscreen');
       activityWindow.classList.remove('hidden');
       activityWindow.setAttribute('aria-hidden', 'false');
     };
@@ -123,6 +133,10 @@ const dockPayload = {
       if (!activityWindow) return;
       activityWindow.classList.add('hidden');
       activityWindow.setAttribute('aria-hidden', 'true');
+      if (activityFrame) {
+        activityFrame.removeAttribute('src');
+      }
+      hideDock();
       pendingOpenItem = null;
     };
 
@@ -133,16 +147,25 @@ const dockPayload = {
         activityWindow.classList.add('hidden');
         activityWindow.classList.remove('dock-activity-minimized');
         activityWindow.setAttribute('aria-hidden', 'true');
+        if (activityFrame) {
+          activityFrame.removeAttribute('src');
+        }
       }, 180);
       pendingOpenItem = null;
     };
 
-    const fullscreenActivityWindow = () => {
+    const openActivityArticle = () => {
       if (!activityWindow || !pendingOpenItem?.href) return;
       activityWindow.classList.add('dock-activity-fullscreen');
       window.setTimeout(() => {
-        window.location.href = pendingOpenItem.href;
-      }, 180);
+        if (document.startViewTransition) {
+          document.startViewTransition(() => {
+            window.location.assign(pendingOpenItem.href);
+          });
+          return;
+        }
+        window.location.assign(pendingOpenItem.href);
+      }, 220);
     };
 
     const createDockItem = (item, removable = false) => {
@@ -231,7 +254,7 @@ const dockPayload = {
 
     activityWindow?.querySelector('[data-action="close"]')?.addEventListener('click', closeActivityWindow);
     activityWindow?.querySelector('[data-action="minimize"]')?.addEventListener('click', minimizeActivityWindow);
-    activityWindow?.querySelector('[data-action="fullscreen"]')?.addEventListener('click', fullscreenActivityWindow);
+    activityWindow?.querySelector('[data-action="open"]')?.addEventListener('click', openActivityArticle);
 
     dock.addEventListener('mouseenter', showDock);
     dock.addEventListener('mouseleave', queueHide);
@@ -353,15 +376,24 @@ const dockPayload = {
   }
 
   .dock-activity-body {
-    padding: 22px;
+    padding: 18px 22px 22px;
   }
 
   .dock-activity-text {
-    margin: 0;
-    font-size: 14px;
+    margin: 0 0 12px;
+    font-size: 13px;
     color: #2f2f2f;
     text-align: center;
     line-height: 1.5;
+  }
+
+  .dock-activity-frame {
+    width: 100%;
+    height: 52vh;
+    min-height: 260px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    background: #fff;
   }
 
   .dock-activity-minimized .dock-activity-window {
