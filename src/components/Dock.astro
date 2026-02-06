@@ -1,0 +1,170 @@
+---
+/**
+ * macOS Dock 风格导航栏 - Astro 组件
+ * 
+ * 设计理念：新拟物主义 + 微妙动效
+ * - 深灰色 + 玻璃态背景（半透明黑色 + 模糊效果）
+ * - 蓝色强调色（Apple 官方配色）
+ * - 精致的多层阴影和浮起效果
+ * - 流畅的隐藏/显示动画（300ms）
+ * - 图标悬停放大至 1.3 倍
+ * - 发光的竖线分隔
+ */
+
+interface NavItem {
+  id: string;
+  title: string;
+  link: string;
+  icon?: string;
+  isActive?: boolean;
+  isExternal?: boolean;
+}
+
+interface Props {
+  leftNav?: NavItem[];
+  rightApps?: NavItem[];
+  hideDelay?: number;
+}
+
+const { 
+  leftNav = [
+    { id: 'home', title: '首页', link: '/', icon: '🏠' },
+    { id: 'blog', title: '博客', link: '/blog', icon: '📝' },
+    { id: 'about', title: '关于', link: '/about', icon: '👤' }
+  ], 
+  rightApps = [
+    { id: 'github', title: 'GitHub', link: 'https://github.com', icon: '🐙', isExternal: true }
+  ],
+  hideDelay = 3000
+} = Astro.props;
+
+import DockItem from './DockItem.astro';
+---
+
+<!-- 触发区域：用于鼠标触底呼出 -->
+<div id="dock-trigger" class="fixed bottom-0 left-0 w-full h-24 z-[49] pointer-events-none"></div>
+
+<!-- Dock 主体 -->
+<div 
+  id="dock-container" 
+  class="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ease-out"
+  style="transform: translateX(-50%) translateY(0); opacity: 1;"
+>
+  <div class="flex items-end justify-center gap-2 px-4 py-3 mb-6 rounded-3xl bg-black/60 backdrop-blur-xl border border-white/10 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.3),0_10px_10px_-5px_rgba(0,0,0,0.04)] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] transition-shadow duration-300">
+    
+    <!-- 左侧系统导航 -->
+    <div class="flex items-end gap-2">
+      {leftNav.map(item => (
+        <DockItem 
+          id={item.id}
+          href={item.link} 
+          label={item.title}
+          icon={item.icon}
+          isActive={item.isActive}
+          isExternal={item.isExternal}
+        />
+      ))}
+    </div>
+
+    <!-- 中竖线分隔 -->
+    {rightApps.length > 0 && (
+      <div 
+        id="dock-separator"
+        class="relative mx-2 w-px h-8 transition-all duration-200 cursor-pointer"
+        style="background: rgba(255, 255, 255, 0.2);"
+      ></div>
+    )}
+
+    <!-- 右侧动态内容 -->
+    {rightApps.length > 0 && (
+      <div class="flex items-end gap-2">
+        {rightApps.map(item => (
+          <DockItem 
+            id={item.id}
+            href={item.link} 
+            label={item.title}
+            icon={item.icon}
+            isActive={item.isActive}
+            isExternal={item.isExternal || item.link.startsWith('http')}
+            isArticle={false}
+          />
+        ))}
+      </div>
+    )}
+  </div>
+</div>
+
+<script define:vars={{ hideDelay }}>
+  const dock = document.getElementById('dock-container');
+  const trigger = document.getElementById('dock-trigger');
+  const separator = document.getElementById('dock-separator');
+  let hideTimeout;
+
+  const showDock = () => {
+    if (dock) {
+      dock.style.transform = 'translateX(-50%) translateY(0)';
+      dock.style.opacity = '1';
+      dock.style.pointerEvents = 'auto';
+      resetHideTimer();
+    }
+  };
+
+  const hideDock = () => {
+    if (dock) {
+      dock.style.transform = 'translateX(-50%) translateY(120%)';
+      dock.style.opacity = '0';
+      dock.style.pointerEvents = 'none';
+    }
+  };
+
+  const resetHideTimer = () => {
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(hideDock, hideDelay);
+  };
+
+  // 分隔线悬停效果
+  if (separator) {
+    separator.addEventListener('mouseenter', () => {
+      separator.style.background = 'linear-gradient(180deg, rgba(0, 132, 255, 0.6), rgba(255, 255, 255, 0.2))';
+      separator.style.boxShadow = '0 0 8px rgba(0, 132, 255, 0.4)';
+    });
+
+    separator.addEventListener('mouseleave', () => {
+      separator.style.background = 'rgba(255, 255, 255, 0.2)';
+      separator.style.boxShadow = 'none';
+    });
+  }
+
+  // 初始化
+  if (dock && trigger) {
+    // 鼠标进入 Dock 区域，显示并重置计时器
+    dock.addEventListener('mouseenter', () => {
+      clearTimeout(hideTimeout);
+      showDock();
+    });
+
+    // 鼠标离开 Dock 区域，开始计时隐藏
+    dock.addEventListener('mouseleave', resetHideTimer);
+
+    // 鼠标移动到触发区域（屏幕底部），呼出 Dock
+    trigger.addEventListener('mouseenter', showDock);
+    
+    // 全局鼠标移动监控，如果靠近底部也显示
+    document.addEventListener('mousemove', (e) => {
+      if (window.innerHeight - e.clientY < 100) {
+        if (dock.style.opacity !== '1') {
+          showDock();
+        }
+      }
+    });
+
+    // 初始 3 秒后自动隐藏
+    resetHideTimer();
+  }
+</script>
+
+<style>
+  #dock-container {
+    will-change: transform, opacity;
+  }
+</style>
