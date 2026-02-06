@@ -9,6 +9,6 @@ image:
 tags: ["astro", "blogging", "learning in public", "successes"]
 likeCount: 7
 shareCount: 2
-docked: false
+docked: true
 ---
 在学习 Astro 大约一周后，我决定尝试些新的东西。我编写并导入了一个小组件！

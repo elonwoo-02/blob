@@ -138,8 +138,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
             <section class="rounded-3xl border border-base-300 bg-base-100 p-5 shadow-sm">
               <div class="mb-3 flex items-center justify-between">
                 <div>
-                  <p class="text-xs uppercase tracking-[0.2em] text-base-content/50">置顶文章</p>
-                  <h2 class="text-lg font-semibold">精选推荐</h2>
+                  <p class="text-sm uppercase tracking-[0.2em] text-base-content/50">置顶文章</p>
                 </div>
                 <span class="badge badge-success badge-outline">Pinned</span>
               </div>
@@ -176,7 +175,10 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
               data-tags={getPostTagPaths(post.data.tags)}
               data-post-id={post.id}
             >
-              <div class="flex items-center gap-3 text-sm text-base-content/70">
+              <h3 class="text-xl font-semibold">
+                <a class="" href={`/posts/${post.id}/`}>{post.data.title}</a>
+              </h3>
+              <div class="mt-2 flex items-center gap-3 text-sm text-base-content/70">
                 <div class="avatar placeholder">
                   <div class="w-9 rounded-full bg-neutral text-neutral-content">
                     <span>{post.data.author.slice(0, 1)}</span>
@@ -189,10 +191,6 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
                   </time>
                 </div>
               </div>
-
-              <h3 class="mt-3 text-xl font-semibold">
-                <a class="" href={`/posts/${post.id}/`}>{post.data.title}</a>
-              </h3>
 
               <div class="mt-3 flex flex-wrap gap-2">
                 {post.data.tags.map((tag: string) => (
