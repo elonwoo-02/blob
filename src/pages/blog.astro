@@ -156,14 +156,17 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
               </div>
 
               <h3 class="mt-3 text-xl font-semibold">
-                <a class="link-hover" href={`/posts/${post.id}/`}>{post.data.title}</a>
+                <a class="" href={`/posts/${post.id}/`}>{post.data.title}</a>
               </h3>
-              <p class="mt-2 text-sm leading-6 text-base-content/80">{post.data.description}</p>
 
               <div class="mt-3 flex flex-wrap gap-2">
                 {post.data.tags.map((tag: string) => (
                   <button class="badge tag-filter-btn card-tag" data-tag={tag} data-tag-slug={tagToSlug(tag)} type="button">#{tag}</button>
                 ))}
+              </div>
+
+              <div>
+                <p class="mt-2 text-sm leading-6 text-base-content/80">{post.data.description}</p>
               </div>
 
               <div class="mt-4">
@@ -493,6 +496,11 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
           padding: 0.55rem 0.9rem;
           font-size: 0.85rem;
           box-shadow: 0 10px 25px hsl(var(--bc) / 0.12);
+        }
+
+        [data-post-card] .card-tag {
+          border: none;
+          box-shadow: none;
         }
 
         [data-post-card] .card-tag:hover {
