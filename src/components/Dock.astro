@@ -26,7 +26,7 @@ const systemItems: DockEntry[] = [
   { label: 'Home', href: '/', icon: homeIcon },
   { label: 'Blog', href: '/blog/', icon: blogIcon },
   { label: 'About', href: '/about/', icon: aboutIcon },
-  { label: 'GitHub', href: 'https://github.com/', icon: githubIcon, external: true },
+  { label: 'GitHub', href: 'https://github.com/elonwoo-02/', icon: githubIcon, external: true },
   { label: 'Bot', href: '/', icon: botIcon }
 ];
 
@@ -39,7 +39,7 @@ const dockPayload = {
 };
 ---
 
-<div class="pointer-events-none fixed inset-x-0 bottom-0 z-50 hidden md:block">
+<div class="pointer-events-none fixed inset-x-0 bottom-0 z-70 hidden md:block">
   <div class="dock-sensor h-24 w-full"></div>
   <nav
     id="mac-dock"
@@ -140,6 +140,7 @@ const dockPayload = {
       if (!activityLayer) return;
       const hasWindows = activityLayer.querySelectorAll('.dock-activity-window:not(.hidden)').length > 0;
       activityLayer.classList.toggle('hidden', !hasWindows);
+      activityLayer.classList.toggle('is-visible', hasWindows);
       activityLayer.setAttribute('aria-hidden', hasWindows ? 'false' : 'true');
     };
 
@@ -211,7 +212,7 @@ const dockPayload = {
         panel.classList.add('dock-activity-fullscreen');
         window.setTimeout(() => {
           window.location.assign(panel.dataset.href);
-        }, 260);
+        }, 320);
       });
 
       const startDrag = (event) => {
@@ -362,6 +363,12 @@ const dockPayload = {
       setLayerVisibility();
     };
 
+    const closeAllActivityWindows = () => {
+      if (!activityLayer) return;
+      activityLayer.querySelectorAll('.dock-activity-window').forEach((panel) => panel.remove());
+      setLayerVisibility();
+    };
+
     const removeDockItemByHref = (href) => {
       if (!href) return;
       const updatedItems = JSON.parse(window.localStorage.getItem(storageKey) || '[]').filter(
@@ -465,6 +472,12 @@ const dockPayload = {
       window.location.assign(panel.dataset.href);
     });
 
+    activityLayer?.addEventListener('click', (event) => {
+      if (event.target.closest('.dock-activity-window')) return;
+      if (event.target.closest('#mac-dock')) return;
+      closeAllActivityWindows();
+    });
+
     dock.addEventListener('mouseenter', showDock);
     dock.addEventListener('mouseleave', queueHide);
     document.addEventListener('mousemove', (event) => {
@@ -517,22 +530,29 @@ const dockPayload = {
   .dock-activity {
     position: fixed;
     inset: 0;
-    z-index: 60;
+    z-index: 40;
     display: flex;
     align-items: center;
     justify-content: center;
     pointer-events: none;
+    background: rgba(0, 0, 0, 0);
+    transition: background 180ms ease;
   }
 
   .dock-activity.hidden {
     display: none;
   }
 
+  .dock-activity.is-visible {
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.25);
+  }
+
   .dock-activity-window {
-    width: min(620px, 92vw);
-    height: min(70vh, 640px);
-    min-width: 360px;
-    min-height: 320px;
+    width: min(760px, 94vw);
+    height: min(78vh, 720px);
+    min-width: 420px;
+    min-height: 360px;
     position: absolute;
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.55);
@@ -543,7 +563,9 @@ const dockPayload = {
     display: flex;
     flex-direction: column;
     transform-origin: center;
-    animation: dock-window-open 180ms ease-out;
+    animation: dock-window-open 200ms ease-out;
+    transition: transform 220ms ease, opacity 220ms ease, border-radius 220ms ease;
+    will-change: transform;
     contain: layout paint;
   }
 
@@ -694,8 +716,8 @@ const dockPayload = {
   }
 
   .dock-activity-window.dock-activity-fullscreen {
-    transform: scale(1.08);
-    transition: transform 180ms ease-in;
+    transform: scale(1.04);
+    transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   @keyframes dock-window-open {
