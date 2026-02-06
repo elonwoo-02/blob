@@ -4,7 +4,6 @@ import DockBackToTop from './dock/DockBackToTop.astro';
 import DockThemeToggle from './dock/DockThemeToggle.astro';
 import DockRssLink from './dock/DockRssLink.astro';
 import DockHomeIcon from "./dock/DockHomeIcon.astro";
-import DockGithubIcon from "./dock/DockGithubIcon.astro";
 
 interface DockEntry {
   label: string;
@@ -61,15 +60,34 @@ const dockPayload = {
   </nav>
 </div>
 
+<div id="dock-activity" class="dock-activity hidden" aria-hidden="true">
+  <div class="dock-activity-window" role="dialog" aria-modal="true" aria-labelledby="dock-activity-title">
+    <div class="dock-activity-titlebar">
+      <div class="dock-traffic-lights">
+        <button class="dock-control dock-control-close" type="button" data-action="close" aria-label="关闭"></button>
+        <button class="dock-control dock-control-minimize" type="button" data-action="minimize" aria-label="缩小"></button>
+        <button class="dock-control dock-control-fullscreen" type="button" data-action="fullscreen" aria-label="全屏"></button>
+      </div>
+      <p id="dock-activity-title" class="dock-activity-title"></p>
+    </div>
+    <div class="dock-activity-body">
+      <p class="dock-activity-text">准备打开文章页面，点击左上角绿色按钮进入全屏后打开。</p>
+    </div>
+  </div>
+</div>
+
 <script>
   const dock = document.querySelector('#mac-dock');
   if (dock) {
     const payload = JSON.parse(dock.dataset.dock || '{}');
     const rightList = dock.querySelector('.dock-right');
     const removeButtons = dock.querySelectorAll('.dock-remove');
+    const activityWindow = document.querySelector('#dock-activity');
+    const activityTitle = activityWindow?.querySelector('#dock-activity-title');
     const hideDelay = 3000;
     const showBoundary = 100;
     let hideTimer;
+    let pendingOpenItem = null;
 
     const articleIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 8h8M8 12h8M8 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
 
@@ -91,11 +109,48 @@ const dockPayload = {
       hideTimer = window.setTimeout(hideDock, hideDelay);
     };
 
+    const openActivityWindow = (item) => {
+      if (!activityWindow) return;
+      pendingOpenItem = item;
+      if (activityTitle) {
+        activityTitle.textContent = item.label || '文章';
+      }
+      activityWindow.classList.remove('hidden');
+      activityWindow.setAttribute('aria-hidden', 'false');
+    };
+
+    const closeActivityWindow = () => {
+      if (!activityWindow) return;
+      activityWindow.classList.add('hidden');
+      activityWindow.setAttribute('aria-hidden', 'true');
+      pendingOpenItem = null;
+    };
+
+    const minimizeActivityWindow = () => {
+      if (!activityWindow) return;
+      activityWindow.classList.add('dock-activity-minimized');
+      window.setTimeout(() => {
+        activityWindow.classList.add('hidden');
+        activityWindow.classList.remove('dock-activity-minimized');
+        activityWindow.setAttribute('aria-hidden', 'true');
+      }, 180);
+      pendingOpenItem = null;
+    };
+
+    const fullscreenActivityWindow = () => {
+      if (!activityWindow || !pendingOpenItem?.href) return;
+      activityWindow.classList.add('dock-activity-fullscreen');
+      window.setTimeout(() => {
+        window.location.href = pendingOpenItem.href;
+      }, 180);
+    };
+
     const createDockItem = (item, removable = false) => {
       const li = document.createElement('li');
       li.className = 'dock-item group relative';
       li.dataset.href = item.href;
       li.dataset.label = item.label;
+      li.dataset.removable = removable ? 'true' : 'false';
 
       const anchor = document.createElement('a');
       anchor.href = item.href;
@@ -162,6 +217,22 @@ const dockPayload = {
       });
     });
 
+    dock.addEventListener('click', (event) => {
+      const anchor = event.target.closest('.dock-item a');
+      if (!anchor) return;
+      const listItem = anchor.closest('.dock-item');
+      if (!listItem || listItem.dataset.removable !== 'true') return;
+      event.preventDefault();
+      openActivityWindow({
+        href: anchor.getAttribute('href'),
+        label: listItem.dataset.label || '文章',
+      });
+    });
+
+    activityWindow?.querySelector('[data-action="close"]')?.addEventListener('click', closeActivityWindow);
+    activityWindow?.querySelector('[data-action="minimize"]')?.addEventListener('click', minimizeActivityWindow);
+    activityWindow?.querySelector('[data-action="fullscreen"]')?.addEventListener('click', fullscreenActivityWindow);
+
     dock.addEventListener('mouseenter', showDock);
     dock.addEventListener('mouseleave', queueHide);
     document.addEventListener('mousemove', (event) => {
@@ -209,3 +280,109 @@ const dockPayload = {
     queueHide();
   }
 </script>
+
+<style is:inline>
+  .dock-activity {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .dock-activity.hidden {
+    display: none;
+  }
+
+  .dock-activity-window {
+    width: min(520px, 92vw);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(232, 232, 232, 0.92));
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.28);
+    overflow: hidden;
+    pointer-events: auto;
+    transform-origin: center;
+    animation: dock-window-open 180ms ease-out;
+  }
+
+  .dock-activity-titlebar {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0 12px;
+    background: linear-gradient(180deg, #f6f6f6, #dcdcdc);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  .dock-traffic-lights {
+    position: absolute;
+    left: 12px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .dock-control {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+
+  .dock-control-close {
+    background: #ff5f57;
+  }
+
+  .dock-control-minimize {
+    background: #febc2e;
+  }
+
+  .dock-control-fullscreen {
+    background: #28c840;
+  }
+
+  .dock-activity-title {
+    margin: 0;
+    font-size: 13px;
+    color: #2f2f2f;
+    font-weight: 600;
+  }
+
+  .dock-activity-body {
+    padding: 22px;
+  }
+
+  .dock-activity-text {
+    margin: 0;
+    font-size: 14px;
+    color: #2f2f2f;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .dock-activity-minimized .dock-activity-window {
+    transform: scale(0.86) translateY(120px);
+    opacity: 0;
+    transition: transform 180ms ease-in, opacity 180ms ease-in;
+  }
+
+  .dock-activity-fullscreen .dock-activity-window {
+    transform: scale(1.08);
+    transition: transform 180ms ease-in;
+  }
+
+  @keyframes dock-window-open {
+    from {
+      transform: scale(0.92) translateY(18px);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+</style>
