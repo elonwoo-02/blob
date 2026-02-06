@@ -66,7 +66,7 @@ const dockPayload = {
       <div class="dock-traffic-lights">
         <button class="dock-control dock-control-close" type="button" data-action="close" aria-label="关闭"></button>
         <button class="dock-control dock-control-minimize" type="button" data-action="minimize" aria-label="缩小"></button>
-        <button class="dock-control dock-control-fullscreen" type="button" data-action="fullscreen" aria-label="全屏"></button>
+        <button class="dock-control dock-control-fullscreen" type="button" data-action="open" aria-label="打开文章"></button>
       </div>
       <p id="dock-activity-title" class="dock-activity-title"></p>
     </div>
@@ -97,6 +97,9 @@ const dockPayload = {
     let pendingOpenItem = null;
 
     const articleIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 8h8M8 12h8M8 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+
+    const storageKey = 'dock-opened-items';
+    const openedItems = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
 
     const showDock = () => {
       dock.style.transform = 'translateY(0)';
@@ -129,7 +132,7 @@ const dockPayload = {
       activityWindow.setAttribute('aria-hidden', 'false');
     };
 
-    const closeActivityWindow = (hideDockTogether = false) => {
+    const closeActivityWindow = () => {
       if (!activityWindow) return;
       activityWindow.classList.add('hidden');
       activityWindow.classList.remove('dock-activity-minimized', 'dock-activity-fullscreen');
@@ -138,10 +141,19 @@ const dockPayload = {
         activityFrame.setAttribute('src', 'about:blank');
       }
       pendingOpenItem = null;
-      if (hideDockTogether) {
-        window.clearTimeout(hideTimer);
-        hideDock();
-      }
+    };
+
+    const removeDockItemByHref = (href) => {
+      if (!href) return;
+      const updatedItems = JSON.parse(window.localStorage.getItem(storageKey) || '[]').filter(
+        (openedItem) => openedItem.href !== href,
+      );
+      window.localStorage.setItem(storageKey, JSON.stringify(updatedItems));
+      dock.querySelectorAll('.dock-item').forEach((item) => {
+        if (item.dataset.href === href) {
+          item.remove();
+        }
+      });
     };
 
     const minimizeActivityWindow = () => {
@@ -158,7 +170,7 @@ const dockPayload = {
       pendingOpenItem = null;
     };
 
-    const fullscreenActivityWindow = () => {
+    const openActivityArticle = () => {
       if (!activityWindow || !pendingOpenItem?.href) return;
       activityWindow.classList.add('dock-activity-fullscreen');
       window.setTimeout(() => {
@@ -210,8 +222,6 @@ const dockPayload = {
       return li;
     };
 
-    const storageKey = 'dock-opened-items';
-    const openedItems = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
     const isSystemPath = ['/', '/blog/', '/about/'].includes(payload.currentPath);
     const isBlogPostPath = /^\/posts\/.+/.test(payload.currentPath);
 
@@ -250,9 +260,14 @@ const dockPayload = {
       });
     });
 
-    activityWindow?.querySelector('[data-action="close"]')?.addEventListener('click', () => closeActivityWindow(true));
+    activityWindow?.querySelector('[data-action="close"]')?.addEventListener('click', () => {
+      if (pendingOpenItem?.href) {
+        removeDockItemByHref(pendingOpenItem.href);
+      }
+      closeActivityWindow();
+    });
     activityWindow?.querySelector('[data-action="minimize"]')?.addEventListener('click', minimizeActivityWindow);
-    activityWindow?.querySelector('[data-action="fullscreen"]')?.addEventListener('click', fullscreenActivityWindow);
+    activityWindow?.querySelector('[data-action="open"]')?.addEventListener('click', openActivityArticle);
 
     dock.addEventListener('mouseenter', showDock);
     dock.addEventListener('mouseleave', queueHide);
@@ -318,13 +333,19 @@ const dockPayload = {
   }
 
   .dock-activity-window {
-    width: min(520px, 92vw);
+    width: min(620px, 92vw);
+    height: min(70vh, 640px);
+    min-width: 360px;
+    min-height: 320px;
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.55);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(232, 232, 232, 0.92));
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.28);
     overflow: hidden;
     pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    resize: both;
     transform-origin: center;
     animation: dock-window-open 180ms ease-out;
   }
@@ -374,8 +395,9 @@ const dockPayload = {
   }
 
   .dock-activity-body {
-    height: min(70vh, 640px);
     background: #f5f5f5;
+    flex: 1;
+    display: flex;
   }
 
   .dock-activity-frame {
@@ -384,6 +406,7 @@ const dockPayload = {
     height: 100%;
     border: 0;
     background: #fff;
+    flex: 1;
   }
 
   .dock-activity-minimized .dock-activity-window {

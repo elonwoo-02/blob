@@ -9,6 +9,7 @@ const navItems = [
   { href: '/blog/', label: '博客' },
   { href: '/about/', label: '关于' },
 ];
+
 ---
 
 <div class="drawer md:hidden">
@@ -28,13 +29,13 @@ const navItems = [
       </div>
     </div>
 
-    <nav class="mobile-dock" aria-label="底部导航">
-      {navItems.map((item) => (
-        <a class:list={["dock-link", currentPath === item.href && 'is-active']} href={item.href}>
-          {item.label}
-        </a>
-      ))}
-    </nav>
+    <!--<nav class="mobile-dock" aria-label="底部导航">-->
+    <!--  {navItems.map((item) => (-->
+    <!--    <a class:list={["dock-link", currentPath === item.href && 'is-active']} href={item.href}>-->
+    <!--      {item.label}-->
+    <!--    </a>-->
+    <!--  ))}-->
+    <!--</nav>-->
   </div>
 
   <div class="drawer-side z-[60]">

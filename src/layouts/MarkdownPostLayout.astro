@@ -70,7 +70,7 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
 <style>
   .post-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr);
     gap: 1.5rem;
     align-items: start;
   }
@@ -78,7 +78,7 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
   .chapter-nav {
     position: sticky;
     top: 5.5rem;
-    justify-self: end;
+    justify-self: start;
   }
 
   .chapter-panel {
