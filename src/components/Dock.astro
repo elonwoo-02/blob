@@ -1,5 +1,8 @@
 ---
 import DockItem from './DockItem.astro';
+import DockBackToTop from './dock/DockBackToTop.astro';
+import DockThemeToggle from './dock/DockThemeToggle.astro';
+import DockRssLink from './dock/DockRssLink.astro';
 
 interface DockEntry {
   label: string;
@@ -47,6 +50,9 @@ const dockPayload = {
 
     <ul class="dock-right flex items-end gap-2">
       {externalItems.map((item) => <DockItem {...item} />)}
+      <DockBackToTop />
+      <DockThemeToggle />
+      <DockRssLink />
     </ul>
   </nav>
 </div>
@@ -158,6 +164,42 @@ const dockPayload = {
       if (window.innerHeight - event.clientY <= showBoundary) {
         showDock();
       }
+    });
+
+    const handleBackToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const getCurrentTheme = () => {
+      const savedTheme = window.localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        return savedTheme;
+      }
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+
+    const applyTheme = (theme) => {
+      document.documentElement.setAttribute('data-theme', theme);
+      window.localStorage.setItem('theme', theme);
+    };
+
+    const handleThemeToggle = () => {
+      const nextTheme = getCurrentTheme() === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme);
+    };
+
+    dock.querySelectorAll('[data-action="back-to-top"]').forEach((item) => {
+      item.querySelector('a')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        handleBackToTop();
+      });
+    });
+
+    dock.querySelectorAll('[data-action="theme-toggle"]').forEach((item) => {
+      item.querySelector('a')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        handleThemeToggle();
+      });
     });
 
     queueHide();
