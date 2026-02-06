@@ -5,6 +5,7 @@ import { getCollection } from 'astro:content';
 import { buildTagTree, tagToSlug } from '../utils/tags';
 import TagTreeNode from '../components/TagTreeNode.astro';
 import GithubIcon from "../components/icon/GithubIcon.astro";
+import PostActionBar from '../components/PostActionBar.astro';
 
 const pageTitle = '';
 const allPosts = await getCollection('blog');
@@ -133,6 +134,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
               data-post-card
               data-post-link={`/posts/${post.id}/`}
               data-tags={getPostTagPaths(post.data.tags)}
+              data-post-id={post.id}
             >
               <div class="flex items-center gap-3 text-sm text-base-content/70">
                 <div class="avatar placeholder">
@@ -159,11 +161,12 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
                 ))}
               </div>
 
-              // todo : 点赞、转发和添加dock功能未完成；
-              <div class="mt-4 flex items-center justify-end gap-2">
-                <button class="btn btn-ghost btn-sm gap-1 text-base-content/80" type="button">❤️</button>
-                <button class="btn btn-ghost btn-sm gap-1 text-base-content/80" type="button">🔁</button>
-                <button class="btn btn-primary btn-sm" type="button">➕</button>
+              <div class="mt-4">
+                <PostActionBar
+                  likeCount={post.data.likeCount ?? 0}
+                  shareCount={post.data.shareCount ?? 0}
+                  docked={post.data.docked ?? false}
+                />
               </div>
             </article>
           ))}
@@ -185,6 +188,9 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
         </div>
       </section>
 
+      <div id="toast" class="toast hidden" role="status" aria-live="polite">
+        <div class="toast-surface">已复制链接</div>
+      </div>
 
       <script is:inline>
         const drawerLayout = document.getElementById('blog-drawer-layout');
@@ -194,6 +200,75 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
         const clearFilterButton = document.getElementById('clear-tag-filter');
         const postCards = Array.from(document.querySelectorAll('[data-post-card]'));
         const emptyState = document.getElementById('empty-filter-state');
+        const toast = document.getElementById('toast');
+        let toastTimer = null;
+        const actionStoragePrefix = 'blog:action:';
+        const canStore = (() => {
+          try {
+            localStorage.setItem(`${actionStoragePrefix}ping`, '1');
+            localStorage.removeItem(`${actionStoragePrefix}ping`);
+            return true;
+          } catch (error) {
+            return false;
+          }
+        })();
+
+        const getStoredNumber = (key, fallback) => {
+          if (!canStore) return fallback;
+          const raw = localStorage.getItem(key);
+          const value = raw === null ? NaN : Number(raw);
+          return Number.isFinite(value) ? value : fallback;
+        };
+
+        const getStoredBool = (key, fallback) => {
+          if (!canStore) return fallback;
+          const raw = localStorage.getItem(key);
+          if (raw === '1') return true;
+          if (raw === '0') return false;
+          return fallback;
+        };
+
+        const setStoredValue = (key, value) => {
+          if (!canStore) return;
+          localStorage.setItem(key, value);
+        };
+
+        const getInitialCount = (button) => {
+          const raw = button.getAttribute('data-initial-count');
+          const value = raw === null ? NaN : Number(raw);
+          return Number.isFinite(value) ? value : 0;
+        };
+
+        const updateLabel = (button, isActive) => {
+          const labelEl = button.querySelector('.post-action-label');
+          if (!labelEl) return;
+          const activeLabel = button.getAttribute('data-active-label') || labelEl.textContent || '';
+          const inactiveLabel = button.getAttribute('data-inactive-label') || labelEl.textContent || '';
+          labelEl.textContent = isActive ? activeLabel : inactiveLabel;
+        };
+
+        const updateCount = (button, count) => {
+          const countEl = button.querySelector('.post-action-count');
+          if (!countEl) return;
+          countEl.textContent = `${count}`;
+        };
+
+        const showToast = (message) => {
+          if (!toast) return;
+          const surface = toast.querySelector('.toast-surface');
+          if (surface) {
+            surface.textContent = message;
+          }
+          toast.classList.remove('hidden');
+          toast.classList.add('is-visible');
+          if (toastTimer) window.clearTimeout(toastTimer);
+          toastTimer = window.setTimeout(() => {
+            toast.classList.remove('is-visible');
+            toastTimer = window.setTimeout(() => {
+              toast.classList.add('hidden');
+            }, 220);
+          }, 1600);
+        };
 
         const applyTagFilter = (tag) => {
           let visibleCount = 0;
@@ -246,6 +321,105 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
           });
         }
 
+        postCards.forEach((card) => {
+          const postId = card.getAttribute('data-post-id');
+          if (!postId) return;
+
+          card.querySelectorAll('.post-action-btn').forEach((button) => {
+            const action = button.getAttribute('data-action');
+            if (!action) return;
+
+            const baseCount = getInitialCount(button);
+            const likeKey = `${actionStoragePrefix}like:${postId}`;
+            const shareKey = `${actionStoragePrefix}share:${postId}`;
+            const dockKey = `${actionStoragePrefix}dock:${postId}`;
+
+            if (action === 'like') {
+              let liked = getStoredBool(likeKey, button.classList.contains('is-active'));
+              button.classList.toggle('is-active', liked);
+              updateLabel(button, liked);
+              updateCount(button, baseCount + (liked ? 1 : 0));
+
+              button.addEventListener('click', (event) => {
+                event.stopPropagation();
+                liked = !liked;
+                setStoredValue(likeKey, liked ? '1' : '0');
+                button.classList.toggle('is-active', liked);
+                updateLabel(button, liked);
+                updateCount(button, baseCount + (liked ? 1 : 0));
+              });
+              return;
+            }
+
+            if (action === 'share') {
+              let total = getStoredNumber(shareKey, baseCount);
+              updateCount(button, total);
+
+              const resolveShareUrl = () => {
+                const href = card.getAttribute('data-post-link') || '';
+                if (!href) return window.location.href;
+                try {
+                  return new URL(href, window.location.origin).toString();
+                } catch (error) {
+                  return window.location.href;
+                }
+              };
+
+              const persistShare = () => {
+                total += 1;
+                setStoredValue(shareKey, `${total}`);
+                updateCount(button, total);
+              };
+
+              button.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                const shareUrl = resolveShareUrl();
+
+                if (navigator.share) {
+                  try {
+                    await navigator.share({
+                      title: document.title,
+                      url: shareUrl
+                    });
+                    persistShare();
+                  } catch (error) {
+                    // User cancelled or share failed.
+                  }
+                  return;
+                }
+
+                if (navigator.clipboard?.writeText) {
+                  try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    persistShare();
+                    showToast('已复制链接');
+                    return;
+                  } catch (error) {
+                    // fall through
+                  }
+                }
+
+                window.prompt('复制链接分享:', shareUrl);
+              });
+              return;
+            }
+
+            if (action === 'dock') {
+              let docked = getStoredBool(dockKey, button.classList.contains('is-active'));
+              button.classList.toggle('is-active', docked);
+              updateLabel(button, docked);
+
+              button.addEventListener('click', (event) => {
+                event.stopPropagation();
+                docked = !docked;
+                setStoredValue(dockKey, docked ? '1' : '0');
+                button.classList.toggle('is-active', docked);
+                updateLabel(button, docked);
+              });
+            }
+          });
+        });
+
         const shouldIgnoreCardClick = (target) =>
           Boolean(target.closest('a, button, input, label, textarea, select, [role="button"]'));
 
@@ -272,6 +446,32 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
       </script>
 
       <style is:inline>
+        .toast {
+          position: fixed;
+          bottom: 1.5rem;
+          right: 1.5rem;
+          z-index: 60;
+          pointer-events: none;
+          opacity: 0;
+          transform: translateY(6px);
+          transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .toast.is-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .toast-surface {
+          background: hsl(var(--b1));
+          border: 1px solid hsl(var(--bc) / 0.15);
+          color: hsl(var(--bc));
+          border-radius: 999px;
+          padding: 0.55rem 0.9rem;
+          font-size: 0.85rem;
+          box-shadow: 0 10px 25px hsl(var(--bc) / 0.12);
+        }
+
         @media (min-width: 1024px) {
           .blog-drawer .drawer-side > *:not(.drawer-overlay) {
             transition: width 0.2s ease;

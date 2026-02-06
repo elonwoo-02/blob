@@ -1,0 +1,43 @@
+---
+import PostActionButton from './PostActionButton.astro';
+import HeartIcon from './icon/HeartIcon.astro';
+import ShareIcon from './icon/ShareIcon.astro';
+import PlusIcon from './icon/PlusIcon.astro';
+
+const { likeCount = 12, shareCount = 3, docked = false } = Astro.props;
+---
+
+<div class="post-action-bar" role="group" aria-label="post actions">
+  <PostActionButton
+    label="Like"
+    inactiveLabel="Like"
+    activeLabel="Liked"
+    title="Like this post"
+    count={likeCount}
+    action="like"
+  >
+    <HeartIcon slot="icon" />
+  </PostActionButton>
+  <PostActionButton label="Share" title="Share this post" count={shareCount} action="share">
+    <ShareIcon slot="icon" />
+  </PostActionButton>
+  <PostActionButton
+    label={docked ? 'Added' : 'Add'}
+    inactiveLabel="Add"
+    activeLabel="Added"
+    title="Add to dock"
+    active={docked}
+    action="dock"
+  >
+    <PlusIcon slot="icon" />
+  </PostActionButton>
+</div>
+
+<style>
+  .post-action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+</style>
