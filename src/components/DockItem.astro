@@ -5,12 +5,13 @@ interface Props {
   icon: string;
   external?: boolean;
   removable?: boolean;
+  action?: string;
 }
 
-const { label, href, icon, external = false, removable = false } = Astro.props;
+const { label, href, icon, external = false, removable = false, action } = Astro.props;
 ---
 
-<li class="dock-item group relative" data-label={label} data-href={href}>
+<li class="dock-item group relative" data-label={label} data-href={href} data-action={action}>
   <a
     href={href}
     class="tooltip tooltip-top block"
