@@ -12,6 +12,7 @@ const allPosts = await getCollection('blog');
 const sortedPosts = [...allPosts].sort(
   (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
 );
+const pinnedPosts = sortedPosts.filter((post) => post.data.docked);
 const tagTree = buildTagTree(sortedPosts);
 
 const expandTagPaths = (tag: string) => {
@@ -133,6 +134,40 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
               </div>
             </div>
             <div id="post-list" class="space-y-4">
+          {pinnedPosts.length > 0 && (
+            <section class="rounded-3xl border border-base-300 bg-base-100 p-5 shadow-sm">
+              <div class="mb-3 flex items-center justify-between">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.2em] text-base-content/50">置顶文章</p>
+                  <h2 class="text-lg font-semibold">精选推荐</h2>
+                </div>
+                <span class="badge badge-success badge-outline">Pinned</span>
+              </div>
+              <div class="grid gap-3 sm:grid-cols-2">
+                {pinnedPosts.map((post) => (
+                  <a
+                    class="group rounded-2xl border border-base-200 bg-base-50/40 p-4 transition hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md"
+                    href={`/posts/${post.id}/`}
+                  >
+                    <div class="flex items-center gap-3 text-xs text-base-content/60">
+                      <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                        {post.data.author.slice(0, 1)}
+                      </span>
+                      <span>{post.data.author}</span>
+                      <span>·</span>
+                      <time datetime={post.data.pubDate.toISOString()}>
+                        {post.data.pubDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
+                      </time>
+                    </div>
+                    <h3 class="mt-2 text-base font-semibold text-base-content group-hover:text-emerald-700">
+                      {post.data.title}
+                    </h3>
+                    <p class="mt-2 line-clamp-2 text-sm text-base-content/70">{post.data.description}</p>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
           {sortedPosts.map((post) => (
             <article
               class="rounded-3xl border border-base-300 bg-base-100 p-5 shadow-sm transition hover:shadow-md"
