@@ -344,6 +344,11 @@ const dockPayload = {
       if (!activityLayer) return;
       const existing = activityLayer.querySelector(`.dock-activity-window[data-href="${item.href}"]`);
       if (existing) {
+        if (!existing.classList.contains('hidden') && !existing.classList.contains('dock-activity-minimized')) {
+          existing.classList.add('hidden');
+          setLayerVisibility();
+          return;
+        }
         existing.classList.remove('hidden', 'dock-activity-minimized');
         bringToFront(existing);
         setLayerVisibility();

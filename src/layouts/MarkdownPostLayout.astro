@@ -83,7 +83,7 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
 
   .chapter-panel {
     width: min(18rem, 28vw);
-    border: 1px solid #e5e7eb;
+    border: 0;
     border-radius: 0.75rem;
     padding: 0.75rem 1rem;
     background: #f8fafc;
@@ -159,7 +159,7 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
 
   .hero-image {
     border-radius: 0.85rem;
-    border: 1px solid color-mix(in oklab, var(--color-base-content) 15%, transparent);
+    border: 0;
     margin: 0.5rem 0 1rem;
     max-width: 100%;
     height: auto;
@@ -177,8 +177,12 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
 
   .markdown-body :global(h1) {
     font-size: clamp(1.8rem, 3vw, 2.2rem);
-    border-bottom: 1px solid color-mix(in oklab, var(--color-base-content) 18%, transparent);
+    border-bottom: 0;
     padding-bottom: 0.25em;
+  }
+
+  .tags .tag {
+    border: 0;
   }
 
   .markdown-body :global(h2) {

@@ -58,6 +58,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
 
   <body>
     <BaseLayout pageTitle={pageTitle}>
+      <div class="blog-page">
       <section class="space-y-4">
         <div class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm">
           <div class="mb-4 flex items-center justify-between gap-3">
@@ -120,7 +121,11 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
           <div class="drawer-content">
             <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div class="lg:hidden">
-                <label for="tag-drawer" class="btn btn-outline btn-sm">打开标签抽屉</label>
+                <label for="tag-drawer" class="btn btn-ghost btn-sm px-2" aria-label="打开标签抽屉">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4">
+                    <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
+                  </svg>
+                </label>
               </div>
               <div id="active-tag-panel" class="hidden flex-1 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-2 text-sm">
                 当前筛选：<span id="active-tag-name" class="font-semibold"></span>
@@ -454,6 +459,16 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
       </script>
 
       <style is:inline>
+        .blog-page .border,
+        .blog-page .border-base-300,
+        .blog-page .border-primary\/30,
+        .blog-page .border-dashed,
+        .blog-page .border-black\/5,
+        .blog-page .border-r {
+          border-width: 0 !important;
+          border-color: transparent !important;
+        }
+
         .toast {
           position: fixed;
           bottom: 1.5rem;
@@ -510,6 +525,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
           }
         }
       </style>
+      </div>
 
     </BaseLayout>
   </body>
