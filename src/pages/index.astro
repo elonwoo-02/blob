@@ -5,15 +5,283 @@ const pageTitle = "";
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-  <section class="hero w-full aspect-video relative z-0 min-h-[70vh] mb-8 rounded-2xl overflow-hidden">
-    <img src="/img.png" class="w-full h-full object-cover" alt="Hero" />
-    <div class="absolute inset-0 flex items-center justify-center z-10">
-      <h1 class="text-white text-5xl font-bold drop-shadow-lg text-center">
-        欢迎来到我的网站
-      </h1>
+  <section class="hero-shell">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <div class="hero-kicker">cli://workspace</div>
+        <h1 class="hero-title">程序员的命令行日志</h1>
+        <p class="hero-subtitle">记录构建、调试与复盘。用终端视角梳理每一次迭代。</p>
+        <div class="hero-actions">
+          <a class="hero-btn primary" href="/blog/">查看日志</a>
+          <a class="hero-btn ghost" href="/tags/">标签导航</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-label">状态</span>
+            <span class="stat-value">ONLINE</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">模式</span>
+            <span class="stat-value">FOCUS</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">语言</span>
+            <span class="stat-value">ASTRO/TS</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-terminal" aria-label="terminal">
+        <div class="terminal-bar">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="terminal-title">~/workspace/astro</span>
+        </div>
+        <div class="terminal-body">
+          <p><span class="prompt">dev@terminal</span>:<span class="path">~/workspace/astro</span>$ ls -la</p>
+          <p class="terminal-output">posts/  notes/  scripts/  drafts/  build.log</p>
+          <p><span class="prompt">dev@terminal</span>:<span class="path">~/workspace/astro</span>$ cat status.txt</p>
+          <p class="terminal-output">Focus: ship clean, fast, documented software.</p>
+          <p><span class="prompt">dev@terminal</span>:<span class="path">~/workspace/astro</span>$ ./watch --focus</p>
+          <p class="terminal-output">[ok] compiling modules...</p>
+          <p class="terminal-output">[ok] tests: 128 passed</p>
+          <p class="terminal-output">[ok] deploy window: open</p>
+          <p class="terminal-output blink">█</p>
+        </div>
+      </div>
     </div>
+    <div class="hero-gridline"></div>
   </section>
-  <p>欢迎来到我的 Astro 网站的首页！这是我使用 Astro 框架创建的第一个页面。</p>
-  <h2>我超棒的博客副标题</h2>
-  <Greeting client:load messages={["Hi", "Hello", "Howdy", "Hey there"]} />
+  <section class="home-section">
+    <h2 class="home-title">命令行即笔记</h2>
+    <p class="home-text">把工程思维写进日常：复盘故障、优化路径、归档实验，留下一条可追溯的构建记录。</p>
+    <Greeting client:load messages={["Hi", "Hello", "Howdy", "Hey there"]} />
+  </section>
+
+  <style is:inline>
+    .hero-shell {
+      position: relative;
+      border-radius: 24px;
+      padding: 3rem clamp(1.5rem, 4vw, 3.25rem);
+      background: radial-gradient(120% 120% at 0% 0%, rgba(5, 150, 105, 0.18), transparent 55%),
+        radial-gradient(120% 120% at 100% 0%, rgba(34, 211, 238, 0.12), transparent 50%),
+        linear-gradient(135deg, #0b1110 0%, #0a0f0f 45%, #0b1511 100%);
+      border: 1px solid rgba(5, 150, 105, 0.2);
+      overflow: hidden;
+      box-shadow: 0 30px 60px rgba(5, 15, 12, 0.45);
+      margin-bottom: 2rem;
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: clamp(2rem, 6vw, 3.5rem);
+      align-items: center;
+    }
+
+    .hero-kicker {
+      font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 0.7rem;
+      color: rgba(94, 234, 212, 0.7);
+    }
+
+    .hero-title {
+      font-family: "Space Grotesk", "IBM Plex Sans", "Noto Sans SC", sans-serif;
+      font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+      line-height: 1.05;
+      margin: 0.6rem 0 1rem;
+      color: #e6fffb;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: rgba(226, 255, 249, 0.7);
+      max-width: 32rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin: 1.5rem 0 1.5rem;
+    }
+
+    .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.65rem 1.4rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hero-btn.primary {
+      background: #059669;
+      color: #03120b;
+      box-shadow: 0 10px 25px rgba(5, 150, 105, 0.35);
+    }
+
+    .hero-btn.ghost {
+      border: 1px solid rgba(94, 234, 212, 0.35);
+      color: rgba(226, 255, 249, 0.85);
+    }
+
+    .hero-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", monospace;
+      color: rgba(187, 255, 244, 0.8);
+      font-size: 0.85rem;
+    }
+
+    .stat {
+      padding: 0.65rem 0.9rem;
+      border-radius: 12px;
+      background: rgba(6, 95, 70, 0.2);
+      border: 1px solid rgba(94, 234, 212, 0.2);
+    }
+
+    .stat-label {
+      display: block;
+      color: rgba(187, 255, 244, 0.6);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 0.2rem;
+      display: block;
+      font-size: 0.95rem;
+    }
+
+    .hero-terminal {
+      background: #050807;
+      border-radius: 18px;
+      border: 1px solid rgba(94, 234, 212, 0.25);
+      box-shadow: inset 0 0 0 1px rgba(5, 150, 105, 0.2), 0 20px 40px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+      min-height: 280px;
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 0.9rem;
+      background: rgba(15, 23, 18, 0.85);
+      border-bottom: 1px solid rgba(94, 234, 212, 0.15);
+    }
+
+    .terminal-title {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: rgba(226, 255, 249, 0.6);
+      font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", monospace;
+    }
+
+    .dot {
+      width: 0.6rem;
+      height: 0.6rem;
+      border-radius: 999px;
+    }
+
+    .dot.red {
+      background: #ef4444;
+    }
+
+    .dot.yellow {
+      background: #f59e0b;
+    }
+
+    .dot.green {
+      background: #10b981;
+    }
+
+    .terminal-body {
+      padding: 1.5rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", "Consolas", "Liberation Mono", "Menlo", monospace;
+      color: rgba(187, 255, 244, 0.9);
+    }
+
+    .terminal-body p {
+      margin: 0 0 0.6rem;
+    }
+
+    .prompt {
+      color: #22c55e;
+      font-weight: 600;
+    }
+
+    .path {
+      color: #38bdf8;
+    }
+
+    .terminal-output {
+      color: rgba(226, 255, 249, 0.75);
+    }
+
+    .blink {
+      animation: blink 1s steps(2, start) infinite;
+    }
+
+    .hero-gridline {
+      position: absolute;
+      inset: -50%;
+      background-image: linear-gradient(rgba(5, 150, 105, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(5, 150, 105, 0.12) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.3;
+      transform: rotate(8deg);
+    }
+
+    .home-section {
+      padding: 1.5rem 0 0.5rem;
+    }
+
+    .home-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+
+    .home-text {
+      color: rgba(15, 23, 18, 0.7);
+      margin-bottom: 1rem;
+    }
+
+    @keyframes blink {
+      0%,
+      100% {
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-actions {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .hero-btn {
+        width: 100%;
+      }
+    }
+  </style>
 </BaseLayout>
