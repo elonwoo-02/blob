@@ -48,7 +48,15 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
 
     <aside class="chapter-nav" aria-label="章節導航">
       <details class="chapter-panel" open>
-        <summary>章節導航</summary>
+        <summary>
+          <span class="chapter-summary-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true">
+              <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
+            </svg>
+          </span>
+          章節導航
+          <span class="chapter-summary-chevron" aria-hidden="true">▾</span>
+        </summary>
         <nav>
           <ul>
             {navigationHeadings.length > 0 ? (
@@ -86,8 +94,8 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
     border: 0;
     border-radius: 0.75rem;
     padding: 0.75rem 1rem;
-    background: #f8fafc;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    background: transparent;
+    box-shadow: none;
     transition: width 180ms ease;
     overflow: hidden;
   }
@@ -97,6 +105,42 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
     font-weight: 600;
     margin-bottom: 0.75rem;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.75rem;
+    border: 1px solid hsl(var(--bc) / 0.2);
+    background: hsl(var(--p) / 0.05);
+    color: hsl(var(--bc));
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .chapter-panel summary:hover {
+    border-color: hsl(var(--p) / 0.4);
+    background: hsl(var(--p) / 0.08);
+    color: hsl(var(--p));
+  }
+
+  .chapter-panel[open] summary {
+    border-color: hsl(var(--p) / 0.4);
+    background: hsl(var(--p) / 0.08);
+    color: hsl(var(--p));
+  }
+
+  .chapter-summary-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .chapter-summary-chevron {
+    margin-left: auto;
+    transition: transform 0.2s ease;
+  }
+
+  .chapter-panel[open] .chapter-summary-chevron {
+    transform: rotate(180deg);
   }
 
   .chapter-panel:not([open]) {
@@ -122,16 +166,32 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
   }
 
   .chapter-nav a {
-    color: #0369a1;
+    color: hsl(var(--bc));
     text-decoration: none;
   }
 
   .chapter-nav a:hover {
-    text-decoration: underline;
+    text-decoration: none;
   }
 
   .chapter-nav .depth-3 {
     padding-left: 1rem;
+  }
+
+  .chapter-nav li > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.75rem;
+    border: 1px solid hsl(var(--bc) / 0.2);
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .chapter-nav li > a:hover {
+    border-color: hsl(var(--p) / 0.4);
+    background: hsl(var(--p) / 0.08);
+    color: hsl(var(--p));
   }
 
   .chapter-nav .empty-state {
@@ -240,11 +300,11 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
 
   .tag {
     margin: 0;
-    border: dotted 1px #a1a1a1;
-    border-radius: 0.5em;
-    padding: 0.4em 0.85em;
+    border: 1px solid hsl(var(--bc) / 0.2);
+    border-radius: 0.75rem;
+    padding: 0.45rem 0.8rem;
     font-size: 1rem;
-    background-color: #f8fcfd;
+    background-color: transparent;
   }
 
   @media (max-width: 900px) {
@@ -266,6 +326,11 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
     .chapter-panel:not([open]) summary {
       writing-mode: horizontal-tb;
       margin-bottom: 0;
+    }
+
+    .chapter-panel summary {
+      width: 100%;
+      justify-content: space-between;
     }
   }
 </style>
