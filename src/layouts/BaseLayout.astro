@@ -1,6 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import StyleSwitcher from '../components/StyleSwitcher.astro';
 import '../styles/global.css';
 
 const { pageTitle } = Astro.props;
@@ -11,13 +12,19 @@ const { pageTitle } = Astro.props;
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width" />
   <meta name="generator" content={Astro.generator} />
-  <title>{pageTitle}</title>
+  <title>{pageTitle ? `${pageTitle} · 风格实验站` : '风格实验站'}</title>
 </head>
-<body class="min-h-screen bg-base-100 text-base-content pb-24">
+<body>
+  <div class="site-bg"></div>
   <Header />
-  <main class="container mx-auto px-4 py-8">
-    <h1 class="text-4xl font-bold mb-8">{pageTitle}</h1>
-    <slot />
+  <main class="page-shell">
+    <div class="page-head">
+      <h1 class="page-title">{pageTitle || '首页'}</h1>
+      <StyleSwitcher />
+    </div>
+    <section class="content-shell">
+      <slot />
+    </section>
   </main>
   <Footer />
   <script>

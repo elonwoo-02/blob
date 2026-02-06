@@ -1,0 +1,33 @@
+<div class="style-switcher card-shell">
+  <p class="style-switcher__label">风格选择</p>
+  <div class="style-switcher__options" role="radiogroup" aria-label="选择站点风格">
+    <button class="style-option" type="button" data-style="token" role="radio" aria-checked="false">Token</button>
+    <button class="style-option" type="button" data-style="matrix" role="radio" aria-checked="false">Matrix</button>
+    <button class="style-option" type="button" data-style="cactus" role="radio" aria-checked="false">Cactus</button>
+    <button class="style-option" type="button" data-style="fusion" role="radio" aria-checked="false">Fusion</button>
+  </div>
+</div>
+
+<script is:inline>
+  const root = document.documentElement;
+  const key = 'site-style';
+  const available = ['token', 'matrix', 'cactus', 'fusion'];
+  const saved = localStorage.getItem(key);
+  const initial = available.includes(saved || '') ? saved : 'fusion';
+
+  const applyStyle = (style) => {
+    root.setAttribute('data-style', style);
+    localStorage.setItem(key, style);
+    document.querySelectorAll('.style-option').forEach((button) => {
+      const active = button.dataset.style === style;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-checked', String(active));
+    });
+  };
+
+  applyStyle(initial);
+
+  document.querySelectorAll('.style-option').forEach((button) => {
+    button.addEventListener('click', () => applyStyle(button.dataset.style || 'fusion'));
+  });
+</script>

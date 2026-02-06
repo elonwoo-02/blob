@@ -1,8 +1,7 @@
 ---
-const {title, url} = Astro.props;
+const { title, url } = Astro.props;
 ---
 
-<html>
-<li><a href={url}>{title}</a></li>
-
-</html>
+<li class="post-item card-shell">
+  <a href={url}>{title}</a>
+</li>

@@ -1,19 +1,36 @@
 ---
 import Greeting from '../components/Greeting';
 import BaseLayout from '../layouts/BaseLayout.astro';
-const pageTitle = "";
+const pageTitle = "风格预览";
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-  <section class="hero w-full aspect-video relative z-0 min-h-[70vh] mb-8 rounded-2xl overflow-hidden">
-    <img src="/img.png" class="w-full h-full object-cover" alt="Hero" />
-    <div class="absolute inset-0 flex items-center justify-center z-10">
-      <h1 class="text-white text-5xl font-bold drop-shadow-lg text-center">
-        欢迎来到我的网站
-      </h1>
+  <section class="hero-card card-shell">
+    <img src="/img.png" class="hero-image" alt="Hero" />
+    <div class="hero-overlay">
+      <h2>四套视觉方案，一键切换</h2>
+      <p>你可以快速比较 Token、Matrix、Astro Cactus 和融合款的视觉表现。</p>
     </div>
   </section>
-  <p>欢迎来到我的 Astro 网站的首页！这是我使用 Astro 框架创建的第一个页面。</p>
-  <h2>我超棒的博客副标题</h2>
+
+  <div class="grid-panels">
+    <article class="card-shell">
+      <h3>1. Token 模板风</h3>
+      <p>强调通透卡片、柔和渐变与现代产品落地页质感。</p>
+    </article>
+    <article class="card-shell">
+      <h3>2. Matrix Astro 风</h3>
+      <p>赛博深色基调、霓虹高亮和科技感边框。</p>
+    </article>
+    <article class="card-shell">
+      <h3>3. Astro Cactus 风</h3>
+      <p>极简排版、阅读优先、低饱和护眼配色。</p>
+    </article>
+    <article class="card-shell">
+      <h3>4. Fusion 组合风</h3>
+      <p>结合以上三者，适合做默认展示风格。</p>
+    </article>
+  </div>
+
   <Greeting client:load messages={["Hi", "Hello", "Howdy", "Hey there"]} />
 </BaseLayout>

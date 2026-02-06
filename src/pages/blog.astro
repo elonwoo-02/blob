@@ -1,35 +1,17 @@
 ---
-import '../styles/global.css';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BlogPost from '../components/BlogPost.astro';
-import {getCollection} from "astro:content";
+import { getCollection } from 'astro:content';
 
-const pageTitle = "博客";
-const allPosts = await getCollection('blog')
+const pageTitle = '博客';
+const allPosts = await getCollection('blog');
 ---
 
-<html lang="zh-cn">
-
-<head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator}>
-    <title>Astro</title>
-</head>
-
-<body>
-    <BaseLayout pageTitle={pageTitle}>
-        <h1>我的 Astro 学习博客</h1>
-        <p>这是我的 Astro 学习笔记</p>
-        <ul>
-        {
-        allPosts.map((post: any) => (
-            <BlogPost url={`/posts/${post.id}/`} title={post.data.title} />
-            ))
-        }
-        </ul>
-    </BaseLayout>
-</body>
-
-</html>
+<BaseLayout pageTitle={pageTitle}>
+  <p class="intro">这是我的 Astro 学习笔记。</p>
+  <ul class="post-list">
+    {allPosts.map((post: any) => (
+      <BlogPost url={`/posts/${post.id}/`} title={post.data.title} />
+    ))}
+  </ul>
+</BaseLayout>
