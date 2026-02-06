@@ -157,7 +157,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
 
               <div class="mt-3 flex flex-wrap gap-2">
                 {post.data.tags.map((tag: string) => (
-                  <button class="badge badge-outline tag-filter-btn" data-tag={tag} data-tag-slug={tagToSlug(tag)} type="button">#{tag}</button>
+                  <button class="badge tag-filter-btn" data-tag={tag} data-tag-slug={tagToSlug(tag)} type="button">#{tag}</button>
                 ))}
               </div>
 
@@ -199,6 +199,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
         const activeTagName = document.getElementById('active-tag-name');
         const clearFilterButton = document.getElementById('clear-tag-filter');
         const postCards = Array.from(document.querySelectorAll('[data-post-card]'));
+        const tagNavButtons = Array.from(document.querySelectorAll('.tag-nav-btn'));
         const emptyState = document.getElementById('empty-filter-state');
         const toast = document.getElementById('toast');
         let toastTimer = null;
@@ -278,6 +279,13 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
             card.classList.toggle('hidden', !matched);
             if (matched) visibleCount += 1;
           });
+
+          if (tagNavButtons.length > 0) {
+            tagNavButtons.forEach((button) => {
+              const buttonTag = button.getAttribute('data-tag') || '';
+              button.classList.toggle('is-active', Boolean(tag) && buttonTag === tag);
+            });
+          }
 
           if (activeTagPanel && activeTagName) {
             activeTagPanel.classList.toggle('hidden', !tag);
@@ -470,6 +478,19 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
           padding: 0.55rem 0.9rem;
           font-size: 0.85rem;
           box-shadow: 0 10px 25px hsl(var(--bc) / 0.12);
+        }
+
+        .tag-filter-btn:hover {
+          background: hsl(var(--p) / 0.12);
+          color: hsl(var(--p));
+        }
+
+        .tag-nav-btn.is-active {
+          background: hsl(var(--p) / 0.16);
+          color: hsl(var(--p));
+          border-radius: 999px;
+          padding-left: 0.35rem;
+          padding-right: 0.35rem;
         }
 
         @media (min-width: 1024px) {
