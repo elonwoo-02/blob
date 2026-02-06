@@ -14,7 +14,7 @@ tags: ["astro", "astro/进阶", "blogging", "learning in public", "devlog/weekly
 
 ## 2-1-2026
 
-```aiignore
+```
 import 
 
 for (int i = 0; i < 10; =++i) { 
