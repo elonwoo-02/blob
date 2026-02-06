@@ -1,7 +1,8 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import SectionTreeNode from '../components/SectionTreeNode.astro';
 
-const { frontmatter } = Astro.props as {
+const { frontmatter, headings = [] } = Astro.props as {
   frontmatter: {
     title: string;
     pubDate: Date;
@@ -13,40 +14,131 @@ const { frontmatter } = Astro.props as {
     };
     tags?: string[];
   };
+  headings?: Array<{ depth: number; slug: string; text: string }>;
 };
+
+type SectionNode = {
+  depth: number;
+  slug: string;
+  text: string;
+  children: SectionNode[];
+};
+
+const sectionHeadings = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 4);
+
+const buildSectionTree = (items: typeof sectionHeadings) => {
+  const root: SectionNode[] = [];
+  const stack: SectionNode[] = [];
+
+  items.forEach((item) => {
+    const node: SectionNode = { ...item, children: [] };
+    while (stack.length > 0 && stack[stack.length - 1].depth >= node.depth) {
+      stack.pop();
+    }
+    if (stack.length === 0) {
+      root.push(node);
+    } else {
+      stack[stack.length - 1].children.push(node);
+    }
+    stack.push(node);
+  });
+
+  return root;
+};
+
+const sectionTree = buildSectionTree(sectionHeadings);
 ---
 
 <BaseLayout pageTitle={frontmatter.title}>
-  <article class="post-layout">
-    <main class="post-content">
-      <h1 class="post-title">{frontmatter.title}</h1>
-      <div class="post-meta">
-        <div class="post-meta-row">
-          <div class="post-avatar" aria-hidden="true">
-            <span>{frontmatter.author.slice(0, 1)}</span>
+  <div class="drawer drawer-end lg:drawer-open post-drawer" id="post-drawer-layout">
+    <input id="section-drawer" type="checkbox" class="drawer-toggle" />
+    <div class="drawer-content">
+      <article class="post-layout">
+        <main class="post-content">
+          <div class="post-header-row">
+            <h1 class="post-title">{frontmatter.title}</h1>
+            <div class="lg:hidden">
+              <label for="section-drawer" class="btn btn-ghost btn-sm px-2" aria-label="打开章节导航">
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4">
+                  <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
+                </svg>
+              </label>
+            </div>
           </div>
-          <div class="post-meta-text">
-            <p class="author">{frontmatter.author}</p>
-            <p class="publish-date">{frontmatter.pubDate.toLocaleDateString()}</p>
+          <div class="post-meta">
+            <div class="post-meta-row">
+              <div class="post-avatar" aria-hidden="true">
+                <span>{frontmatter.author.slice(0, 1)}</span>
+              </div>
+              <div class="post-meta-text">
+                <p class="author">{frontmatter.author}</p>
+                <p class="publish-date">{frontmatter.pubDate.toLocaleDateString()}</p>
+              </div>
+            </div>
+            <p class="description"><em>{frontmatter.description}</em></p>
           </div>
+          {frontmatter.image?.url && (
+            <img class="hero-image" src={frontmatter.image.url} width="300" alt={frontmatter.image.alt || ''} />
+          )}
+
+          <div class="tags">
+            {(frontmatter.tags ?? []).map((tag: string) => (
+              <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
+            ))}
+          </div>
+
+          <div class="markdown-body">
+            <slot />
+          </div>
+        </main>
+      </article>
+    </div>
+    <div class="drawer-side z-20 post-drawer-side">
+      <label for="section-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+      <aside class="min-h-full w-80 rounded-l-3xl border-l border-base-300 bg-base-100 p-5 shadow-sm lg:rounded-3xl lg:border lg:shadow-sm">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-lg font-semibold">文章目录</h2>
+          <button id="toggle-section-sidebar" class="btn btn-ghost btn-xs hidden lg:inline-flex" type="button" aria-label="收起章节导航">
+            ⇤
+          </button>
         </div>
-        <p class="description"><em>{frontmatter.description}</em></p>
-      </div>
-      {frontmatter.image?.url && (
-        <img class="hero-image" src={frontmatter.image.url} width="300" alt={frontmatter.image.alt || ''} />
-      )}
+        {sectionTree.length > 0 ? (
+          <ul id="section-tree" class="space-y-2">
+            {sectionTree.map((section) => <SectionTreeNode node={section} />)}
+          </ul>
+        ) : (
+          <p class="text-sm text-base-content/60">暂无章节。</p>
+        )}
+      </aside>
+    </div>
+  </div>
 
-      <div class="tags">
-        {(frontmatter.tags ?? []).map((tag: string) => (
-          <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
-        ))}
-      </div>
+  <script is:inline>
+    const drawerLayout = document.getElementById('post-drawer-layout');
+    const sidebarToggle = document.getElementById('toggle-section-sidebar');
 
-      <div class="markdown-body">
-        <slot />
-      </div>
-    </main>
-  </article>
+    document.querySelectorAll('.section-toggle').forEach((toggleButton) => {
+      toggleButton.addEventListener('click', () => {
+        const listItem = toggleButton.closest('li');
+        const children = listItem?.querySelector(':scope > .section-children');
+        if (!children) return;
+
+        const expanded = toggleButton.getAttribute('data-expanded') !== 'false';
+        const nextExpanded = !expanded;
+        toggleButton.setAttribute('data-expanded', `${nextExpanded}`);
+        toggleButton.setAttribute('aria-expanded', `${nextExpanded}`);
+        toggleButton.textContent = nextExpanded ? '▾' : '▸';
+        children.classList.toggle('hidden', !nextExpanded);
+      });
+    });
+
+    if (sidebarToggle && drawerLayout) {
+      sidebarToggle.addEventListener('click', () => {
+        const collapsed = drawerLayout.classList.toggle('post-sidebar-collapsed');
+        sidebarToggle.textContent = collapsed ? '⇥' : '⇤';
+      });
+    }
+  </script>
 </BaseLayout>
 
 <style>
@@ -57,6 +149,13 @@ const { frontmatter } = Astro.props as {
 
   .post-content {
     min-width: 0;
+  }
+
+  .post-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
   }
 
   .post-meta {
@@ -197,5 +296,28 @@ const { frontmatter } = Astro.props as {
     padding: 0.45rem 0.8rem;
     font-size: 1rem;
     background-color: transparent;
+  }
+
+  .section-nav-btn:hover {
+    color: #059669;
+  }
+
+  @media (min-width: 1024px) {
+    .post-drawer .drawer-side > *:not(.drawer-overlay) {
+      transition: width 0.2s ease;
+    }
+
+    .post-sidebar-collapsed .post-drawer-side aside {
+      width: 3.5rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      overflow: hidden;
+    }
+
+    .post-sidebar-collapsed .post-drawer-side h2,
+    .post-sidebar-collapsed .post-drawer-side #section-tree,
+    .post-sidebar-collapsed .post-drawer-side p {
+      display: none;
+    }
   }
 </style>
