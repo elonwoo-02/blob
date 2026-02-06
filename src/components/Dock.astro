@@ -1,0 +1,165 @@
+---
+import DockItem from './DockItem.astro';
+
+interface DockEntry {
+  label: string;
+  href: string;
+  icon: string;
+  external?: boolean;
+  removable?: boolean;
+}
+
+const { pageTitle = '页面', currentPath = '/' } = Astro.props;
+
+const homeIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V10.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`;
+const blogIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 7h8M8 11h8M8 15h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+const aboutIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+const githubIcon = `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 .5A12 12 0 0 0 8.2 23.9c.6.1.8-.2.8-.6v-2.2c-3.3.7-4-1.5-4-1.5-.6-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.7-2.7-.3-5.6-1.3-5.6-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2A11.4 11.4 0 0 1 12 6a11.3 11.3 0 0 1 3 .4c2.2-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.6 5.9.5.4.9 1.2.9 2.4v3.5c0 .4.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>`;
+
+const systemItems: DockEntry[] = [
+  { label: 'Home', href: '/', icon: homeIcon },
+  { label: 'Blog', href: '/blog/', icon: blogIcon },
+  { label: 'About', href: '/about/', icon: aboutIcon },
+  { label: 'GitHub', href: 'https://github.com/', icon: githubIcon, external: true }
+];
+
+const externalItems: DockEntry[] = [];
+
+const dockPayload = {
+  pageTitle,
+  currentPath,
+};
+---
+
+<div class="pointer-events-none fixed inset-x-0 bottom-0 z-50 hidden md:block">
+  <div class="dock-sensor h-24 w-full"></div>
+  <nav
+    id="mac-dock"
+    class="pointer-events-auto mx-auto mb-4 flex w-fit max-w-[90vw] items-center gap-3 rounded-3xl border border-white/30 bg-black/55 px-4 py-3 text-white shadow-2xl backdrop-blur-md transition-all duration-300 ease-out"
+    data-state="visible"
+    data-dock={JSON.stringify(dockPayload)}
+  >
+    <ul class="dock-left flex items-end gap-2">
+      {systemItems.map((item) => <DockItem {...item} />)}
+    </ul>
+
+    <div class="dock-divider h-8 w-px bg-white/40"></div>
+
+    <ul class="dock-right flex items-end gap-2">
+      {externalItems.map((item) => <DockItem {...item} />)}
+    </ul>
+  </nav>
+</div>
+
+<script>
+  const dock = document.querySelector('#mac-dock');
+  if (dock) {
+    const payload = JSON.parse(dock.dataset.dock || '{}');
+    const rightList = dock.querySelector('.dock-right');
+    const removeButtons = dock.querySelectorAll('.dock-remove');
+    const hideDelay = 3000;
+    const showBoundary = 100;
+    let hideTimer;
+
+    const articleIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 8h8M8 12h8M8 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+
+    const showDock = () => {
+      dock.style.transform = 'translateY(0)';
+      dock.style.opacity = '1';
+      dock.dataset.state = 'visible';
+      window.clearTimeout(hideTimer);
+    };
+
+    const hideDock = () => {
+      dock.style.transform = 'translateY(120%)';
+      dock.style.opacity = '0';
+      dock.dataset.state = 'hidden';
+    };
+
+    const queueHide = () => {
+      window.clearTimeout(hideTimer);
+      hideTimer = window.setTimeout(hideDock, hideDelay);
+    };
+
+    const createDockItem = (item, removable = false) => {
+      const li = document.createElement('li');
+      li.className = 'dock-item group relative';
+      li.dataset.href = item.href;
+      li.dataset.label = item.label;
+
+      const anchor = document.createElement('a');
+      anchor.href = item.href;
+      anchor.className = 'tooltip tooltip-top block';
+      anchor.dataset.tip = item.label;
+      anchor.setAttribute('aria-label', item.label);
+
+      const iconWrap = document.createElement('span');
+      iconWrap.className = 'dock-icon flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white shadow-lg transition-all duration-200 ease-out group-hover:scale-[1.3] group-hover:shadow-2xl';
+      const icon = document.createElement('span');
+      icon.className = 'h-6 w-6';
+      icon.innerHTML = item.icon;
+      iconWrap.append(icon);
+      anchor.append(iconWrap);
+      li.append(anchor);
+
+      if (removable) {
+        const close = document.createElement('button');
+        close.type = 'button';
+        close.className = 'dock-remove btn btn-xs btn-circle btn-error absolute -right-1 -top-1 hidden border-0 text-[10px] text-white group-hover:flex';
+        close.setAttribute('aria-label', `关闭 ${item.label}`);
+        close.title = `关闭 ${item.label}`;
+        close.textContent = '✕';
+        close.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const updatedItems = JSON.parse(window.localStorage.getItem(storageKey) || '[]').filter(
+            (openedItem) => openedItem.href !== item.href,
+          );
+          window.localStorage.setItem(storageKey, JSON.stringify(updatedItems));
+          li.remove();
+        });
+        li.append(close);
+      }
+
+      return li;
+    };
+
+    const storageKey = 'dock-opened-items';
+    const openedItems = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+    const isSystemPath = ['/', '/blog/', '/about/'].includes(payload.currentPath);
+    const isBlogPostPath = /^\/posts\/.+/.test(payload.currentPath);
+
+    if (!isSystemPath && isBlogPostPath && payload.currentPath) {
+      const current = {
+        label: payload.pageTitle,
+        href: payload.currentPath,
+        icon: articleIcon,
+      };
+      const deduped = [current, ...openedItems.filter((item) => item.href !== current.href)].slice(0, 5);
+      window.localStorage.setItem(storageKey, JSON.stringify(deduped));
+    }
+
+    const finalOpenedItems = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+    finalOpenedItems.forEach((item) => {
+      rightList?.prepend(createDockItem(item, true));
+    });
+
+    removeButtons.forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        button.closest('.dock-item')?.remove();
+      });
+    });
+
+    dock.addEventListener('mouseenter', showDock);
+    dock.addEventListener('mouseleave', queueHide);
+    document.addEventListener('mousemove', (event) => {
+      if (window.innerHeight - event.clientY <= showBoundary) {
+        showDock();
+      }
+    });
+
+    queueHide();
+  }
+</script>
