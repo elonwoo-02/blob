@@ -1,0 +1,32 @@
+---
+type HeadingNode = {
+  depth: number;
+  slug: string;
+  text: string;
+  children: HeadingNode[];
+};
+
+interface Props {
+  node: HeadingNode;
+}
+
+const { node } = Astro.props;
+---
+
+<li class="section-nav-item" data-depth={node.depth - 2} style={`--depth:${node.depth - 2};`}>
+  <a
+    class="section-nav-link"
+    href={`#${node.slug}`}
+    data-section-link
+    data-section-id={node.slug}
+  >
+    {node.text}
+  </a>
+  {node.children.length > 0 && (
+    <ul class="section-nav-list">
+      {node.children.map((child) => (
+        <Astro.self node={child} />
+      ))}
+    </ul>
+  )}
+</li>
