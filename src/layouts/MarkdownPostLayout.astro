@@ -1,37 +1,148 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-const { frontmatter } = Astro.props;
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+const { frontmatter, headings = [] } = Astro.props as {
+  frontmatter: {
+    title: string;
+    pubDate: Date;
+    description: string;
+    author: string;
+    image: {
+      url: string;
+      alt: string;
+    };
+    tags: string[];
+  };
+  headings: Heading[];
+};
+
+const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
 ---
+
 <BaseLayout pageTitle={frontmatter.title}>
-  <p>{frontmatter.pubDate.toLocaleDateString()}</p>
-  <p><em>{frontmatter.description}</em></p>
-  <p>Written by: {frontmatter.author}</p>
-  <img src={frontmatter.image.url} width="300" alt={frontmatter.image.alt} />
+  <article class="post-layout">
+    <aside class="chapter-nav" aria-label="章節導航">
+      <details open>
+        <summary>章節導航</summary>
+        <nav>
+          <ul>
+            {navigationHeadings.length > 0 ? (
+              navigationHeadings.map((heading) => (
+                <li class={`depth-${heading.depth}`}>
+                  <a href={`#${heading.slug}`}>{heading.text}</a>
+                </li>
+              ))
+            ) : (
+              <li class="empty-state">本篇文章暫無章節</li>
+            )}
+          </ul>
+        </nav>
+      </details>
+    </aside>
 
-  <div class="tags">
-    {frontmatter.tags.map((tag: string) => (
-      <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
-    ))}
-  </div>
+    <main class="post-content">
+      <p>{frontmatter.pubDate.toLocaleDateString()}</p>
+      <p><em>{frontmatter.description}</em></p>
+      <p>Written by: {frontmatter.author}</p>
+      <img src={frontmatter.image.url} width="300" alt={frontmatter.image.alt} />
 
-  <slot />
+      <div class="tags">
+        {frontmatter.tags.map((tag: string) => (
+          <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
+        ))}
+      </div>
+
+      <slot />
+    </main>
+  </article>
 </BaseLayout>
-<!--<style>-->
-<!--  a {-->
-<!--    color: #00539F;-->
-<!--  }-->
 
-<!--  .tags {-->
-<!--    display: flex;-->
-<!--    flex-wrap: wrap;-->
-<!--  }-->
+<style>
+  .post-layout {
+    display: grid;
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
 
-<!--  .tag {-->
-<!--    margin: 0.25em;-->
-<!--    border: dotted 1px #a1a1a1;-->
-<!--    border-radius: .5em;-->
-<!--    padding: .5em 1em;-->
-<!--    font-size: 1.15em;-->
-<!--    background-color: #F8FCFD;-->
-<!--  }-->
-<!--</style>-->
+  .chapter-nav {
+    position: sticky;
+    top: 1rem;
+  }
+
+  .chapter-nav details {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #f8fafc;
+  }
+
+  .chapter-nav summary {
+    cursor: pointer;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  .chapter-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .chapter-nav li + li {
+    margin-top: 0.4rem;
+  }
+
+  .chapter-nav a {
+    color: #0369a1;
+    text-decoration: none;
+  }
+
+  .chapter-nav a:hover {
+    text-decoration: underline;
+  }
+
+  .chapter-nav .depth-3 {
+    padding-left: 1rem;
+  }
+
+  .chapter-nav .empty-state {
+    color: #6b7280;
+    font-size: 0.95rem;
+  }
+
+  .post-content {
+    min-width: 0;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    margin: 0;
+    border: dotted 1px #a1a1a1;
+    border-radius: 0.5em;
+    padding: 0.4em 0.85em;
+    font-size: 1rem;
+    background-color: #f8fcfd;
+  }
+
+  @media (max-width: 900px) {
+    .post-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .chapter-nav {
+      position: static;
+    }
+  }
+</style>
