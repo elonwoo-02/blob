@@ -2,6 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
+import Menu from "../components/Menu.astro";
 
 const { pageTitle } = Astro.props;
 ---
@@ -14,7 +15,8 @@ const { pageTitle } = Astro.props;
   <title>{pageTitle}</title>
 </head>
 <body class="min-h-screen bg-base-100 text-base-content pb-24">
-  <Header />
+  <!--<Header />-->
+  <Menu/>
   <main class="container mx-auto px-4 py-8">
     <h1 class="text-4xl font-bold mb-8">{pageTitle}</h1>
     <slot />

@@ -1,5 +1,11 @@
 ---
+import Dock from "./Dock.astro";
+const { pageTitle } = Astro.props;
 ---
-<button aria-expanded="false" aria-controls="main-menu" class="menu">
-  Menu
-</button>
+<!--<button aria-expanded="false" aria-controls="main-menu" class="menu">-->
+<!--  Menu-->
+<!--</button>-->
+
+<div class="relative">
+  <Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
+</div>
