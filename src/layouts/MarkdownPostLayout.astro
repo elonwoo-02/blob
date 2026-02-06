@@ -66,8 +66,8 @@ const sectionTree = buildSectionTree(sectionHeadings);
           </div>
           <div class="post-meta">
             <div class="post-meta-row">
-              <div class="post-avatar" aria-hidden="true">
-                <span>{frontmatter.author.slice(0, 1)}</span>
+              <div class="post-avatar">
+                <img src="/avatars/default.png" alt={`${frontmatter.author} avatar`} width="36" height="36" loading="lazy" />
               </div>
               <p class="author">{frontmatter.author}</p>
               <p class="publish-date">{frontmatter.pubDate.toLocaleDateString()}</p>
@@ -172,8 +172,8 @@ const sectionTree = buildSectionTree(sectionHeadings);
   }
 
   .post-avatar {
-    width: 2.2rem;
-    height: 2.2rem;
+    width: 1.8rem;
+    height: 1.8rem;
     border-radius: 999px;
     background: hsl(var(--n));
     color: hsl(var(--nc));
@@ -181,6 +181,14 @@ const sectionTree = buildSectionTree(sectionHeadings);
     align-items: center;
     justify-content: center;
     font-weight: 600;
+    overflow: hidden;
+  }
+
+  .post-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 
   .post-meta p {
