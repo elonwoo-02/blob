@@ -1,22 +1,9 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import Dock from '../components/Dock.astro';
 import '../styles/global.css';
 
 const { pageTitle } = Astro.props;
-
-// 配置 Dock 导航数据
-const leftNav = [
-  { title: '首页', link: '/' },
-  { title: '博客', link: '/blog' },
-  { title: '关于', link: '/about' }
-];
-
-const rightApps = [
-  { title: '文章: 快速开始', link: '/blog/post-1' },
-  { title: 'GitHub', link: 'https://github.com/elonwoo-02/blob' }
-];
 ---
 <html lang="zh-CN">
 <head>
@@ -33,9 +20,7 @@ const rightApps = [
     <slot />
   </main>
   <Footer />
-  
-  <!-- Dock 导航组件 -->
-  <Dock {leftNav} {rightApps} />
+
 
   <script>
     import "../scripts/menu.js";
