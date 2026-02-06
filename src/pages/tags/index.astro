@@ -1,33 +1,19 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import {getCollection} from "astro:content";
-const allPosts = await getCollection('blog')
-const tags = [...new Set(allPosts.map((post: any) => post.data.tags).flat())];
-const pageTitle = "标签索引";
+import { getCollection } from 'astro:content';
+import { buildTagTree } from '../../utils/tags';
+import TagTreeNode from '../../components/TagTreeNode.astro';
+
+const allPosts = await getCollection('blog');
+const tagTree = buildTagTree(allPosts);
+const pageTitle = '标签索引';
 ---
+
 <BaseLayout pageTitle={pageTitle}>
-  <div class="tags">
-    {tags.map((tag) => (
-      <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
-    ))}
+  <div class="rounded-3xl border border-base-300 bg-base-100 p-5 shadow-sm">
+    <h1 class="mb-4 text-xl font-semibold">标签索引</h1>
+    <ul class="space-y-2">
+      {tagTree.map((tag) => <TagTreeNode node={tag} />)}
+    </ul>
   </div>
 </BaseLayout>
-<style>
-  a {
-    color: #00539F;
-  }
-
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  .tag {
-    margin: 0.25em;
-    border: dotted 1px #a1a1a1;
-    border-radius: .5em;
-    padding: .5em 1em;
-    font-size: 1.15em;
-    background-color: #F8FCFD;
-  }
-</style>

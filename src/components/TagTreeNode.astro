@@ -1,0 +1,24 @@
+---
+import type { TagNode } from '../utils/tags';
+
+interface Props {
+  node: TagNode;
+}
+
+const { node } = Astro.props;
+---
+
+<li>
+  <details class="group" open>
+    <summary class="flex cursor-pointer list-none items-center justify-between rounded-xl border border-base-300 px-3 py-2 text-sm transition hover:border-primary/40 hover:bg-primary/5">
+      <a href={`/tags/${node.slug}`} class="font-medium">#{node.name}</a>
+      <span class="badge badge-ghost badge-sm">{node.count}</span>
+    </summary>
+
+    {node.children.length > 0 && (
+      <ul class="mt-2 space-y-2 pl-4">
+        {node.children.map((child) => <Astro.self node={child} />)}
+      </ul>
+    )}
+  </details>
+</li>
