@@ -1,5 +1,31 @@
 ---
+import Dock from "./Dock.astro";
+import ThemeIcon from "./ThemeIcon.astro";
+const { pageTitle } = Astro.props;
 ---
-<button aria-expanded="false" aria-controls="main-menu" class="menu">
-  Menu
-</button>
+
+<div class="md:hidden fixed top-0 left-0 right-0 z-50 border-b border-base-300 bg-base-100/90 backdrop-blur">
+  <div class="navbar px-3">
+    <div class="navbar-start">
+      <a href="/" class="text-base font-bold">首页</a>
+    </div>
+    <div class="navbar-end">
+      <details class="dropdown dropdown-end">
+        <summary class="btn btn-ghost btn-sm">菜单</summary>
+        <ul class="menu dropdown-content z-[60] mt-2 w-44 rounded-box bg-base-100 p-2 shadow">
+          <li><a href="/">首页</a></li>
+          <li><a href="/blog/">博客</a></li>
+          <li><a href="/about/">关于</a></li>
+          <li><a href="https://github.com/" target="_blank" rel="noreferrer">GitHub</a></li>
+        </ul>
+      </details>
+      <ThemeIcon />
+    </div>
+  </div>
+</div>
+
+<div class="h-16 md:hidden"></div>
+
+<div class="hidden md:block relative">
+  <Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
+</div>
