@@ -71,8 +71,13 @@ const dockPayload = {
       <p id="dock-activity-title" class="dock-activity-title"></p>
     </div>
     <div class="dock-activity-body">
-      <p class="dock-activity-text">正在载入文章内容…</p>
-      <iframe class="dock-activity-frame" title="文章预览" loading="lazy"></iframe>
+      <iframe
+        id="dock-activity-frame"
+        class="dock-activity-frame"
+        title="文章预览"
+        loading="lazy"
+        referrerpolicy="strict-origin-when-cross-origin"
+      ></iframe>
     </div>
   </div>
 </div>
@@ -85,8 +90,7 @@ const dockPayload = {
     const removeButtons = dock.querySelectorAll('.dock-remove');
     const activityWindow = document.querySelector('#dock-activity');
     const activityTitle = activityWindow?.querySelector('#dock-activity-title');
-    const activityText = activityWindow?.querySelector('.dock-activity-text');
-    const activityFrame = activityWindow?.querySelector('.dock-activity-frame');
+    const activityFrame = activityWindow?.querySelector('#dock-activity-frame');
     const hideDelay = 3000;
     const showBoundary = 100;
     let hideTimer;
@@ -118,26 +122,26 @@ const dockPayload = {
       if (activityTitle) {
         activityTitle.textContent = item.label || '文章';
       }
-      if (activityText) {
-        activityText.textContent = `正在预览《${item.label || '文章'}》`;
+      if (activityFrame && item.href) {
+        activityFrame.setAttribute('src', item.href);
       }
-      if (activityFrame) {
-        activityFrame.setAttribute('src', item.href || '');
-      }
-      activityWindow.classList.remove('dock-activity-fullscreen');
-      activityWindow.classList.remove('hidden');
+      activityWindow.classList.remove('dock-activity-minimized', 'dock-activity-fullscreen', 'hidden');
       activityWindow.setAttribute('aria-hidden', 'false');
     };
 
-    const closeActivityWindow = () => {
+    const closeActivityWindow = (hideDockTogether = false) => {
       if (!activityWindow) return;
       activityWindow.classList.add('hidden');
+      activityWindow.classList.remove('dock-activity-minimized', 'dock-activity-fullscreen');
       activityWindow.setAttribute('aria-hidden', 'true');
       if (activityFrame) {
-        activityFrame.removeAttribute('src');
+        activityFrame.setAttribute('src', 'about:blank');
       }
-      hideDock();
       pendingOpenItem = null;
+      if (hideDockTogether) {
+        window.clearTimeout(hideTimer);
+        hideDock();
+      }
     };
 
     const minimizeActivityWindow = () => {
@@ -145,10 +149,10 @@ const dockPayload = {
       activityWindow.classList.add('dock-activity-minimized');
       window.setTimeout(() => {
         activityWindow.classList.add('hidden');
-        activityWindow.classList.remove('dock-activity-minimized');
+        activityWindow.classList.remove('dock-activity-minimized', 'dock-activity-fullscreen');
         activityWindow.setAttribute('aria-hidden', 'true');
         if (activityFrame) {
-          activityFrame.removeAttribute('src');
+          activityFrame.setAttribute('src', 'about:blank');
         }
       }, 180);
       pendingOpenItem = null;
@@ -158,14 +162,8 @@ const dockPayload = {
       if (!activityWindow || !pendingOpenItem?.href) return;
       activityWindow.classList.add('dock-activity-fullscreen');
       window.setTimeout(() => {
-        if (document.startViewTransition) {
-          document.startViewTransition(() => {
-            window.location.assign(pendingOpenItem.href);
-          });
-          return;
-        }
         window.location.assign(pendingOpenItem.href);
-      }, 220);
+      }, 260);
     };
 
     const createDockItem = (item, removable = false) => {
@@ -252,7 +250,7 @@ const dockPayload = {
       });
     });
 
-    activityWindow?.querySelector('[data-action="close"]')?.addEventListener('click', closeActivityWindow);
+    activityWindow?.querySelector('[data-action="close"]')?.addEventListener('click', () => closeActivityWindow(true));
     activityWindow?.querySelector('[data-action="minimize"]')?.addEventListener('click', minimizeActivityWindow);
     activityWindow?.querySelector('[data-action="open"]')?.addEventListener('click', openActivityArticle);
 
@@ -376,15 +374,16 @@ const dockPayload = {
   }
 
   .dock-activity-body {
-    padding: 18px 22px 22px;
+    height: min(70vh, 640px);
+    background: #f5f5f5;
   }
 
-  .dock-activity-text {
-    margin: 0 0 12px;
-    font-size: 13px;
-    color: #2f2f2f;
-    text-align: center;
-    line-height: 1.5;
+  .dock-activity-frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
   }
 
   .dock-activity-frame {
