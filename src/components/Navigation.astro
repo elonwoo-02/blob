@@ -1,61 +1,42 @@
 ---
-import MenuIcon from "./icon/MenuIcon.astro";
-import ThemeIcon from "./ThemeIcon.astro";
-import Dock from "./Dock.astro";
-const { pageTitle } = Astro.props;
+import ThemeIcon from './ThemeIcon.astro';
+
+const { currentPath = '/' } = Astro.props;
+
+const links = [
+  { href: '/', label: '首页' },
+  { href: '/blog/', label: '博客' },
+  { href: '/tags/', label: '标签' },
+  { href: '/about/', label: '关于' },
+];
 ---
 
-<!--<div class="drawer">-->
-<!--  <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />-->
+<nav class="nav-wrap">
+  <a href="/" class="brand">Cactus Notes</a>
+  <div class="nav-links">
+    {links.map((link) => (
+      <a href={link.href} class:list={{ active: currentPath === link.href }}>{link.label}</a>
+    ))}
+    <ThemeIcon />
+  </div>
+</nav>
 
-<!--  &lt;!&ndash; 页面主体 &ndash;&gt;-->
-<!--  <div class="drawer-content flex flex-col">-->
-<!--    &lt;!&ndash; Navbar &ndash;&gt;-->
-<!--    <div class="navbar fixed top-0 left-0 w-full bg-base-100/30 backdrop-blur-md shadow-md">-->
-<!--      &lt;!&ndash; 左侧小屏幕按钮 &ndash;&gt;-->
-<!--      <div class="navbar-start flex-none lg:hidden">-->
-<!--        <label for="my-drawer-2" aria-label="open sidebar" class="btn btn-square btn-ghost">-->
-<!--          <MenuIcon/>-->
-<!--        </label>-->
-<!--      </div>-->
-
-<!--      &lt;!&ndash; Navbar 标题 &ndash;&gt;-->
-<!--      <div class="navbar-start mx-2 p-2 flex-1 text-black font-bold">-->
-<!--        <a href="/">Navbar Title</a>-->
-<!--      </div>-->
-
-<!--      &lt;!&ndash; 右侧菜单 &ndash;&gt;-->
-<!--      <div class="navbar-end hidden lg:flex gap-2">-->
-<!--        <ul class="menu menu-horizontal px-1 bg-transparent">-->
-<!--          <li><a class="text-black font-bold" href="/about/">关于我</a></li>-->
-<!--          <li>-->
-<!--            <details>-->
-<!--              <summary class="text-black font-bold">Parent</summary>-->
-<!--              <ul class="p-2 bg-base-100/80 w-40 z-50">-->
-<!--                <li><a>Submenu 1</a></li>-->
-<!--                <li><a>Submenu 2</a></li>-->
-<!--              </ul>-->
-<!--            </details>-->
-<!--          </li>-->
-<!--          <li><a class="text-black font-bold" href="/blog/">Item 3</a></li>-->
-<!--        </ul>-->
-<!--        <ThemeIcon />-->
-<!--      </div>-->
-<!--    </div>-->
-
-<!--    &lt;!&ndash; 页面内容 &ndash;&gt;-->
-<!--    <slot/>-->
-<!--  </div>-->
-
-<!--  &lt;!&ndash; Drawer 侧边栏 &ndash;&gt;-->
-<!--  <div class="drawer-side">-->
-<!--    <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>-->
-<!--    <ul class="menu bg-base-200 min-h-full w-50 p-4">-->
-<!--      &lt;!&ndash; Sidebar content here &ndash;&gt;-->
-<!--      <li><a>Sidebar Item 1</a></li>-->
-<!--      <li><a>Sidebar Item 2</a></li>-->
-<!--    </ul>-->
-<!--  </div>-->
-
-<!--</div>-->
-<Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
+<style>
+  .nav-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter: blur(6px);
+  }
+  .brand { font-weight: 700; letter-spacing: 0.02em; text-decoration: none; }
+  .nav-links { display: flex; align-items: center; gap: 0.9rem; }
+  .nav-links a { text-decoration: none; color: var(--text-soft); font-size: 0.95rem; }
+  .nav-links a.active, .nav-links a:hover { color: var(--text); }
+  @media (max-width: 640px) {
+    .nav-wrap { flex-direction: column; align-items: flex-start; gap: 0.7rem; }
+    .nav-links { flex-wrap: wrap; }
+  }
+</style>

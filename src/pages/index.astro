@@ -1,19 +1,14 @@
 ---
-import Greeting from '../components/Greeting';
 import BaseLayout from '../layouts/BaseLayout.astro';
-const pageTitle = "";
 ---
 
-<BaseLayout pageTitle={pageTitle}>
-  <section class="hero w-full aspect-video relative z-0 min-h-[70vh] mb-8 rounded-2xl overflow-hidden">
-    <img src="/img.png" class="w-full h-full object-cover" alt="Hero" />
-    <div class="absolute inset-0 flex items-center justify-center z-10">
-      <h1 class="text-white text-5xl font-bold drop-shadow-lg text-center">
-        欢迎来到我的网站
-      </h1>
-    </div>
+<BaseLayout pageTitle="你好，我是一名开发者" pageDescription="Cactus 风格的简洁个人站点">
+  <section class="panel" style="display:grid; gap:1rem;">
+    <img src="/avatar.jpg" alt="头像" style="width:84px;height:84px;border-radius:999px;border:1px solid var(--border);" />
+    <p class="muted">记录技术、写作与生活碎片。整体采用轻量、留白和自然色调，支持浅色/深色主题切换。</p>
+    <p>
+      可以先从 <a href="/blog/" class="link-accent">博客文章</a> 开始，或浏览
+      <a href="/tags/" class="link-accent">标签索引</a>。
+    </p>
   </section>
-  <p>欢迎来到我的 Astro 网站的首页！这是我使用 Astro 框架创建的第一个页面。</p>
-  <h2>我超棒的博客副标题</h2>
-  <Greeting client:load messages={["Hi", "Hello", "Howdy", "Hey there"]} />
 </BaseLayout>

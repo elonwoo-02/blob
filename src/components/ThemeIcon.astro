@@ -1,41 +1,43 @@
 ---
 ---
-<label id="themeToggle" aria-label="Toggle theme" class="toggle text-base-content">
-  <input type="checkbox" value="synthwave" class="theme-controller" />
-
-  <svg aria-label="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></g></svg>
-
-  <svg aria-label="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></g></svg>
-
-</label>
+<button id="themeToggle" aria-label="切换主题" class="theme-toggle" type="button">
+  <span>☀️</span>
+  <span>🌙</span>
+</button>
 
 <script is:inline>
-  const root = document.documentElement
-  const toggle = document.querySelector('#themeToggle input')
+  const root = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  const key = 'theme';
+  const initTheme = () => {
+    const saved = localStorage.getItem(key);
+    if (saved === 'light' || saved === 'dark') return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  };
 
-  // 1. 初始化主题
-  const theme = (() => {
-    const saved = localStorage.getItem('theme')
-    if (saved === 'dark' || saved === 'light') {
-      return saved
-    }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light'
-  })()
+  const apply = (theme) => {
+    root.setAttribute('data-theme', theme);
+    localStorage.setItem(key, theme);
+    toggle?.setAttribute('data-theme', theme);
+  };
 
-  // 2. 应用主题
-  root.setAttribute('data-theme', theme)
-  localStorage.setItem('theme', theme)
-
-  // 3. 同步 checkbox + 切换逻辑
-  if (toggle) {
-    toggle.checked = theme === 'dark'
-
-    toggle.addEventListener('change', () => {
-      const nextTheme = toggle.checked ? 'dark' : 'light'
-      root.setAttribute('data-theme', nextTheme)
-      localStorage.setItem('theme', nextTheme)
-    })
-  }
+  apply(initTheme());
+  toggle?.addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    apply(next);
+  });
 </script>
+
+<style>
+  .theme-toggle {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-soft);
+    color: var(--text);
+    display: inline-flex;
+    gap: 0.35rem;
+    align-items: center;
+    padding: 0.25rem 0.6rem;
+    cursor: pointer;
+  }
+</style>

@@ -1,8 +1,9 @@
 ---
-const {title, url} = Astro.props;
+const { title, url, description, date } = Astro.props;
 ---
 
-<html>
-<li><a href={url}>{title}</a></li>
-
-</html>
+<li class="panel">
+  <a href={url} class="link-accent">{title}</a>
+  {description && <p class="muted" style="margin-top:0.5rem;">{description}</p>}
+  {date && <p class="muted" style="margin-top:0.4rem;font-size:0.9rem;">{date}</p>}
+</li>

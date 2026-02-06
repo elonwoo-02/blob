@@ -1,33 +1,15 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import {getCollection} from "astro:content";
-const allPosts = await getCollection('blog')
-const tags = [...new Set(allPosts.map((post: any) => post.data.tags).flat())];
-const pageTitle = "标签索引";
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog');
+const tags = [...new Set(allPosts.flatMap((post) => post.data.tags))].sort();
 ---
-<BaseLayout pageTitle={pageTitle}>
-  <div class="tags">
+
+<BaseLayout pageTitle="标签索引" pageDescription="按标签浏览文章">
+  <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
     {tags.map((tag) => (
-      <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
+      <a class="chip" href={`/tags/${tag}`}>#{tag}</a>
     ))}
   </div>
 </BaseLayout>
-<style>
-  a {
-    color: #00539F;
-  }
-
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  .tag {
-    margin: 0.25em;
-    border: dotted 1px #a1a1a1;
-    border-radius: .5em;
-    padding: .5em 1em;
-    font-size: 1.15em;
-    background-color: #F8FCFD;
-  }
-</style>
