@@ -26,67 +26,134 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
 ---
 
 <BaseLayout pageTitle={frontmatter.title}>
-  <article class="post-layout">
-    <main class="post-content">
-      <div class="post-meta">
-        <p class="publish-date">{frontmatter.pubDate.toLocaleDateString()}</p>
-        <p class="description"><em>{frontmatter.description}</em></p>
-        <p class="author">Written by: {frontmatter.author}</p>
-      </div>
-      <img class="hero-image" src={frontmatter.image.url} width="300" alt={frontmatter.image.alt} />
+  <div class="chapter-drawer">
+    <input id="chapter-drawer" type="checkbox" class="chapter-drawer-toggle" />
+    <div class="chapter-drawer-content">
+      <article class="post-layout">
+        <main class="post-content">
+          <div class="chapter-drawer-trigger">
+            <label for="chapter-drawer" class="chapter-drawer-button" aria-label="´ò¿ªÕÂ½Úµ¼º½">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true">
+                <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
+              </svg>
+            </label>
+          </div>
+          <div class="post-meta">
+            <p class="publish-date">{frontmatter.pubDate.toLocaleDateString()}</p>
+            <p class="description"><em>{frontmatter.description}</em></p>
+            <p class="author">Written by: {frontmatter.author}</p>
+          </div>
+          <img class="hero-image" src={frontmatter.image.url} width="300" alt={frontmatter.image.alt} />
 
-      <div class="tags">
-        {frontmatter.tags.map((tag: string) => (
-          <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
-        ))}
-      </div>
+          <div class="tags">
+            {frontmatter.tags.map((tag: string) => (
+              <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
+            ))}
+          </div>
 
-      <div class="markdown-body">
-        <slot />
-      </div>
-    </main>
-
-    <aside class="chapter-nav" aria-label="ç« ç¯€å°èˆª">
-      <details class="chapter-panel" open>
-        <summary>
-          <span class="chapter-summary-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true">
-              <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
-            </svg>
-          </span>
-          ç« ç¯€å°èˆª
-          <span class="chapter-summary-chevron" aria-hidden="true">â–¾</span>
-        </summary>
-        <nav>
-          <ul>
-            {navigationHeadings.length > 0 ? (
-              navigationHeadings.map((heading) => (
-                <li class={`depth-${heading.depth}`}>
-                  <a href={`#${heading.slug}`}>{heading.text}</a>
-                </li>
-              ))
-            ) : (
-              <li class="empty-state">æœ¬ç¯‡æ–‡ç« æš«ç„¡ç« ç¯€</li>
-            )}
-          </ul>
-        </nav>
-      </details>
-    </aside>
-  </article>
+          <div class="markdown-body">
+            <slot />
+          </div>
+        </main>
+      </article>
+    </div>
+    <div class="chapter-drawer-side" aria-hidden="true">
+      <label for="chapter-drawer" class="chapter-drawer-overlay" aria-label="¹Ø±ÕÕÂ½Úµ¼º½"></label>
+      <aside class="chapter-nav" aria-label="ç« ç¯€å°èˆª">
+        <details class="chapter-panel" open>
+          <summary>
+            <span class="chapter-summary-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true">
+                <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
+              </svg>
+            </span>
+            ÕÂ¹Œ§º½
+            <span class="chapter-summary-chevron" aria-hidden="true">?</span>
+          </summary>
+          <nav>
+            <ul>
+              {navigationHeadings.length > 0 ? (
+                navigationHeadings.map((heading) => (
+                  <li class={`depth-${heading.depth}`}>
+                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                  </li>
+                ))
+              ) : (
+                <li class="empty-state">æœ¬ç¯‡æ–‡ç« æš«ç„¡ç« ç¯€</li>
+              )}
+            </ul>
+          </nav>
+        </details>
+      </aside>
+    </div>
+  </div>
 </BaseLayout>
 
 <style>
   .post-layout {
+    display: block;
+    min-width: 0;
+  }
+
+  .chapter-drawer {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 1.5rem;
     align-items: start;
   }
 
-  .chapter-nav {
+  .chapter-drawer-content {
+    min-width: 0;
+  }
+
+  .chapter-drawer-toggle {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .chapter-drawer-trigger {
+    display: none;
+    justify-content: flex-end;
+    margin-bottom: 0.75rem;
+  }
+
+  .chapter-drawer-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    border: 1px solid hsl(var(--bc) / 0.2);
+    background: hsl(var(--p) / 0.05);
+    color: hsl(var(--bc));
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .chapter-drawer-button:hover {
+    border-color: hsl(var(--p) / 0.4);
+    background: hsl(var(--p) / 0.08);
+    color: hsl(var(--p));
+  }
+
+  .chapter-drawer-side {
+    position: static;
+    pointer-events: auto;
+  }
+
+  .chapter-drawer-overlay {
+    display: none;
+  }
+
+  .chapter-drawer-side .chapter-nav {
     position: sticky;
     top: 5.5rem;
-    justify-self: start;
+    width: min(18rem, 28vw);
+    height: auto;
+    padding: 0;
+    background: transparent;
+    transform: none;
   }
 
   .chapter-panel {
@@ -308,13 +375,52 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
   }
 
   @media (max-width: 900px) {
-    .post-layout {
-      grid-template-columns: 1fr;
+    .chapter-drawer {
+      display: block;
     }
 
-    .chapter-nav {
-      position: static;
-      width: 100%;
+    .chapter-drawer-trigger {
+      display: flex;
+    }
+
+    .chapter-drawer-side {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 40;
+    }
+
+    .chapter-drawer-overlay {
+      display: block;
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .chapter-drawer-side .chapter-nav {
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 100%;
+      width: min(18rem, 82vw);
+      padding: 1rem;
+      background: hsl(var(--b1));
+      transform: translateX(100%);
+      transition: transform 0.2s ease;
+    }
+
+    .chapter-drawer-toggle:checked ~ .chapter-drawer-side {
+      pointer-events: auto;
+    }
+
+    .chapter-drawer-toggle:checked ~ .chapter-drawer-side .chapter-nav {
+      transform: translateX(0);
+    }
+
+    .chapter-drawer-toggle:checked ~ .chapter-drawer-side .chapter-drawer-overlay {
+      opacity: 1;
     }
 
     .chapter-panel,
@@ -334,3 +440,8 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
     }
   }
 </style>
+
+
+
+
+
