@@ -79,6 +79,16 @@ const dockPayload = {
         referrerpolicy="strict-origin-when-cross-origin"
       ></iframe>
     </div>
+    <div class="dock-activity-resize-handles" aria-hidden="true">
+      <span class="dock-activity-resize-handle" data-resize="n"></span>
+      <span class="dock-activity-resize-handle" data-resize="s"></span>
+      <span class="dock-activity-resize-handle" data-resize="e"></span>
+      <span class="dock-activity-resize-handle" data-resize="w"></span>
+      <span class="dock-activity-resize-handle" data-resize="ne"></span>
+      <span class="dock-activity-resize-handle" data-resize="nw"></span>
+      <span class="dock-activity-resize-handle" data-resize="se"></span>
+      <span class="dock-activity-resize-handle" data-resize="sw"></span>
+    </div>
   </div>
 </div>
 
@@ -91,8 +101,14 @@ const dockPayload = {
     const activityWindow = document.querySelector('#dock-activity');
     const activityTitle = activityWindow?.querySelector('#dock-activity-title');
     const activityFrame = activityWindow?.querySelector('#dock-activity-frame');
+    const activityPanel = activityWindow?.querySelector('.dock-activity-window');
+    const activityTitlebar = activityWindow?.querySelector('.dock-activity-titlebar');
+    const resizeHandles = activityWindow?.querySelectorAll('.dock-activity-resize-handle') || [];
     const hideDelay = 3000;
     const showBoundary = 100;
+    const windowPadding = 12;
+    const minActivityWidth = 360;
+    const minActivityHeight = 320;
     let hideTimer;
     let pendingOpenItem = null;
 
@@ -130,6 +146,18 @@ const dockPayload = {
       }
       activityWindow.classList.remove('dock-activity-minimized', 'dock-activity-fullscreen', 'hidden');
       activityWindow.setAttribute('aria-hidden', 'false');
+      if (activityPanel && !activityPanel.dataset.positioned) {
+        requestAnimationFrame(() => {
+          const rect = activityPanel.getBoundingClientRect();
+          const left = Math.max(windowPadding, (window.innerWidth - rect.width) / 2);
+          const top = Math.max(windowPadding, (window.innerHeight - rect.height) / 2);
+          activityPanel.style.left = `${left}px`;
+          activityPanel.style.top = `${top}px`;
+          activityPanel.style.width = `${rect.width}px`;
+          activityPanel.style.height = `${rect.height}px`;
+          activityPanel.dataset.positioned = 'true';
+        });
+      }
     };
 
     const closeActivityWindow = () => {
@@ -168,6 +196,97 @@ const dockPayload = {
         }
       }, 180);
       pendingOpenItem = null;
+    };
+
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+    const startDrag = (event) => {
+      if (!activityPanel || !activityWindow || activityWindow.classList.contains('dock-activity-fullscreen')) return;
+      if (event.target.closest('.dock-control')) return;
+      event.preventDefault();
+      const rect = activityPanel.getBoundingClientRect();
+      const startX = event.clientX;
+      const startY = event.clientY;
+      const startLeft = rect.left;
+      const startTop = rect.top;
+
+      const handleMove = (moveEvent) => {
+        const deltaX = moveEvent.clientX - startX;
+        const deltaY = moveEvent.clientY - startY;
+        const nextLeft = clamp(
+          startLeft + deltaX,
+          windowPadding,
+          window.innerWidth - rect.width - windowPadding,
+        );
+        const nextTop = clamp(
+          startTop + deltaY,
+          windowPadding,
+          window.innerHeight - rect.height - windowPadding,
+        );
+        activityPanel.style.left = `${nextLeft}px`;
+        activityPanel.style.top = `${nextTop}px`;
+      };
+
+      const handleUp = () => {
+        window.removeEventListener('pointermove', handleMove);
+        window.removeEventListener('pointerup', handleUp);
+      };
+
+      window.addEventListener('pointermove', handleMove);
+      window.addEventListener('pointerup', handleUp);
+    };
+
+    const startResize = (event) => {
+      if (!activityPanel || !activityWindow || activityWindow.classList.contains('dock-activity-fullscreen')) return;
+      const direction = event.target.dataset.resize;
+      if (!direction) return;
+      event.preventDefault();
+      const rect = activityPanel.getBoundingClientRect();
+      const startX = event.clientX;
+      const startY = event.clientY;
+      const startLeft = rect.left;
+      const startTop = rect.top;
+      const startWidth = rect.width;
+      const startHeight = rect.height;
+
+      const handleMove = (moveEvent) => {
+        const deltaX = moveEvent.clientX - startX;
+        const deltaY = moveEvent.clientY - startY;
+        let nextWidth = startWidth;
+        let nextHeight = startHeight;
+        let nextLeft = startLeft;
+        let nextTop = startTop;
+
+        if (direction.includes('e')) {
+          nextWidth = clamp(startWidth + deltaX, minActivityWidth, window.innerWidth - startLeft - windowPadding);
+        }
+        if (direction.includes('s')) {
+          nextHeight = clamp(startHeight + deltaY, minActivityHeight, window.innerHeight - startTop - windowPadding);
+        }
+        if (direction.includes('w')) {
+          const maxWidth = startWidth + (startLeft - windowPadding);
+          nextWidth = clamp(startWidth - deltaX, minActivityWidth, maxWidth);
+          nextLeft = clamp(startLeft + deltaX, windowPadding, startLeft + startWidth - minActivityWidth);
+        }
+        if (direction.includes('n')) {
+          const maxHeight = startHeight + (startTop - windowPadding);
+          nextHeight = clamp(startHeight - deltaY, minActivityHeight, maxHeight);
+          nextTop = clamp(startTop + deltaY, windowPadding, startTop + startHeight - minActivityHeight);
+        }
+
+        activityPanel.style.left = `${nextLeft}px`;
+        activityPanel.style.top = `${nextTop}px`;
+        activityPanel.style.width = `${nextWidth}px`;
+        activityPanel.style.height = `${nextHeight}px`;
+      };
+
+      const handleUp = () => {
+        window.removeEventListener('pointermove', handleMove);
+        window.removeEventListener('pointerup', handleUp);
+      };
+
+      window.addEventListener('pointermove', handleMove);
+      window.addEventListener('pointerup', handleUp);
     };
 
     const openActivityArticle = () => {
@@ -268,6 +387,8 @@ const dockPayload = {
     });
     activityWindow?.querySelector('[data-action="minimize"]')?.addEventListener('click', minimizeActivityWindow);
     activityWindow?.querySelector('[data-action="open"]')?.addEventListener('click', openActivityArticle);
+    activityTitlebar?.addEventListener('pointerdown', startDrag);
+    resizeHandles.forEach((handle) => handle.addEventListener('pointerdown', startResize));
 
     dock.addEventListener('mouseenter', showDock);
     dock.addEventListener('mouseleave', queueHide);
@@ -337,6 +458,7 @@ const dockPayload = {
     height: min(70vh, 640px);
     min-width: 360px;
     min-height: 320px;
+    position: absolute;
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.55);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(232, 232, 232, 0.92));
@@ -345,7 +467,6 @@ const dockPayload = {
     pointer-events: auto;
     display: flex;
     flex-direction: column;
-    resize: both;
     transform-origin: center;
     animation: dock-window-open 180ms ease-out;
   }
@@ -407,6 +528,83 @@ const dockPayload = {
     border: 0;
     background: #fff;
     flex: 1;
+  }
+
+  .dock-activity-resize-handles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .dock-activity-resize-handle {
+    position: absolute;
+    pointer-events: auto;
+  }
+
+  .dock-activity-resize-handle[data-resize='n'],
+  .dock-activity-resize-handle[data-resize='s'] {
+    left: 10px;
+    right: 10px;
+    height: 10px;
+  }
+
+  .dock-activity-resize-handle[data-resize='n'] {
+    top: -4px;
+    cursor: ns-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='s'] {
+    bottom: -4px;
+    cursor: ns-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='e'],
+  .dock-activity-resize-handle[data-resize='w'] {
+    top: 10px;
+    bottom: 10px;
+    width: 10px;
+  }
+
+  .dock-activity-resize-handle[data-resize='e'] {
+    right: -4px;
+    cursor: ew-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='w'] {
+    left: -4px;
+    cursor: ew-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='ne'],
+  .dock-activity-resize-handle[data-resize='nw'],
+  .dock-activity-resize-handle[data-resize='se'],
+  .dock-activity-resize-handle[data-resize='sw'] {
+    width: 16px;
+    height: 16px;
+  }
+
+  .dock-activity-resize-handle[data-resize='ne'] {
+    top: -6px;
+    right: -6px;
+    cursor: nesw-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='nw'] {
+    top: -6px;
+    left: -6px;
+    cursor: nwse-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='se'] {
+    bottom: -6px;
+    right: -6px;
+    cursor: nwse-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='sw'] {
+    bottom: -6px;
+    left: -6px;
+    cursor: nesw-resize;
   }
 
   .dock-activity-minimized .dock-activity-window {
