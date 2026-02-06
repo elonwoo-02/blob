@@ -4,8 +4,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { buildTagTree, tagToSlug } from '../utils/tags';
 import TagTreeNode from '../components/TagTreeNode.astro';
+import GithubIcon from "../components/icon/GithubIcon.astro";
 
-const pageTitle = '博客';
+const pageTitle = '';
 const allPosts = await getCollection('blog');
 const sortedPosts = [...allPosts].sort(
   (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
@@ -52,7 +53,9 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
               <h1 class="text-2xl font-bold">Blog Timeline</h1>
               <p class="text-sm text-base-content/70">GitHub 风格贡献热力图</p>
             </div>
-            <a class="btn btn-sm btn-outline" href="https://github.com/" target="_blank" rel="noreferrer">访问 GitHub</a>
+            <a class="w-10 h-10" href="https://github.com/" target="_blank" rel="noreferrer">
+              <GithubIcon/>
+            </a>
           </div>
 
           <div class="overflow-x-auto pb-2">
@@ -134,10 +137,11 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
                 ))}
               </div>
 
+              // todo : 点赞、转发和添加dock功能未完成；
               <div class="mt-4 flex items-center justify-end gap-2">
-                <button class="btn btn-ghost btn-sm gap-1 text-base-content/80" type="button">❤️ 点赞</button>
-                <button class="btn btn-ghost btn-sm gap-1 text-base-content/80" type="button">🔁 转发</button>
-                <button class="btn btn-primary btn-sm" type="button">➕ 添加到 DOCK</button>
+                <button class="btn btn-ghost btn-sm gap-1 text-base-content/80" type="button">❤️</button>
+                <button class="btn btn-ghost btn-sm gap-1 text-base-content/80" type="button">🔁</button>
+                <button class="btn btn-primary btn-sm" type="button">➕</button>
               </div>
             </article>
           ))}
