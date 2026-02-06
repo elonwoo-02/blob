@@ -27,8 +27,23 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
 
 <BaseLayout pageTitle={frontmatter.title}>
   <article class="post-layout">
+    <main class="post-content">
+      <p>{frontmatter.pubDate.toLocaleDateString()}</p>
+      <p><em>{frontmatter.description}</em></p>
+      <p>Written by: {frontmatter.author}</p>
+      <img src={frontmatter.image.url} width="300" alt={frontmatter.image.alt} />
+
+      <div class="tags">
+        {frontmatter.tags.map((tag: string) => (
+          <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
+        ))}
+      </div>
+
+      <slot />
+    </main>
+
     <aside class="chapter-nav" aria-label="章節導航">
-      <details open>
+      <details class="chapter-panel" open>
         <summary>章節導航</summary>
         <nav>
           <ul>
@@ -45,48 +60,51 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
         </nav>
       </details>
     </aside>
-
-    <main class="post-content">
-      <p>{frontmatter.pubDate.toLocaleDateString()}</p>
-      <p><em>{frontmatter.description}</em></p>
-      <p>Written by: {frontmatter.author}</p>
-      <img src={frontmatter.image.url} width="300" alt={frontmatter.image.alt} />
-
-      <div class="tags">
-        {frontmatter.tags.map((tag: string) => (
-          <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
-        ))}
-      </div>
-
-      <slot />
-    </main>
   </article>
 </BaseLayout>
 
 <style>
   .post-layout {
     display: grid;
-    grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
-    gap: 2rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem;
     align-items: start;
   }
 
   .chapter-nav {
     position: sticky;
-    top: 0.5rem;
+    top: 5.5rem;
+    justify-self: end;
   }
 
-  .chapter-nav details {
+  .chapter-panel {
+    width: min(18rem, 28vw);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 0.75rem 1rem;
     background: #f8fafc;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    transition: width 180ms ease;
+    overflow: hidden;
   }
 
-  .chapter-nav summary {
+  .chapter-panel summary {
     cursor: pointer;
     font-weight: 600;
     margin-bottom: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .chapter-panel:not([open]) {
+    width: 3.25rem;
+    padding: 0.75rem;
+  }
+
+  .chapter-panel:not([open]) summary {
+    margin-bottom: 0;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: 0.05em;
   }
 
   .chapter-nav ul {
@@ -143,6 +161,18 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
 
     .chapter-nav {
       position: static;
+      width: 100%;
+    }
+
+    .chapter-panel,
+    .chapter-panel:not([open]) {
+      width: 100%;
+      padding: 0.75rem 1rem;
+    }
+
+    .chapter-panel:not([open]) summary {
+      writing-mode: horizontal-tb;
+      margin-bottom: 0;
     }
   }
 </style>
