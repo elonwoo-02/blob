@@ -24,7 +24,7 @@ type SectionNode = {
   children: SectionNode[];
 };
 
-const sectionHeadings = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 4);
+const sectionHeadings = headings.filter((heading) => heading.depth >= 1 && heading.depth <= 4);
 
 const buildSectionTree = (items: typeof sectionHeadings) => {
   const root: SectionNode[] = [];
@@ -56,7 +56,6 @@ const sectionTree = buildSectionTree(sectionHeadings);
       <article class="post-layout">
         <main class="post-content">
           <div class="post-header-row">
-            <h1 class="post-title">{frontmatter.title}</h1>
             <div class="lg:hidden">
               <label for="section-drawer" class="btn btn-ghost btn-sm px-2" aria-label="打开章节导航">
                 <svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4">
@@ -70,10 +69,8 @@ const sectionTree = buildSectionTree(sectionHeadings);
               <div class="post-avatar" aria-hidden="true">
                 <span>{frontmatter.author.slice(0, 1)}</span>
               </div>
-              <div class="post-meta-text">
-                <p class="author">{frontmatter.author}</p>
-                <p class="publish-date">{frontmatter.pubDate.toLocaleDateString()}</p>
-              </div>
+              <p class="author">{frontmatter.author}</p>
+              <p class="publish-date">{frontmatter.pubDate.toLocaleDateString()}</p>
             </div>
             <p class="description"><em>{frontmatter.description}</em></p>
           </div>
@@ -83,7 +80,7 @@ const sectionTree = buildSectionTree(sectionHeadings);
 
           <div class="tags">
             {(frontmatter.tags ?? []).map((tag: string) => (
-              <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
+              <p class="tag"><a href={`/tags/${tag}`}>#{tag}</a></p>
             ))}
           </div>
 
@@ -156,7 +153,7 @@ const sectionTree = buildSectionTree(sectionHeadings);
   .post-header-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 1rem;
   }
 
@@ -166,18 +163,12 @@ const sectionTree = buildSectionTree(sectionHeadings);
     font-size: 0.95rem;
   }
 
-  .post-title {
-    font-size: clamp(1.9rem, 3.2vw, 2.4rem);
-    line-height: 1.2;
-    font-weight: 700;
-    margin: 0 0 0.75rem;
-  }
-
   .post-meta-row {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     margin-bottom: 0.35rem;
+    flex-wrap: wrap;
   }
 
   .post-avatar {
@@ -192,14 +183,12 @@ const sectionTree = buildSectionTree(sectionHeadings);
     font-weight: 600;
   }
 
-  .post-meta-text {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-  }
-
   .post-meta p {
     margin: 0.2rem 0;
+  }
+
+  .post-meta-row p {
+    margin: 0;
   }
 
   .description {
@@ -229,6 +218,7 @@ const sectionTree = buildSectionTree(sectionHeadings);
     font-size: clamp(1.8rem, 3vw, 2.2rem);
     border-bottom: 0;
     padding-bottom: 0.25em;
+    display: none;
   }
 
   .tags .tag {
@@ -285,7 +275,7 @@ const sectionTree = buildSectionTree(sectionHeadings);
   .tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.3rem;
   }
 
   .tag {
