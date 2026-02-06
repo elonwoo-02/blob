@@ -2,40 +2,28 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
-const {pageTitle} = Astro.props;
-const {skillColor = 'green', fontWeight = 'normal', textCase = 'none'} = Astro.props;
+
+const { pageTitle } = Astro.props;
 ---
 <html lang="zh-CN">
-
 <head>
   <meta charset="utf-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width" />
   <meta name="generator" content={Astro.generator} />
   <title>{pageTitle}</title>
-  <!--<style define:vars={{skillColor, fontWeight, textCase}}>-->
-  <!--  h1 {-->
-  <!--    color: purple;-->
-  <!--    font-size: 2rem;-->
-  <!--  }-->
-
-  <!--  .skill {-->
-  <!--    font-family: monospace;-->
-  <!--    color: var(&#45;&#45;skillColor);-->
-  <!--    font-weight: var(&#45;&#45;fontWeight);-->
-  <!--    text-transform: var(&#45;&#45;textCase);-->
-  <!--  }-->
-  <!--</style>-->
 </head>
-
-<body>
+<body class="min-h-screen bg-base-100 text-base-content pb-24">
   <Header />
-  <h1>{pageTitle}</h1>
-  <slot></slot>
+  <main class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-8">{pageTitle}</h1>
+    <slot />
+  </main>
   <Footer />
+
+
   <script>
     import "../scripts/menu.js";
   </script>
 </body>
-
 </html>
