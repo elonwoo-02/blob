@@ -1,7 +1,8 @@
 ---
 import MenuIcon from "./icon/MenuIcon.astro";
 import ThemeIcon from "./ThemeIcon.astro";
-
+import Dock from "./Dock.astro";
+const { pageTitle } = Astro.props;
 ---
 
 <!--<div class="drawer">-->
@@ -57,3 +58,4 @@ import ThemeIcon from "./ThemeIcon.astro";
 <!--  </div>-->
 
 <!--</div>-->
+<Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
