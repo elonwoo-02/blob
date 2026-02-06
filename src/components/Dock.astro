@@ -61,35 +61,36 @@ const dockPayload = {
 </div>
 
 <div id="dock-activity" class="dock-activity hidden" aria-hidden="true">
-  <div class="dock-activity-window" role="dialog" aria-modal="true" aria-labelledby="dock-activity-title">
-    <div class="dock-activity-titlebar">
-      <div class="dock-traffic-lights">
-        <button class="dock-control dock-control-close" type="button" data-action="close" aria-label="关闭"></button>
-        <button class="dock-control dock-control-minimize" type="button" data-action="minimize" aria-label="缩小"></button>
-        <button class="dock-control dock-control-fullscreen" type="button" data-action="open" aria-label="打开文章"></button>
+  <template id="dock-activity-template">
+    <div class="dock-activity-window" role="dialog" aria-modal="true">
+      <div class="dock-activity-titlebar">
+        <div class="dock-traffic-lights">
+          <button class="dock-control dock-control-close" type="button" data-action="close" aria-label="关闭"></button>
+          <button class="dock-control dock-control-minimize" type="button" data-action="minimize" aria-label="缩小"></button>
+          <button class="dock-control dock-control-fullscreen" type="button" data-action="open" aria-label="打开文章"></button>
+        </div>
+        <p class="dock-activity-title"></p>
       </div>
-      <p id="dock-activity-title" class="dock-activity-title"></p>
+      <div class="dock-activity-body">
+        <iframe
+          class="dock-activity-frame"
+          title="文章预览"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+      </div>
+      <div class="dock-activity-resize-handles" aria-hidden="true">
+        <span class="dock-activity-resize-handle" data-resize="n"></span>
+        <span class="dock-activity-resize-handle" data-resize="s"></span>
+        <span class="dock-activity-resize-handle" data-resize="e"></span>
+        <span class="dock-activity-resize-handle" data-resize="w"></span>
+        <span class="dock-activity-resize-handle" data-resize="ne"></span>
+        <span class="dock-activity-resize-handle" data-resize="nw"></span>
+        <span class="dock-activity-resize-handle" data-resize="se"></span>
+        <span class="dock-activity-resize-handle" data-resize="sw"></span>
+      </div>
     </div>
-    <div class="dock-activity-body">
-      <iframe
-        id="dock-activity-frame"
-        class="dock-activity-frame"
-        title="文章预览"
-        loading="lazy"
-        referrerpolicy="strict-origin-when-cross-origin"
-      ></iframe>
-    </div>
-    <div class="dock-activity-resize-handles" aria-hidden="true">
-      <span class="dock-activity-resize-handle" data-resize="n"></span>
-      <span class="dock-activity-resize-handle" data-resize="s"></span>
-      <span class="dock-activity-resize-handle" data-resize="e"></span>
-      <span class="dock-activity-resize-handle" data-resize="w"></span>
-      <span class="dock-activity-resize-handle" data-resize="ne"></span>
-      <span class="dock-activity-resize-handle" data-resize="nw"></span>
-      <span class="dock-activity-resize-handle" data-resize="se"></span>
-      <span class="dock-activity-resize-handle" data-resize="sw"></span>
-    </div>
-  </div>
+  </template>
 </div>
 
 <script>
@@ -98,19 +99,15 @@ const dockPayload = {
     const payload = JSON.parse(dock.dataset.dock || '{}');
     const rightList = dock.querySelector('.dock-right');
     const removeButtons = dock.querySelectorAll('.dock-remove');
-    const activityWindow = document.querySelector('#dock-activity');
-    const activityTitle = activityWindow?.querySelector('#dock-activity-title');
-    const activityFrame = activityWindow?.querySelector('#dock-activity-frame');
-    const activityPanel = activityWindow?.querySelector('.dock-activity-window');
-    const activityTitlebar = activityWindow?.querySelector('.dock-activity-titlebar');
-    const resizeHandles = activityWindow?.querySelectorAll('.dock-activity-resize-handle') || [];
+    const activityLayer = document.querySelector('#dock-activity');
+    const activityTemplate = document.querySelector('#dock-activity-template');
     const hideDelay = 3000;
     const showBoundary = 100;
     const windowPadding = 12;
     const minActivityWidth = 360;
     const minActivityHeight = 320;
     let hideTimer;
-    let pendingOpenItem = null;
+    let topZIndex = 70;
 
     const articleIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 8h8M8 12h8M8 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
 
@@ -135,40 +132,225 @@ const dockPayload = {
       hideTimer = window.setTimeout(hideDock, hideDelay);
     };
 
-    const openActivityWindow = (item) => {
-      if (!activityWindow) return;
-      pendingOpenItem = item;
-      if (activityTitle) {
-        activityTitle.textContent = item.label || '文章';
-      }
-      if (activityFrame && item.href) {
-        activityFrame.setAttribute('src', item.href);
-      }
-      activityWindow.classList.remove('dock-activity-minimized', 'dock-activity-fullscreen', 'hidden');
-      activityWindow.setAttribute('aria-hidden', 'false');
-      if (activityPanel && !activityPanel.dataset.positioned) {
-        requestAnimationFrame(() => {
-          const rect = activityPanel.getBoundingClientRect();
-          const left = Math.max(windowPadding, (window.innerWidth - rect.width) / 2);
-          const top = Math.max(windowPadding, (window.innerHeight - rect.height) / 2);
-          activityPanel.style.left = `${left}px`;
-          activityPanel.style.top = `${top}px`;
-          activityPanel.style.width = `${rect.width}px`;
-          activityPanel.style.height = `${rect.height}px`;
-          activityPanel.dataset.positioned = 'true';
-        });
-      }
+    const setLayerVisibility = () => {
+      if (!activityLayer) return;
+      const hasWindows = activityLayer.querySelectorAll('.dock-activity-window:not(.hidden)').length > 0;
+      activityLayer.classList.toggle('hidden', !hasWindows);
+      activityLayer.setAttribute('aria-hidden', hasWindows ? 'false' : 'true');
     };
 
-    const closeActivityWindow = () => {
-      if (!activityWindow) return;
-      activityWindow.classList.add('hidden');
-      activityWindow.classList.remove('dock-activity-minimized', 'dock-activity-fullscreen');
-      activityWindow.setAttribute('aria-hidden', 'true');
-      if (activityFrame) {
-        activityFrame.setAttribute('src', 'about:blank');
+    const bringToFront = (panel) => {
+      topZIndex += 1;
+      panel.style.zIndex = `${topZIndex}`;
+    };
+
+    const positionPanel = (panel) => {
+      if (panel.dataset.positioned) return;
+      requestAnimationFrame(() => {
+        const rect = panel.getBoundingClientRect();
+        const left = Math.max(windowPadding, (window.innerWidth - rect.width) / 2);
+        const top = Math.max(windowPadding, (window.innerHeight - rect.height) / 2);
+        panel.style.left = `${left}px`;
+        panel.style.top = `${top}px`;
+        panel.style.width = `${rect.width}px`;
+        panel.style.height = `${rect.height}px`;
+        panel.dataset.positioned = 'true';
+      });
+    };
+
+    const buildActivityWindow = (item) => {
+      if (!activityLayer || !activityTemplate) return null;
+      const fragment = activityTemplate.content.cloneNode(true);
+      const panel = fragment.querySelector('.dock-activity-window');
+      const title = panel?.querySelector('.dock-activity-title');
+      const frame = panel?.querySelector('.dock-activity-frame');
+      if (!panel || !title || !frame) return null;
+
+      panel.dataset.href = item.href || '';
+      panel.dataset.label = item.label || '文章';
+      panel.setAttribute('aria-labelledby', `dock-activity-title-${Date.now()}`);
+      title.id = panel.getAttribute('aria-labelledby');
+      title.textContent = item.label || '文章';
+      if (item.href) {
+        frame.setAttribute('src', item.href);
       }
-      pendingOpenItem = null;
+      bringToFront(panel);
+      activityLayer.append(panel);
+      positionPanel(panel);
+
+      const resizeHandles = panel.querySelectorAll('.dock-activity-resize-handle') || [];
+      const titlebar = panel.querySelector('.dock-activity-titlebar');
+
+      const closeButton = panel.querySelector('[data-action="close"]');
+      const minimizeButton = panel.querySelector('[data-action="minimize"]');
+      const openButton = panel.querySelector('[data-action="open"]');
+
+      closeButton?.addEventListener('click', () => {
+        if (panel.dataset.href) {
+          removeDockItemByHref(panel.dataset.href);
+        }
+        panel.remove();
+        setLayerVisibility();
+      });
+
+      minimizeButton?.addEventListener('click', () => {
+        panel.classList.add('dock-activity-minimized');
+        window.setTimeout(() => {
+          panel.classList.add('hidden');
+          panel.classList.remove('dock-activity-minimized', 'dock-activity-fullscreen');
+          setLayerVisibility();
+        }, 180);
+      });
+
+      openButton?.addEventListener('click', () => {
+        if (!panel.dataset.href) return;
+        panel.classList.add('dock-activity-fullscreen');
+        window.setTimeout(() => {
+          window.location.assign(panel.dataset.href);
+        }, 260);
+      });
+
+      const startDrag = (event) => {
+        if (panel.classList.contains('dock-activity-fullscreen')) return;
+        if (event.target.closest('.dock-control')) return;
+        event.preventDefault();
+        bringToFront(panel);
+        const rect = panel.getBoundingClientRect();
+        const startX = event.clientX;
+        const startY = event.clientY;
+        const startLeft = rect.left;
+        const startTop = rect.top;
+        let latestX = startX;
+        let latestY = startY;
+        let rafId;
+
+        const applyMove = () => {
+          const deltaX = latestX - startX;
+          const deltaY = latestY - startY;
+          const nextLeft = clamp(
+            startLeft + deltaX,
+            windowPadding,
+            window.innerWidth - rect.width - windowPadding,
+          );
+          const nextTop = clamp(
+            startTop + deltaY,
+            windowPadding,
+            window.innerHeight - rect.height - windowPadding,
+          );
+          panel.style.left = `${nextLeft}px`;
+          panel.style.top = `${nextTop}px`;
+          rafId = null;
+        };
+
+        const handleMove = (moveEvent) => {
+          latestX = moveEvent.clientX;
+          latestY = moveEvent.clientY;
+          if (!rafId) {
+            rafId = requestAnimationFrame(applyMove);
+          }
+        };
+
+        const handleUp = () => {
+          window.removeEventListener('pointermove', handleMove);
+          window.removeEventListener('pointerup', handleUp);
+          if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+        };
+
+        window.addEventListener('pointermove', handleMove);
+        window.addEventListener('pointerup', handleUp);
+      };
+
+      const startResize = (event) => {
+        if (panel.classList.contains('dock-activity-fullscreen')) return;
+        const direction = event.target.dataset.resize;
+        if (!direction) return;
+        event.preventDefault();
+        bringToFront(panel);
+        const rect = panel.getBoundingClientRect();
+        const startX = event.clientX;
+        const startY = event.clientY;
+        const startLeft = rect.left;
+        const startTop = rect.top;
+        const startWidth = rect.width;
+        const startHeight = rect.height;
+        let latestX = startX;
+        let latestY = startY;
+        let rafId;
+
+        const applyResize = () => {
+          const deltaX = latestX - startX;
+          const deltaY = latestY - startY;
+          let nextWidth = startWidth;
+          let nextHeight = startHeight;
+          let nextLeft = startLeft;
+          let nextTop = startTop;
+
+          if (direction.includes('e')) {
+            nextWidth = clamp(startWidth + deltaX, minActivityWidth, window.innerWidth - startLeft - windowPadding);
+          }
+          if (direction.includes('s')) {
+            nextHeight = clamp(startHeight + deltaY, minActivityHeight, window.innerHeight - startTop - windowPadding);
+          }
+          if (direction.includes('w')) {
+            const maxWidth = startWidth + (startLeft - windowPadding);
+            nextWidth = clamp(startWidth - deltaX, minActivityWidth, maxWidth);
+            nextLeft = clamp(startLeft + deltaX, windowPadding, startLeft + startWidth - minActivityWidth);
+          }
+          if (direction.includes('n')) {
+            const maxHeight = startHeight + (startTop - windowPadding);
+            nextHeight = clamp(startHeight - deltaY, minActivityHeight, maxHeight);
+            nextTop = clamp(startTop + deltaY, windowPadding, startTop + startHeight - minActivityHeight);
+          }
+
+          panel.style.left = `${nextLeft}px`;
+          panel.style.top = `${nextTop}px`;
+          panel.style.width = `${nextWidth}px`;
+          panel.style.height = `${nextHeight}px`;
+          rafId = null;
+        };
+
+        const handleMove = (moveEvent) => {
+          latestX = moveEvent.clientX;
+          latestY = moveEvent.clientY;
+          if (!rafId) {
+            rafId = requestAnimationFrame(applyResize);
+          }
+        };
+
+        const handleUp = () => {
+          window.removeEventListener('pointermove', handleMove);
+          window.removeEventListener('pointerup', handleUp);
+          if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+        };
+
+        window.addEventListener('pointermove', handleMove);
+        window.addEventListener('pointerup', handleUp);
+      };
+
+      titlebar?.addEventListener('pointerdown', startDrag);
+      resizeHandles.forEach((handle) => handle.addEventListener('pointerdown', startResize));
+      panel.addEventListener('pointerdown', () => bringToFront(panel));
+
+      return panel;
+    };
+
+    const openActivityWindow = (item) => {
+      if (!activityLayer) return;
+      const existing = activityLayer.querySelector(`.dock-activity-window[data-href="${item.href}"]`);
+      if (existing) {
+        existing.classList.remove('hidden', 'dock-activity-minimized');
+        bringToFront(existing);
+        setLayerVisibility();
+        return;
+      }
+      buildActivityWindow(item);
+      setLayerVisibility();
     };
 
     const removeDockItemByHref = (href) => {
@@ -184,118 +366,7 @@ const dockPayload = {
       });
     };
 
-    const minimizeActivityWindow = () => {
-      if (!activityWindow) return;
-      activityWindow.classList.add('dock-activity-minimized');
-      window.setTimeout(() => {
-        activityWindow.classList.add('hidden');
-        activityWindow.classList.remove('dock-activity-minimized', 'dock-activity-fullscreen');
-        activityWindow.setAttribute('aria-hidden', 'true');
-        if (activityFrame) {
-          activityFrame.setAttribute('src', 'about:blank');
-        }
-      }, 180);
-      pendingOpenItem = null;
-    };
-
     const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-
-    const startDrag = (event) => {
-      if (!activityPanel || !activityWindow || activityWindow.classList.contains('dock-activity-fullscreen')) return;
-      if (event.target.closest('.dock-control')) return;
-      event.preventDefault();
-      const rect = activityPanel.getBoundingClientRect();
-      const startX = event.clientX;
-      const startY = event.clientY;
-      const startLeft = rect.left;
-      const startTop = rect.top;
-
-      const handleMove = (moveEvent) => {
-        const deltaX = moveEvent.clientX - startX;
-        const deltaY = moveEvent.clientY - startY;
-        const nextLeft = clamp(
-          startLeft + deltaX,
-          windowPadding,
-          window.innerWidth - rect.width - windowPadding,
-        );
-        const nextTop = clamp(
-          startTop + deltaY,
-          windowPadding,
-          window.innerHeight - rect.height - windowPadding,
-        );
-        activityPanel.style.left = `${nextLeft}px`;
-        activityPanel.style.top = `${nextTop}px`;
-      };
-
-      const handleUp = () => {
-        window.removeEventListener('pointermove', handleMove);
-        window.removeEventListener('pointerup', handleUp);
-      };
-
-      window.addEventListener('pointermove', handleMove);
-      window.addEventListener('pointerup', handleUp);
-    };
-
-    const startResize = (event) => {
-      if (!activityPanel || !activityWindow || activityWindow.classList.contains('dock-activity-fullscreen')) return;
-      const direction = event.target.dataset.resize;
-      if (!direction) return;
-      event.preventDefault();
-      const rect = activityPanel.getBoundingClientRect();
-      const startX = event.clientX;
-      const startY = event.clientY;
-      const startLeft = rect.left;
-      const startTop = rect.top;
-      const startWidth = rect.width;
-      const startHeight = rect.height;
-
-      const handleMove = (moveEvent) => {
-        const deltaX = moveEvent.clientX - startX;
-        const deltaY = moveEvent.clientY - startY;
-        let nextWidth = startWidth;
-        let nextHeight = startHeight;
-        let nextLeft = startLeft;
-        let nextTop = startTop;
-
-        if (direction.includes('e')) {
-          nextWidth = clamp(startWidth + deltaX, minActivityWidth, window.innerWidth - startLeft - windowPadding);
-        }
-        if (direction.includes('s')) {
-          nextHeight = clamp(startHeight + deltaY, minActivityHeight, window.innerHeight - startTop - windowPadding);
-        }
-        if (direction.includes('w')) {
-          const maxWidth = startWidth + (startLeft - windowPadding);
-          nextWidth = clamp(startWidth - deltaX, minActivityWidth, maxWidth);
-          nextLeft = clamp(startLeft + deltaX, windowPadding, startLeft + startWidth - minActivityWidth);
-        }
-        if (direction.includes('n')) {
-          const maxHeight = startHeight + (startTop - windowPadding);
-          nextHeight = clamp(startHeight - deltaY, minActivityHeight, maxHeight);
-          nextTop = clamp(startTop + deltaY, windowPadding, startTop + startHeight - minActivityHeight);
-        }
-
-        activityPanel.style.left = `${nextLeft}px`;
-        activityPanel.style.top = `${nextTop}px`;
-        activityPanel.style.width = `${nextWidth}px`;
-        activityPanel.style.height = `${nextHeight}px`;
-      };
-
-      const handleUp = () => {
-        window.removeEventListener('pointermove', handleMove);
-        window.removeEventListener('pointerup', handleUp);
-      };
-
-      window.addEventListener('pointermove', handleMove);
-      window.addEventListener('pointerup', handleUp);
-    };
-
-    const openActivityArticle = () => {
-      if (!activityWindow || !pendingOpenItem?.href) return;
-      activityWindow.classList.add('dock-activity-fullscreen');
-      window.setTimeout(() => {
-        window.location.assign(pendingOpenItem.href);
-      }, 260);
-    };
 
     const createDockItem = (item, removable = false) => {
       const li = document.createElement('li');
@@ -379,16 +450,11 @@ const dockPayload = {
       });
     });
 
-    activityWindow?.querySelector('[data-action="close"]')?.addEventListener('click', () => {
-      if (pendingOpenItem?.href) {
-        removeDockItemByHref(pendingOpenItem.href);
-      }
-      closeActivityWindow();
+    activityLayer?.addEventListener('dblclick', (event) => {
+      const panel = event.target.closest('.dock-activity-window');
+      if (!panel?.dataset.href) return;
+      window.location.assign(panel.dataset.href);
     });
-    activityWindow?.querySelector('[data-action="minimize"]')?.addEventListener('click', minimizeActivityWindow);
-    activityWindow?.querySelector('[data-action="open"]')?.addEventListener('click', openActivityArticle);
-    activityTitlebar?.addEventListener('pointerdown', startDrag);
-    resizeHandles.forEach((handle) => handle.addEventListener('pointerdown', startResize));
 
     dock.addEventListener('mouseenter', showDock);
     dock.addEventListener('mouseleave', queueHide);
@@ -469,6 +535,11 @@ const dockPayload = {
     flex-direction: column;
     transform-origin: center;
     animation: dock-window-open 180ms ease-out;
+    contain: layout paint;
+  }
+
+  .dock-activity-window.hidden {
+    display: none;
   }
 
   .dock-activity-titlebar {
@@ -607,13 +678,13 @@ const dockPayload = {
     cursor: nesw-resize;
   }
 
-  .dock-activity-minimized .dock-activity-window {
+  .dock-activity-window.dock-activity-minimized {
     transform: scale(0.86) translateY(120px);
     opacity: 0;
     transition: transform 180ms ease-in, opacity 180ms ease-in;
   }
 
-  .dock-activity-fullscreen .dock-activity-window {
+  .dock-activity-window.dock-activity-fullscreen {
     transform: scale(1.08);
     transition: transform 180ms ease-in;
   }
