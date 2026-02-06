@@ -63,10 +63,10 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
         <details class="chapter-panel" open>
           <summary>
             <span class="chapter-summary-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true">
-                <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
-              </svg>
-            </span>
+            <!--  <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true">-->
+            <!--    <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>-->
+            <!--  </svg>-->
+            <!--</span>-->
             # 章節導航
             <span class="chapter-summary-chevron" aria-hidden="true"></span>
           </summary>
@@ -217,9 +217,6 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
 
   .chapter-panel:not([open]) summary {
     margin-bottom: 0;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    letter-spacing: 0.05em;
   }
 
   .chapter-nav ul {
@@ -430,7 +427,6 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
     }
 
     .chapter-panel:not([open]) summary {
-      writing-mode: horizontal-tb;
       margin-bottom: 0;
     }
 
@@ -440,7 +436,6 @@ const navigationHeadings = headings.filter((heading) => heading.depth <= 3);
     }
   }
 </style>
-
 
 
 
