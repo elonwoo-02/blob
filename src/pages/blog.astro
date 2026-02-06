@@ -131,6 +131,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
             <article
               class="rounded-3xl border border-base-300 bg-base-100 p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               data-post-card
+              data-post-link={`/posts/${post.id}/`}
               data-tags={getPostTagPaths(post.data.tags)}
             >
               <div class="flex items-center gap-3 text-sm text-base-content/70">
@@ -244,6 +245,30 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
             sidebarToggle.textContent = collapsed ? '⇤' : '⇥';
           });
         }
+
+        const shouldIgnoreCardClick = (target) =>
+          Boolean(target.closest('a, button, input, label, textarea, select, [role="button"]'));
+
+        postCards.forEach((card) => {
+          card.addEventListener('click', (event) => {
+            if (shouldIgnoreCardClick(event.target)) return;
+            const href = card.getAttribute('data-post-link');
+            if (!href) return;
+            window.location.href = href;
+          });
+
+          card.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            if (shouldIgnoreCardClick(event.target)) return;
+            const href = card.getAttribute('data-post-link');
+            if (!href) return;
+            event.preventDefault();
+            window.location.href = href;
+          });
+
+          card.setAttribute('tabindex', '0');
+          card.setAttribute('role', 'link');
+        });
       </script>
 
       <style is:inline>
