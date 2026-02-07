@@ -580,6 +580,7 @@ const { pageTitle } = Astro.props;
       pushLine('  home                 Go to Home', 'dim');
       pushLine('  blog                 Go to Blog', 'dim');
       pushLine('  about                Go to About', 'dim');
+      pushLine('  bookmarks            Go to Bookmarks', 'dim');
       pushLine('  theme dark|light|auto Switch theme', 'dim');
       pushLine('  theme toggle          Toggle theme', 'dim');
       pushLine('  open <url>            Open a URL', 'dim');
@@ -618,6 +619,9 @@ const { pageTitle } = Astro.props;
           break;
         case 'about':
           pushLine('about - go to About', 'dim');
+          break;
+        case 'bookmarks':
+          pushLine('bookmarks - go to Bookmarks', 'dim');
           break;
         case 'theme':
           pushLine('theme dark|light|auto|toggle - switch theme', 'dim');
@@ -918,6 +922,7 @@ const { pageTitle } = Astro.props;
       'home',
       'blog',
       'about',
+      'bookmarks',
       'theme',
       'open',
       'search',
@@ -994,9 +999,12 @@ const { pageTitle } = Astro.props;
           case 'blog':
             navigateTo('/blog/');
             break;
-          case 'about':
-            navigateTo('/about/');
-            break;
+        case 'about':
+          navigateTo('/about/');
+          break;
+        case 'bookmarks':
+          navigateTo('/bookmarks/');
+          break;
           case 'theme':
             if (argument === 'dark' || argument === 'light' || argument === 'auto') {
               setThemeMode(argument);

@@ -246,6 +246,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
         const toast = document.getElementById('toast');
         let toastTimer = null;
         const actionStoragePrefix = 'blog:action:';
+        const bookmarkKey = 'blog:bookmarks';
         const canStore = (() => {
           try {
             localStorage.setItem(`${actionStoragePrefix}ping`, '1');
@@ -274,6 +275,20 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
         const setStoredValue = (key, value) => {
           if (!canStore) return;
           localStorage.setItem(key, value);
+        };
+
+        const readBookmarks = () => {
+          if (!canStore) return [];
+          try {
+            return JSON.parse(localStorage.getItem(bookmarkKey) || '[]');
+          } catch (error) {
+            return [];
+          }
+        };
+
+        const writeBookmarks = (items) => {
+          if (!canStore) return;
+          localStorage.setItem(bookmarkKey, JSON.stringify(items.slice(-200)));
         };
 
         const getInitialCount = (button) => {
@@ -390,6 +405,27 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
               updateLabel(button, liked);
               updateCount(button, baseCount + (liked ? 1 : 0));
 
+              const resolveBookmarkPayload = () => {
+                const title = card.querySelector('h3 a')?.textContent?.trim() || postId;
+                const description = card.querySelector('p.mt-2')?.textContent?.trim() || '';
+                const url = card.getAttribute('data-post-link') || '';
+                return {
+                  slug: postId,
+                  title,
+                  description,
+                  url,
+                };
+              };
+
+              if (liked) {
+                const list = readBookmarks();
+                const payload = resolveBookmarkPayload();
+                if (!list.some((item) => item.slug === payload.slug)) {
+                  list.push(payload);
+                  writeBookmarks(list);
+                }
+              }
+
               button.addEventListener('click', (event) => {
                 event.stopPropagation();
                 liked = !liked;
@@ -397,6 +433,16 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
                 button.classList.toggle('is-active', liked);
                 updateLabel(button, liked);
                 updateCount(button, baseCount + (liked ? 1 : 0));
+                const list = readBookmarks();
+                const payload = resolveBookmarkPayload();
+                if (liked) {
+                  if (!list.some((item) => item.slug === payload.slug)) {
+                    list.push(payload);
+                  }
+                  writeBookmarks(list);
+                } else {
+                  writeBookmarks(list.filter((item) => item.slug !== payload.slug));
+                }
               });
               return;
             }

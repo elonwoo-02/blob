@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const pageTitle = '';
+---
+
+<BaseLayout pageTitle={pageTitle}>
+  <section class="bookmark-page">
+    <div class="bookmark-panel">
+      <h1 class="text-2xl font-bold">稍後在讀</h1>
+      <p class="text-sm text-base-content/70">Saved on this device only.</p>
+      <button id="bookmark-clear" class="btn btn-ghost btn-sm" type="button">Clear</button>
+    </div>
+    <div id="bookmark-list" class="bookmark-list"></div>
+  </section>
+
+  <script is:inline>
+    const listEl = document.getElementById('bookmark-list');
+    const clearBtn = document.getElementById('bookmark-clear');
+    const key = 'blog:bookmarks';
+
+    const readList = () => JSON.parse(localStorage.getItem(key) || '[]');
+    const writeList = (items) => localStorage.setItem(key, JSON.stringify(items));
+
+    const render = () => {
+      if (!listEl) return;
+      const items = readList();
+      listEl.innerHTML = '';
+      if (!items.length) {
+        listEl.innerHTML = '<p class="text-sm text-base-content/60">No bookmarks yet.</p>';
+        return;
+      }
+      items.slice().reverse().forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'bookmark-card';
+        card.innerHTML = `
+          <div>
+            <a href="${item.url}">${item.title || item.slug}</a>
+            <p>${item.description || ''}</p>
+          </div>
+          <button class="btn btn-ghost btn-xs" type="button" data-slug="${item.slug}">Remove</button>
+        `;
+        listEl.append(card);
+      });
+    };
+
+    listEl?.addEventListener('click', (event) => {
+      const btn = event.target.closest('button[data-slug]');
+      if (!btn) return;
+      const slug = btn.getAttribute('data-slug');
+      const items = readList().filter((item) => item.slug !== slug);
+      writeList(items);
+      render();
+    });
+
+    clearBtn?.addEventListener('click', () => {
+      writeList([]);
+      render();
+    });
+
+    render();
+  </script>
+</BaseLayout>
+
+<style>
+  .bookmark-page {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .bookmark-panel {
+    border-radius: 1.25rem;
+    border: 1px solid hsl(var(--bc) / 0.15);
+    background: hsl(var(--b1));
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .bookmark-list {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .bookmark-card {
+    border-radius: 1rem;
+    border: 1px solid hsl(var(--bc) / 0.15);
+    padding: 0.9rem 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: hsl(var(--b1));
+  }
+
+  .bookmark-card a {
+    font-weight: 600;
+  }
+
+  .bookmark-card p {
+    font-size: 0.9rem;
+    color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
+  }
+</style>

@@ -2,7 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import SectionTreeNode from '../components/SectionTreeNode.astro';
 
-const { frontmatter, headings = [] } = Astro.props as {
+const { frontmatter, headings = [], readingTime = 1, postId = '' } = Astro.props as {
   frontmatter: {
     title: string;
     pubDate: Date;
@@ -15,6 +15,8 @@ const { frontmatter, headings = [] } = Astro.props as {
     tags?: string[];
   };
   headings?: Array<{ depth: number; slug: string; text: string }>;
+  readingTime?: number;
+  postId?: string;
 };
 
 type SectionNode = {
@@ -71,6 +73,21 @@ const sectionTree = buildSectionTree(sectionHeadings);
               </div>
               <p class="author">{frontmatter.author}</p>
               <p class="publish-date">{frontmatter.pubDate.toLocaleDateString()}</p>
+              <p class="reading-time">{readingTime} min read</p>
+              <button
+                id="post-like-btn"
+                class="post-action-btn"
+                type="button"
+                data-post-id={postId || Astro.url.pathname}
+                data-post-title={frontmatter.title}
+                data-post-url={Astro.url.pathname}
+                data-post-desc={frontmatter.description}
+                data-post-date={frontmatter.pubDate.toISOString()}
+                aria-pressed="false"
+              >
+                <span class="post-action-icon" aria-hidden="true">❤</span>
+                <span class="post-action-label">Like</span>
+              </button>
             </div>
             <p class="description"><em>{frontmatter.description}</em></p>
           </div>
@@ -137,10 +154,91 @@ const sectionTree = buildSectionTree(sectionHeadings);
         sidebarToggle.textContent = collapsed ? '⇥' : '⇤';
       });
     }
+    const progressBar = document.getElementById('reading-progress');
+    const updateProgress = () => {
+      if (!progressBar) return;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = total > 0 ? Math.min(1, window.scrollY / total) : 0;
+      progressBar.style.width = `${percent * 100}%`;
+    };
+    updateProgress();
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress);
+
+    const likeButton = document.getElementById('post-like-btn');
+    if (likeButton) {
+      const postId = likeButton.getAttribute('data-post-id') || '';
+      const likeKey = `blog:action:like:${postId}`;
+      const bookmarkKey = 'blog:bookmarks';
+      const readBookmarks = () => JSON.parse(localStorage.getItem(bookmarkKey) || '[]');
+      const writeBookmarks = (items) =>
+        localStorage.setItem(bookmarkKey, JSON.stringify(items.slice(-200)));
+
+      const getPayload = () => ({
+        slug: postId,
+        title: likeButton.getAttribute('data-post-title') || '',
+        url: likeButton.getAttribute('data-post-url') || '',
+        description: likeButton.getAttribute('data-post-desc') || '',
+        date: likeButton.getAttribute('data-post-date') || '',
+      });
+
+      const syncState = () => {
+        const liked = localStorage.getItem(likeKey) === '1';
+        likeButton.classList.toggle('is-active', liked);
+        likeButton.setAttribute('aria-pressed', `${liked}`);
+        likeButton.querySelector('.post-action-label').textContent = liked ? 'Liked' : 'Like';
+        if (liked) {
+          const list = readBookmarks();
+          const payload = getPayload();
+          if (!list.some((item) => item.slug === payload.slug)) {
+            list.push(payload);
+            writeBookmarks(list);
+          }
+        }
+      };
+
+      likeButton.addEventListener('click', () => {
+        if (!postId) return;
+        const liked = localStorage.getItem(likeKey) === '1';
+        const next = !liked;
+        localStorage.setItem(likeKey, next ? '1' : '0');
+        const list = readBookmarks();
+        const payload = getPayload();
+        if (next) {
+          if (!list.some((item) => item.slug === payload.slug)) {
+            list.push(payload);
+          }
+          writeBookmarks(list);
+        } else {
+          const filtered = list.filter((item) => item.slug !== payload.slug);
+          writeBookmarks(filtered);
+        }
+        syncState();
+      });
+
+      syncState();
+    }
   </script>
 </BaseLayout>
 
 <style>
+  .post-progress {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: 3px;
+    width: 100%;
+    background: color-mix(in oklab, var(--color-base-content) 12%, transparent);
+    margin-bottom: 0.75rem;
+  }
+
+  #reading-progress {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #34d399, #10b981);
+    transition: width 0.1s linear;
+  }
   .post-layout {
     display: block;
     min-width: 0;
@@ -169,6 +267,44 @@ const sectionTree = buildSectionTree(sectionHeadings);
     gap: 0.75rem;
     margin-bottom: 0.35rem;
     flex-wrap: wrap;
+  }
+
+  .reading-time {
+    font-size: 0.85rem;
+    color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
+  }
+
+  .post-action-btn {
+    align-items: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    color: hsl(var(--bc));
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 600;
+    gap: 0.35rem;
+    padding: 0.35rem 0.6rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  }
+
+  .post-action-btn:hover {
+    border-color: hsl(var(--bc) / 0.18);
+    background: hsl(var(--b2));
+    transform: translateY(-1px);
+  }
+
+  .post-action-btn.is-active {
+    color: hsl(var(--p));
+    border-color: transparent;
+    background: hsl(var(--p) / 0.08);
+  }
+
+  .post-action-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .post-avatar {
