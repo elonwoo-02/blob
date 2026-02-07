@@ -1,5 +1,9 @@
 ---
+import Dock from "./Dock.astro";
+import ThemeIcon from "./ThemeIcon.astro";
+const { pageTitle } = Astro.props;
 ---
-<button aria-expanded="false" aria-controls="main-menu" class="menu">
-  Menu
-</button>
+
+<div class="hidden md:block relative">
+  <Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
+</div>

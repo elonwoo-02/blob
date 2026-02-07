@@ -1,9 +1,9 @@
 // 导入 glob 加载器（loader）
-import { glob } from "astro/loaders";
+import {glob} from "astro/loaders";
 // 从 `astro:content` 导入工具函数
-import { defineCollection } from "astro:content";
+import {defineCollection} from "astro:content";
 // 导入 Zod
-import { z } from "astro/zod";
+import {z} from "astro/zod";
 // 为每个集合定义一个 `loader` 和 `schema`
 const blog = defineCollection({
     loader: glob({ pattern: '**/[^_]*.md', base: "./src/blog" }),
@@ -16,7 +16,10 @@ const blog = defineCollection({
         url: z.string(),
         alt: z.string()
       }),
-      tags: z.array(z.string())
+      tags: z.array(z.string()),
+      likeCount: z.number().int().min(0).optional(),
+      shareCount: z.number().int().min(0).optional(),
+      docked: z.boolean().optional()
     })
 });
 // 导出一个单独的 `collections` 对象用以注册你的集合（们）

@@ -1,59 +1,100 @@
 ---
-import MenuIcon from "./icon/MenuIcon.astro";
-import ThemeIcon from "./ThemeIcon.astro";
+import MenuIcon from './icon/MenuIcon.astro';
+import ThemeIcon from './ThemeIcon.astro';
+
+const { pageTitle = 'Dimensional Debris' } = Astro.props;
+const currentPath = Astro.url.pathname;
+const navItems = [
+  { href: '/', label: 'Home' },
+  { href: '/blog/', label: 'Blog' },
+  { href: '/about/', label: 'About' },
+  { href: '/', label: 'Bot'}
+];
 
 ---
 
-<div class="drawer">
-  <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+<div class="drawer md:hidden">
+  <input id="mobile-nav-drawer" type="checkbox" class="drawer-toggle" />
 
-  <!-- 页面主体 -->
-  <div class="drawer-content flex flex-col">
-    <!-- Navbar -->
-    <div class="navbar fixed top-0 left-0 w-full bg-base-100/30 backdrop-blur-md shadow-md">
-      <!-- 左侧小屏幕按钮 -->
-      <div class="navbar-start flex-none lg:hidden">
-        <label for="my-drawer-2" aria-label="open sidebar" class="btn btn-square btn-ghost">
-          <MenuIcon/>
+  <div class="drawer-content">
+    <div class="navbar fixed top-0 left-0 z-50 w-full border-b border-base-200 bg-base-100/90 backdrop-blur-md">
+      <div class="navbar-start flex items-center gap-2">
+        <label for="mobile-nav-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost">
+          <MenuIcon />
         </label>
+        <a href="/" class="font-bold truncate max-w-[42vw]">{pageTitle}</a>
       </div>
 
-      <!-- Navbar 标题 -->
-      <div class="navbar-start mx-2 p-2 flex-1 text-black font-bold">
-        <a href="/">Navbar Title</a>
-      </div>
-
-      <!-- 右侧菜单 -->
-      <div class="navbar-end hidden lg:flex gap-2">
-        <ul class="menu menu-horizontal px-1 bg-transparent">
-          <li><a class="text-black font-bold" href="/about/">关于我</a></li>
-          <li>
-            <details>
-              <summary class="text-black font-bold">Parent</summary>
-              <ul class="p-2 bg-base-100/80 w-40 z-50">
-                <li><a>Submenu 1</a></li>
-                <li><a>Submenu 2</a></li>
-              </ul>
-            </details>
-          </li>
-          <li><a class="text-black font-bold">Item 3</a></li>
-        </ul>
+      <div class="navbar-end">
         <ThemeIcon />
       </div>
     </div>
 
-    <!-- 页面内容 -->
-    <slot/>
+    <!--<nav class="mobile-dock" aria-label="底部导航">-->
+    <!--  {navItems.map((item) => (-->
+    <!--    <a class:list={["dock-link", currentPath === item.href && 'is-active']} href={item.href}>-->
+    <!--      {item.label}-->
+    <!--    </a>-->
+    <!--  ))}-->
+    <!--</nav>-->
   </div>
 
-  <!-- Drawer 侧边栏 -->
-  <div class="drawer-side">
-    <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
-    <ul class="menu bg-base-200 min-h-full w-50 p-4">
-      <!-- Sidebar content here -->
-      <li><a>Sidebar Item 1</a></li>
-      <li><a>Sidebar Item 2</a></li>
+  <div class="drawer-side z-[60]">
+    <label for="mobile-nav-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+    <ul class="menu min-h-full w-64 bg-base-200 p-4">
+      <li class="menu-title">Navbar</li>
+  {navItems.map((item) => (
+    <li>
+      <a href={item.href} data-nav-path={item.href}>
+        {item.label}
+      </a>
+    </li>
+  ))}
+      <li><a href="https://github.com/elonwoo-02/" target="_blank" rel="noreferrer">GitHub</a></li>
     </ul>
   </div>
-
 </div>
+
+<script>
+  const isFileScheme = window.location.protocol === 'file:' || window.location.origin === 'null';
+  if (isFileScheme) {
+    const base = window.location.href.replace(/[^/]*$/, '');
+    const links = document.querySelectorAll('[data-nav-path]');
+    links.forEach((link) => {
+      const rawPath = link.getAttribute('data-nav-path') || '';
+      if (!rawPath || rawPath.startsWith('http')) return;
+      const normalized = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
+      link.setAttribute('href', new URL(normalized, base).toString());
+    });
+  }
+</script>
+
+<style>
+  .mobile-dock {
+    position: fixed;
+    left: 50%;
+    bottom: 0.8rem;
+    z-index: 50;
+    display: flex;
+    gap: 0.4rem;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--color-base-content) 15%, transparent);
+    background: color-mix(in oklab, var(--color-base-100) 82%, transparent);
+    padding: 0.45rem;
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.16);
+    backdrop-filter: blur(10px);
+  }
+
+  .dock-link {
+    border-radius: 999px;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.9rem;
+  }
+
+  .dock-link.is-active {
+    background: color-mix(in oklab, var(--color-primary) 20%, transparent);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+</style>
