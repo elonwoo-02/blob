@@ -10,6 +10,6 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
-  site:"https://example.com",
+  site:"https://blob-1yd.pages.dev",
   integrations: [preact()]
 });

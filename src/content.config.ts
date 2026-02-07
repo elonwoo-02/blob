@@ -10,13 +10,18 @@ const blog = defineCollection({
     schema: z.object({
       title: z.string(),
       pubDate: z.date(),
+      updated: z.date().optional(),
       description: z.string(),
       author: z.string(),
       image: z.object({
         url: z.string(),
         alt: z.string()
-      }),
+      }).optional(),
       tags: z.array(z.string()),
+      series: z.string().optional(),
+      seriesOrder: z.number().int().optional(),
+      changes: z.array(z.string()).optional(),
+      draft: z.boolean().optional(),
       likeCount: z.number().int().min(0).optional(),
       shareCount: z.number().int().min(0).optional(),
       docked: z.boolean().optional()
