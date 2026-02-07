@@ -1,0 +1,765 @@
+---
+import DockItem from './DockItem.astro';
+import DockBackToTop from './dock/DockBackToTop.astro';
+import DockThemeToggle from './dock/DockThemeToggle.astro';
+import DockRssLink from './dock/DockRssLink.astro';
+import DockHomeIcon from "./dock/DockHomeIcon.astro";
+import DockBotIcon from "./dock/DockBotIcon.astro";
+
+interface DockEntry {
+  label: string;
+  href: string;
+  icon: string;
+  external?: boolean;
+  removable?: boolean;
+  action?: string;
+}
+
+const { pageTitle = '页面', currentPath = '/' } = Astro.props;
+
+const homeIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V10.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`;
+const blogIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 7h8M8 11h8M8 15h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+const aboutIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+const githubIcon = `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 .5A12 12 0 0 0 8.2 23.9c.6.1.8-.2.8-.6v-2.2c-3.3.7-4-1.5-4-1.5-.6-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.7-2.7-.3-5.6-1.3-5.6-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2A11.4 11.4 0 0 1 12 6a11.3 11.3 0 0 1 3 .4c2.2-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.6 5.9.5.4.9 1.2.9 2.4v3.5c0 .4.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>`;
+const botIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6" aria-hidden="true"><rect x="2" y="5.4" width="20" height="17.8" rx="5.1"/><circle cx="9.4" cy="12.6" r="1.8" fill="currentColor" stroke="none"/><circle cx="14.6" cy="12.6" r="1.8" fill="currentColor" stroke="none"/><path d="M8.6 16.9h6.8"/><path d="M12 2.2v3"/><circle cx="12" cy="2.2" r="1.2" fill="currentColor" stroke="none"/></svg>`;
+const terminalIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M7 9l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.5 15.5H17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+
+const systemItems: DockEntry[] = [
+  { label: 'Home', href: '/', icon: homeIcon },
+  { label: 'Blog', href: '/blog/', icon: blogIcon },
+  { label: 'About', href: '/about/', icon: aboutIcon },
+  { label: 'Terminal', href: '#terminal', icon: terminalIcon, action: 'terminal' },
+  { label: 'GitHub', href: 'https://github.com/elonwoo-02/', icon: githubIcon, external: true },
+  { label: 'Bot', href: '/', icon: botIcon }
+];
+
+
+const externalItems: DockEntry[] = [];
+
+const dockPayload = {
+  pageTitle,
+  currentPath,
+};
+---
+
+<div class="pointer-events-none fixed inset-x-0 bottom-0 z-70 hidden md:block">
+  <div class="dock-sensor h-24 w-full"></div>
+  <nav
+    id="mac-dock"
+    class="pointer-events-auto mx-auto mb-4 flex w-fit max-w-[90vw] items-center gap-3 rounded-3xl border border-white/30 bg-black/55 px-4 py-3 text-white shadow-2xl backdrop-blur-md transition-all duration-300 ease-out"
+    data-state="visible"
+    data-dock={JSON.stringify(dockPayload)}
+  >
+    <ul class="dock-left flex items-end gap-2">
+      {systemItems.map((item) => <DockItem {...item} />)}
+      <DockHomeIcon/>
+      <!--<DockBotIcon/>-->
+      <DockBackToTop />
+      <DockThemeToggle />
+      <DockRssLink />
+    </ul>
+
+    <div class="dock-divider h-8 w-px bg-white/40"></div>
+
+    <ul class="dock-right flex items-end gap-2">
+      {externalItems.map((item) => <DockItem {...item} />)}
+    </ul>
+  </nav>
+</div>
+
+<div id="dock-activity" class="dock-activity hidden" aria-hidden="true">
+  <template id="dock-activity-template">
+    <div class="dock-activity-window" role="dialog" aria-modal="true">
+      <div class="dock-activity-titlebar">
+        <div class="dock-traffic-lights">
+          <button class="dock-control dock-control-close" type="button" data-action="close" aria-label="关闭"></button>
+          <button class="dock-control dock-control-minimize" type="button" data-action="minimize" aria-label="缩小"></button>
+          <button class="dock-control dock-control-fullscreen" type="button" data-action="open" aria-label="打开文章"></button>
+        </div>
+        <p class="dock-activity-title"></p>
+      </div>
+      <div class="dock-activity-body">
+        <iframe
+          class="dock-activity-frame"
+          title="文章预览"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+      </div>
+      <div class="dock-activity-resize-handles" aria-hidden="true">
+        <span class="dock-activity-resize-handle" data-resize="n"></span>
+        <span class="dock-activity-resize-handle" data-resize="s"></span>
+        <span class="dock-activity-resize-handle" data-resize="e"></span>
+        <span class="dock-activity-resize-handle" data-resize="w"></span>
+        <span class="dock-activity-resize-handle" data-resize="ne"></span>
+        <span class="dock-activity-resize-handle" data-resize="nw"></span>
+        <span class="dock-activity-resize-handle" data-resize="se"></span>
+        <span class="dock-activity-resize-handle" data-resize="sw"></span>
+      </div>
+    </div>
+  </template>
+</div>
+
+<script>
+  const dock = document.querySelector('#mac-dock');
+  if (dock) {
+    const payload = JSON.parse(dock.dataset.dock || '{}');
+    const rightList = dock.querySelector('.dock-right');
+    const removeButtons = dock.querySelectorAll('.dock-remove');
+    const activityLayer = document.querySelector('#dock-activity');
+    const activityTemplate = document.querySelector('#dock-activity-template');
+    const hideDelay = 3000;
+    const showBoundary = 100;
+    const windowPadding = 12;
+    const minActivityWidth = 360;
+    const minActivityHeight = 320;
+    let hideTimer;
+    let topZIndex = 70;
+
+    const articleIcon = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 8h8M8 12h8M8 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+
+    const storageKey = 'dock-opened-items';
+    const openedItems = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+
+    const showDock = () => {
+      dock.style.transform = 'translateY(0)';
+      dock.style.opacity = '1';
+      dock.dataset.state = 'visible';
+      window.clearTimeout(hideTimer);
+    };
+
+    const hideDock = () => {
+      dock.style.transform = 'translateY(120%)';
+      dock.style.opacity = '0';
+      dock.dataset.state = 'hidden';
+    };
+
+    const queueHide = () => {
+      window.clearTimeout(hideTimer);
+      hideTimer = window.setTimeout(hideDock, hideDelay);
+    };
+
+    const setLayerVisibility = () => {
+      if (!activityLayer) return;
+      const hasWindows = activityLayer.querySelectorAll('.dock-activity-window:not(.hidden)').length > 0;
+      activityLayer.classList.toggle('hidden', !hasWindows);
+      activityLayer.classList.toggle('is-visible', hasWindows);
+      activityLayer.setAttribute('aria-hidden', hasWindows ? 'false' : 'true');
+    };
+
+    const bringToFront = (panel) => {
+      topZIndex += 1;
+      panel.style.zIndex = `${topZIndex}`;
+    };
+
+    const positionPanel = (panel) => {
+      if (panel.dataset.positioned) return;
+      requestAnimationFrame(() => {
+        const rect = panel.getBoundingClientRect();
+        const left = Math.max(windowPadding, (window.innerWidth - rect.width) / 2);
+        const top = Math.max(windowPadding, (window.innerHeight - rect.height) / 2);
+        panel.style.left = `${left}px`;
+        panel.style.top = `${top}px`;
+        panel.style.width = `${rect.width}px`;
+        panel.style.height = `${rect.height}px`;
+        panel.dataset.positioned = 'true';
+      });
+    };
+
+    const restorePanelState = (panel) => {
+      const key = panel.dataset.href ? `dock:panel:${panel.dataset.href}` : null;
+      if (!key) return false;
+      const stored = window.localStorage.getItem(key);
+      if (!stored) return false;
+      try {
+        const parsed = JSON.parse(stored);
+        panel.style.left = `${parsed.left}px`;
+        panel.style.top = `${parsed.top}px`;
+        panel.style.width = `${parsed.width}px`;
+        panel.style.height = `${parsed.height}px`;
+        panel.dataset.positioned = 'true';
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    const persistPanelState = (panel) => {
+      if (!panel.dataset.href) return;
+      const rect = panel.getBoundingClientRect();
+      const payload = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+      window.localStorage.setItem(`dock:panel:${panel.dataset.href}`, JSON.stringify(payload));
+    };
+
+    const buildActivityWindow = (item) => {
+      if (!activityLayer || !activityTemplate) return null;
+      const fragment = activityTemplate.content.cloneNode(true);
+      const panel = fragment.querySelector('.dock-activity-window');
+      const title = panel?.querySelector('.dock-activity-title');
+      const frame = panel?.querySelector('.dock-activity-frame');
+      if (!panel || !title || !frame) return null;
+
+      panel.dataset.href = item.href || '';
+      panel.dataset.label = item.label || '文章';
+      panel.setAttribute('aria-labelledby', `dock-activity-title-${Date.now()}`);
+      title.id = panel.getAttribute('aria-labelledby');
+      title.textContent = item.label || '文章';
+      if (item.href) {
+        frame.setAttribute('src', item.href);
+      }
+      bringToFront(panel);
+      activityLayer.append(panel);
+      if (!restorePanelState(panel)) {
+        positionPanel(panel);
+      }
+
+      const resizeHandles = panel.querySelectorAll('.dock-activity-resize-handle') || [];
+      const titlebar = panel.querySelector('.dock-activity-titlebar');
+
+      const closeButton = panel.querySelector('[data-action="close"]');
+      const minimizeButton = panel.querySelector('[data-action="minimize"]');
+      const openButton = panel.querySelector('[data-action="open"]');
+
+      closeButton?.addEventListener('click', () => {
+        if (panel.dataset.href) {
+          removeDockItemByHref(panel.dataset.href);
+        }
+        panel.remove();
+        setLayerVisibility();
+      });
+
+      minimizeButton?.addEventListener('click', () => {
+        panel.classList.add('dock-activity-minimized');
+        window.setTimeout(() => {
+          panel.classList.add('hidden');
+          panel.classList.remove('dock-activity-minimized', 'dock-activity-fullscreen');
+          setLayerVisibility();
+        }, 180);
+      });
+
+      openButton?.addEventListener('click', () => {
+        if (!panel.dataset.href) return;
+        panel.classList.add('dock-activity-fullscreen');
+        window.setTimeout(() => {
+          window.location.assign(panel.dataset.href);
+        }, 320);
+      });
+
+      const startDrag = (event) => {
+        if (panel.classList.contains('dock-activity-fullscreen')) return;
+        if (event.target.closest('.dock-control')) return;
+        event.preventDefault();
+        bringToFront(panel);
+        const rect = panel.getBoundingClientRect();
+        const startX = event.clientX;
+        const startY = event.clientY;
+        const startLeft = rect.left;
+        const startTop = rect.top;
+        let latestX = startX;
+        let latestY = startY;
+        let rafId;
+
+        const applyMove = () => {
+          const deltaX = latestX - startX;
+          const deltaY = latestY - startY;
+          const nextLeft = clamp(
+            startLeft + deltaX,
+            windowPadding,
+            window.innerWidth - rect.width - windowPadding,
+          );
+          const nextTop = clamp(
+            startTop + deltaY,
+            windowPadding,
+            window.innerHeight - rect.height - windowPadding,
+          );
+          panel.style.left = `${nextLeft}px`;
+          panel.style.top = `${nextTop}px`;
+          rafId = null;
+        };
+
+        const handleMove = (moveEvent) => {
+          latestX = moveEvent.clientX;
+          latestY = moveEvent.clientY;
+          if (!rafId) {
+            rafId = requestAnimationFrame(applyMove);
+          }
+        };
+
+        const handleUp = () => {
+          window.removeEventListener('pointermove', handleMove);
+          window.removeEventListener('pointerup', handleUp);
+          if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+          persistPanelState(panel);
+        };
+
+        window.addEventListener('pointermove', handleMove);
+        window.addEventListener('pointerup', handleUp);
+      };
+
+      const startResize = (event) => {
+        if (panel.classList.contains('dock-activity-fullscreen')) return;
+        const direction = event.target.dataset.resize;
+        if (!direction) return;
+        event.preventDefault();
+        bringToFront(panel);
+        const rect = panel.getBoundingClientRect();
+        const startX = event.clientX;
+        const startY = event.clientY;
+        const startLeft = rect.left;
+        const startTop = rect.top;
+        const startWidth = rect.width;
+        const startHeight = rect.height;
+        let latestX = startX;
+        let latestY = startY;
+        let rafId;
+
+        const applyResize = () => {
+          const deltaX = latestX - startX;
+          const deltaY = latestY - startY;
+          let nextWidth = startWidth;
+          let nextHeight = startHeight;
+          let nextLeft = startLeft;
+          let nextTop = startTop;
+
+          if (direction.includes('e')) {
+            nextWidth = clamp(startWidth + deltaX, minActivityWidth, window.innerWidth - startLeft - windowPadding);
+          }
+          if (direction.includes('s')) {
+            nextHeight = clamp(startHeight + deltaY, minActivityHeight, window.innerHeight - startTop - windowPadding);
+          }
+          if (direction.includes('w')) {
+            const maxWidth = startWidth + (startLeft - windowPadding);
+            nextWidth = clamp(startWidth - deltaX, minActivityWidth, maxWidth);
+            nextLeft = clamp(startLeft + deltaX, windowPadding, startLeft + startWidth - minActivityWidth);
+          }
+          if (direction.includes('n')) {
+            const maxHeight = startHeight + (startTop - windowPadding);
+            nextHeight = clamp(startHeight - deltaY, minActivityHeight, maxHeight);
+            nextTop = clamp(startTop + deltaY, windowPadding, startTop + startHeight - minActivityHeight);
+          }
+
+          panel.style.left = `${nextLeft}px`;
+          panel.style.top = `${nextTop}px`;
+          panel.style.width = `${nextWidth}px`;
+          panel.style.height = `${nextHeight}px`;
+          rafId = null;
+        };
+
+        const handleMove = (moveEvent) => {
+          latestX = moveEvent.clientX;
+          latestY = moveEvent.clientY;
+          if (!rafId) {
+            rafId = requestAnimationFrame(applyResize);
+          }
+        };
+
+        const handleUp = () => {
+          window.removeEventListener('pointermove', handleMove);
+          window.removeEventListener('pointerup', handleUp);
+          if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+          persistPanelState(panel);
+        };
+
+        window.addEventListener('pointermove', handleMove);
+        window.addEventListener('pointerup', handleUp);
+      };
+
+      titlebar?.addEventListener('pointerdown', startDrag);
+      resizeHandles.forEach((handle) => handle.addEventListener('pointerdown', startResize));
+      panel.addEventListener('pointerdown', () => bringToFront(panel));
+
+      return panel;
+    };
+
+    const openActivityWindow = (item) => {
+      if (!activityLayer) return;
+      const existing = activityLayer.querySelector(`.dock-activity-window[data-href="${item.href}"]`);
+      if (existing) {
+        if (!existing.classList.contains('hidden') && !existing.classList.contains('dock-activity-minimized')) {
+          existing.classList.add('hidden');
+          setLayerVisibility();
+          return;
+        }
+        existing.classList.remove('hidden', 'dock-activity-minimized');
+        bringToFront(existing);
+        setLayerVisibility();
+        return;
+      }
+      buildActivityWindow(item);
+      setLayerVisibility();
+    };
+
+    const closeAllActivityWindows = () => {
+      if (!activityLayer) return;
+      activityLayer.querySelectorAll('.dock-activity-window').forEach((panel) => panel.remove());
+      setLayerVisibility();
+    };
+
+    const removeDockItemByHref = (href) => {
+      if (!href) return;
+      const updatedItems = JSON.parse(window.localStorage.getItem(storageKey) || '[]').filter(
+        (openedItem) => openedItem.href !== href,
+      );
+      window.localStorage.setItem(storageKey, JSON.stringify(updatedItems));
+      dock.querySelectorAll('.dock-item').forEach((item) => {
+        if (item.dataset.href === href) {
+          item.remove();
+        }
+      });
+    };
+
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+    const createDockItem = (item, removable = false) => {
+      const li = document.createElement('li');
+      li.className = 'dock-item group relative';
+      li.dataset.href = item.href;
+      li.dataset.label = item.label;
+      li.dataset.removable = removable ? 'true' : 'false';
+
+      const anchor = document.createElement('a');
+      anchor.href = item.href;
+      anchor.className = 'tooltip tooltip-top block';
+      anchor.dataset.tip = item.label;
+      anchor.setAttribute('aria-label', item.label);
+
+      const iconWrap = document.createElement('span');
+      iconWrap.className = 'dock-icon flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white shadow-lg transition-all duration-200 ease-out group-hover:scale-[1.3] group-hover:shadow-2xl';
+      const icon = document.createElement('span');
+      icon.className = 'h-6 w-6';
+      icon.innerHTML = item.icon;
+      iconWrap.append(icon);
+      anchor.append(iconWrap);
+      li.append(anchor);
+
+      if (removable) {
+        const close = document.createElement('button');
+        close.type = 'button';
+        close.className = 'dock-remove btn btn-xs btn-circle btn-error absolute -right-1 -top-1 hidden border-0 text-[10px] text-white group-hover:flex';
+        close.setAttribute('aria-label', `关闭 ${item.label}`);
+        close.title = `关闭 ${item.label}`;
+        close.textContent = '✕';
+        close.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const updatedItems = JSON.parse(window.localStorage.getItem(storageKey) || '[]').filter(
+            (openedItem) => openedItem.href !== item.href,
+          );
+          window.localStorage.setItem(storageKey, JSON.stringify(updatedItems));
+          li.remove();
+        });
+        li.append(close);
+      }
+
+      return li;
+    };
+
+    const isSystemPath = ['/', '/blog/', '/about/'].includes(payload.currentPath);
+    const isBlogPostPath = /^\/posts\/.+/.test(payload.currentPath);
+
+    if (!isSystemPath && isBlogPostPath && payload.currentPath) {
+      const current = {
+        label: payload.pageTitle,
+        href: payload.currentPath,
+        icon: articleIcon,
+      };
+      const deduped = [current, ...openedItems.filter((item) => item.href !== current.href)].slice(0, 5);
+      window.localStorage.setItem(storageKey, JSON.stringify(deduped));
+    }
+
+    const finalOpenedItems = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+    finalOpenedItems.forEach((item) => {
+      rightList?.prepend(createDockItem(item, true));
+    });
+
+    removeButtons.forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        button.closest('.dock-item')?.remove();
+      });
+    });
+
+    dock.addEventListener('click', (event) => {
+      const anchor = event.target.closest('.dock-item a');
+      if (!anchor) return;
+      const listItem = anchor.closest('.dock-item');
+      if (!listItem || listItem.dataset.removable !== 'true') return;
+      event.preventDefault();
+      openActivityWindow({
+        href: anchor.getAttribute('href'),
+        label: listItem.dataset.label || '文章',
+      });
+    });
+
+    activityLayer?.addEventListener('dblclick', (event) => {
+      const panel = event.target.closest('.dock-activity-window');
+      if (!panel?.dataset.href) return;
+      window.location.assign(panel.dataset.href);
+    });
+
+    activityLayer?.addEventListener('click', (event) => {
+      if (event.target.closest('.dock-activity-window')) return;
+      if (event.target.closest('#mac-dock')) return;
+      closeAllActivityWindows();
+    });
+
+    dock.addEventListener('mouseenter', showDock);
+    dock.addEventListener('mouseleave', queueHide);
+    document.addEventListener('mousemove', (event) => {
+      if (window.innerHeight - event.clientY <= showBoundary) {
+        showDock();
+      }
+    });
+
+    const handleBackToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const getCurrentTheme = () => {
+      const savedTheme = window.localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        return savedTheme;
+      }
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+
+    const applyTheme = (theme) => {
+      document.documentElement.setAttribute('data-theme', theme);
+      window.localStorage.setItem('theme', theme);
+    };
+
+    const handleThemeToggle = () => {
+      const nextTheme = getCurrentTheme() === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme);
+    };
+
+    dock.querySelectorAll('[data-action="back-to-top"]').forEach((item) => {
+      item.querySelector('a')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        handleBackToTop();
+      });
+    });
+
+    dock.querySelectorAll('[data-action="theme-toggle"]').forEach((item) => {
+      item.querySelector('a')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        handleThemeToggle();
+      });
+    });
+
+    queueHide();
+  }
+</script>
+
+<style is:inline>
+  .dock-activity {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0);
+    transition: background 180ms ease;
+  }
+
+  .dock-activity.hidden {
+    display: none;
+  }
+
+  .dock-activity.is-visible {
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  .dock-activity-window {
+    width: min(760px, 94vw);
+    height: min(78vh, 720px);
+    min-width: 420px;
+    min-height: 360px;
+    position: absolute;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(232, 232, 232, 0.92));
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.28);
+    overflow: hidden;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    transform-origin: center;
+    animation: dock-window-open 200ms ease-out;
+    transition: transform 220ms ease, opacity 220ms ease, border-radius 220ms ease;
+    will-change: transform;
+    contain: layout paint;
+  }
+
+  .dock-activity-window.hidden {
+    display: none;
+  }
+
+  .dock-activity-titlebar {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0 12px;
+    background: linear-gradient(180deg, #f6f6f6, #dcdcdc);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  .dock-traffic-lights {
+    position: absolute;
+    left: 12px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .dock-control {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+
+  .dock-control-close {
+    background: #ff5f57;
+  }
+
+  .dock-control-minimize {
+    background: #febc2e;
+  }
+
+  .dock-control-fullscreen {
+    background: #28c840;
+  }
+
+  .dock-activity-title {
+    margin: 0;
+    font-size: 13px;
+    color: #2f2f2f;
+    font-weight: 600;
+  }
+
+  .dock-activity-body {
+    background: #f5f5f5;
+    flex: 1;
+    display: flex;
+  }
+
+  .dock-activity-frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+    flex: 1;
+  }
+
+  .dock-activity-resize-handles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .dock-activity-resize-handle {
+    position: absolute;
+    pointer-events: auto;
+  }
+
+  .dock-activity-resize-handle[data-resize='n'],
+  .dock-activity-resize-handle[data-resize='s'] {
+    left: 10px;
+    right: 10px;
+    height: 10px;
+  }
+
+  .dock-activity-resize-handle[data-resize='n'] {
+    top: -4px;
+    cursor: ns-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='s'] {
+    bottom: -4px;
+    cursor: ns-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='e'],
+  .dock-activity-resize-handle[data-resize='w'] {
+    top: 10px;
+    bottom: 10px;
+    width: 10px;
+  }
+
+  .dock-activity-resize-handle[data-resize='e'] {
+    right: -4px;
+    cursor: ew-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='w'] {
+    left: -4px;
+    cursor: ew-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='ne'],
+  .dock-activity-resize-handle[data-resize='nw'],
+  .dock-activity-resize-handle[data-resize='se'],
+  .dock-activity-resize-handle[data-resize='sw'] {
+    width: 16px;
+    height: 16px;
+  }
+
+  .dock-activity-resize-handle[data-resize='ne'] {
+    top: -6px;
+    right: -6px;
+    cursor: nesw-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='nw'] {
+    top: -6px;
+    left: -6px;
+    cursor: nwse-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='se'] {
+    bottom: -6px;
+    right: -6px;
+    cursor: nwse-resize;
+  }
+
+  .dock-activity-resize-handle[data-resize='sw'] {
+    bottom: -6px;
+    left: -6px;
+    cursor: nesw-resize;
+  }
+
+  .dock-activity-window.dock-activity-minimized {
+    transform: scale(0.86) translateY(120px);
+    opacity: 0;
+    transition: transform 180ms ease-in, opacity 180ms ease-in;
+  }
+
+  .dock-activity-window.dock-activity-fullscreen {
+    transform: scale(1.04);
+    transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @keyframes dock-window-open {
+    from {
+      transform: scale(0.92) translateY(18px);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+</style>
