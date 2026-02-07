@@ -56,6 +56,16 @@ const { pageTitle } = Astro.props;
     </div>
   </div>
   <style>
+    .dock-hidden #mac-dock {
+      transform: translateY(140%) !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    .dock-hidden .dock-sensor {
+      display: none;
+    }
+
     .shortcut-overlay {
       position: fixed;
       inset: 0;
@@ -361,9 +371,14 @@ const { pageTitle } = Astro.props;
     const terminalOutput = document.getElementById('terminal-output');
     const closeButtons = document.querySelectorAll('[data-shortcut-close]');
     const titlebars = document.querySelectorAll('.shortcut-titlebar');
+    const dock = document.querySelector('#mac-dock');
 
     let sequence = '';
     let sequenceTimer = null;
+
+    if (window.localStorage.getItem('dock-hidden') === '1') {
+      document.documentElement.classList.add('dock-hidden');
+    }
 
     const isEditableTarget = (target) => {
       if (!target) return false;
@@ -542,29 +557,51 @@ const { pageTitle } = Astro.props;
     }
 
 
-    const setTheme = (theme) => {
-      document.documentElement.setAttribute('data-theme', theme);
-      window.localStorage.setItem('theme', theme);
+    const getPreferredTheme = () =>
+      window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
+    const setThemeMode = (mode) => {
+      const resolved = mode === 'auto' ? getPreferredTheme() : mode;
+      document.documentElement.setAttribute('data-theme', resolved);
+      window.localStorage.setItem('theme', mode);
     };
+
+    const themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+    themeMedia.addEventListener('change', () => {
+      if (window.localStorage.getItem('theme') === 'auto') {
+        setThemeMode('auto');
+      }
+    });
 
     const showHelp = () => {
       pushLine('Commands:');
       pushLine('  help                 Show all commands', 'dim');
+      pushLine('  help <cmd>            Show command usage', 'dim');
       pushLine('  home                 Go to Home', 'dim');
       pushLine('  blog                 Go to Blog', 'dim');
       pushLine('  about                Go to About', 'dim');
-      pushLine('  theme dark|light      Switch theme', 'dim');
+      pushLine('  theme dark|light|auto Switch theme', 'dim');
       pushLine('  theme toggle          Toggle theme', 'dim');
       pushLine('  open <url>            Open a URL', 'dim');
       pushLine('  search <keyword>      Filter posts by keyword', 'dim');
+      pushLine('  search tags <tag>     Filter posts by tag', 'dim');
+      pushLine('  notes                Show quick notes', 'dim');
+      pushLine('  notes add <text>      Add a note', 'dim');
+      pushLine('  notes clear           Clear all notes', 'dim');
+      pushLine('  draft <title>         New draft template', 'dim');
+      pushLine('  post <title>          New post template', 'dim');
+      pushLine('  links                Show common links', 'dim');
+      pushLine('  export               Download terminal output', 'dim');
+      pushLine('  toggle dock          Show/hide dock', 'dim');
+      pushLine('  profile              Show profile info', 'dim');
+      pushLine('  version              Show app version', 'dim');
       pushLine('  clear                Clear terminal output', 'dim');
+      pushLine('  clear-history        Clear all command history', 'dim');
       pushLine('  !<n>                 Re-run history item', 'dim');
       pushLine('  reset-layout         Clear saved window layout', 'dim');
-      pushLine('  exit                 Close terminal', 'dim');
       pushLine('  reload               Reload current page', 'dim');
       pushLine('  status               Show page status', 'dim');
-      pushLine('  help <cmd>            Show command usage', 'dim');
-      pushLine('  clear-history        Clear all command history', 'dim');
+      pushLine('  exit                 Close terminal', 'dim');
     };
 
     const showHelpFor = (cmd) => {
@@ -583,13 +620,40 @@ const { pageTitle } = Astro.props;
           pushLine('about - go to About', 'dim');
           break;
         case 'theme':
-          pushLine('theme dark|light|toggle - switch theme', 'dim');
+          pushLine('theme dark|light|auto|toggle - switch theme', 'dim');
           break;
         case 'open':
           pushLine('open <url> - open a URL', 'dim');
           break;
         case 'search':
           pushLine('search <keyword> - list matching posts', 'dim');
+          pushLine('search tags <tag> - list posts by tag', 'dim');
+          break;
+        case 'notes':
+          pushLine('notes - show quick notes', 'dim');
+          pushLine('notes add <text> - add a note', 'dim');
+          pushLine('notes clear - clear all notes', 'dim');
+          break;
+        case 'draft':
+          pushLine('draft <title> - output draft template', 'dim');
+          break;
+        case 'post':
+          pushLine('post <title> - output post template', 'dim');
+          break;
+        case 'links':
+          pushLine('links - show common links', 'dim');
+          break;
+        case 'export':
+          pushLine('export - download terminal output', 'dim');
+          break;
+        case 'toggle':
+          pushLine('toggle dock - show/hide dock', 'dim');
+          break;
+        case 'profile':
+          pushLine('profile - show profile info', 'dim');
+          break;
+        case 'version':
+          pushLine('version - show app version', 'dim');
           break;
         case 'clear':
           pushLine('clear - clear terminal output', 'dim');
@@ -624,19 +688,163 @@ const { pageTitle } = Astro.props;
         const res = await fetch('/search.json');
         const data = await res.json();
         const items = Array.isArray(data.items) ? data.items : [];
-        const matches = items.filter((item) =>
-          (item.title || '').toLowerCase().includes(keyword.toLowerCase()),
-        ).slice(0, 6);
+        const needle = keyword.toLowerCase();
+        const matches = items.filter((item) => {
+          const title = (item.title || '').toLowerCase();
+          const description = (item.description || '').toLowerCase();
+          const tags = Array.isArray(item.tags) ? item.tags.join(' ').toLowerCase() : '';
+          return title.includes(needle) || description.includes(needle) || tags.includes(needle);
+        }).slice(0, 6);
         lastSearchResults = matches;
         if (!matches.length) {
           pushLine('No results.', 'dim');
           return;
         }
-        matches.forEach((item) => pushLine(`${item.title} -> ${item.url}`));
+        matches.forEach((item) => {
+          pushLine(`${item.title} -> ${item.url}`);
+          if (item.description) {
+            pushLine(`  ${item.description}`, 'dim');
+          }
+          if (Array.isArray(item.tags) && item.tags.length) {
+            pushLine(`  #${item.tags.join(' #')}`, 'dim');
+          }
+        });
       } catch {
         lastSearchResults = [];
         pushLine('Search index not available.', 'error');
       }
+    };
+
+    const runTagSearch = async (tag) => {
+      if (!tag) {
+        pushLine('Usage: search tags <tag>', 'error');
+        return;
+      }
+      pushLine(`Searching tag "${tag}"...`, 'dim');
+      try {
+        const res = await fetch('/search.json');
+        const data = await res.json();
+        const items = Array.isArray(data.items) ? data.items : [];
+        const needle = tag.toLowerCase();
+        const matches = items.filter((item) => {
+          const tags = Array.isArray(item.tags) ? item.tags : [];
+          return tags.some((t) => t.toLowerCase() === needle);
+        }).slice(0, 8);
+        lastSearchResults = matches;
+        if (!matches.length) {
+          pushLine('No results.', 'dim');
+          return;
+        }
+        matches.forEach((item) => {
+          pushLine(`${item.title} -> ${item.url}`);
+          if (item.description) {
+            pushLine(`  ${item.description}`, 'dim');
+          }
+          if (Array.isArray(item.tags) && item.tags.length) {
+            pushLine(`  #${item.tags.join(' #')}`, 'dim');
+          }
+        });
+      } catch {
+        lastSearchResults = [];
+        pushLine('Search index not available.', 'error');
+      }
+    };
+
+    const notesKey = 'terminal-notes';
+    const readNotes = () => JSON.parse(window.localStorage.getItem(notesKey) || '[]');
+    const writeNotes = (notes) => {
+      window.localStorage.setItem(notesKey, JSON.stringify(notes.slice(-100)));
+    };
+
+    const showNotes = () => {
+      const notes = readNotes();
+      if (!notes.length) {
+        pushLine('No notes yet. Use: notes add <text>', 'dim');
+        return;
+      }
+      pushLine('Notes:', 'dim');
+      const startIndex = Math.max(0, notes.length - 10);
+      notes.slice(-10).forEach((note, index) => {
+        pushLine(`${startIndex + index + 1}. ${note}`, 'dim');
+      });
+    };
+
+    const generateTemplate = (kind, title) => {
+      const date = new Date().toISOString().slice(0, 10);
+      const safeTitle = title || 'Untitled';
+      const template = [
+        '---',
+        `title: ${safeTitle}`,
+        `date: ${date}`,
+        'description: ',
+        'tags: []',
+        '---',
+        '',
+        '# ' + safeTitle,
+        '',
+        kind === 'draft' ? '> Draft notes here.' : 'Write here.',
+        '',
+      ].join('\n');
+      pushLine(template);
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(template).then(
+          () => pushLine('Template copied to clipboard.', 'dim'),
+          () => pushLine('Copy failed. Select and copy manually.', 'dim'),
+        );
+      }
+    };
+
+    const showLinks = () => {
+      pushLine('Links:', 'dim');
+      pushLine('Home -> /', 'dim');
+      pushLine('Blog -> /blog/', 'dim');
+      pushLine('About -> /about/', 'dim');
+      pushLine('Tags -> /tags/', 'dim');
+      pushLine('RSS -> /rss.xml', 'dim');
+    };
+
+    const exportOutput = () => {
+      if (!terminalOutput) return;
+      const lines = Array.from(terminalOutput.children).map((li) => li.textContent || '');
+      if (!lines.length) {
+        pushLine('Nothing to export.', 'dim');
+        return;
+      }
+      const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `terminal-log-${stamp}.txt`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      pushLine('Exported terminal output.', 'dim');
+    };
+
+    const toggleDock = () => {
+      const root = document.documentElement;
+      const isHidden = root.classList.toggle('dock-hidden');
+      window.localStorage.setItem('dock-hidden', isHidden ? '1' : '0');
+      if (dock) {
+        dock.style.opacity = isHidden ? '0' : '';
+      }
+      pushLine(isHidden ? 'Dock hidden.' : 'Dock shown.', 'dim');
+    };
+
+    const showProfile = () => {
+      pushLine('Profile:', 'dim');
+      pushLine(`title: ${document.title}`, 'dim');
+      pushLine(`origin: ${window.location.origin}`, 'dim');
+      const theme = window.localStorage.getItem('theme') || 'light';
+      pushLine(`theme: ${theme}`, 'dim');
+    };
+
+    const showVersion = () => {
+      pushLine('App version:', 'dim');
+      pushLine(`build: ${document.lastModified}`, 'dim');
+      pushLine(`runtime: ${navigator.userAgent}`, 'dim');
     };
 
     closeButtons.forEach((btn) => {
@@ -705,7 +913,29 @@ const { pageTitle } = Astro.props;
     const historyKey = 'terminal-history';
     const history = JSON.parse(window.localStorage.getItem(historyKey) || '[]');
     let historyIndex = -1;
-    const commands = ['help', 'home', 'blog', 'about', 'theme', 'open', 'search', 'clear'];
+    const commands = [
+      'help',
+      'home',
+      'blog',
+      'about',
+      'theme',
+      'open',
+      'search',
+      'notes',
+      'draft',
+      'post',
+      'links',
+      'export',
+      'toggle',
+      'profile',
+      'version',
+      'clear',
+      'reset-layout',
+      'reload',
+      'status',
+      'exit',
+      'clear-history',
+    ];
     const completeInput = () => {
       const raw = terminalInput.value;
       const parts = raw.split(' ');
@@ -749,6 +979,135 @@ const { pageTitle } = Astro.props;
         }
         return;
       }
+      const executeCommand = (command, argument) => {
+        switch (command.toLowerCase()) {
+          case 'help':
+            if (argument) {
+              showHelpFor(argument);
+            } else {
+              showHelp();
+            }
+            break;
+          case 'home':
+            navigateTo('/');
+            break;
+          case 'blog':
+            navigateTo('/blog/');
+            break;
+          case 'about':
+            navigateTo('/about/');
+            break;
+          case 'theme':
+            if (argument === 'dark' || argument === 'light' || argument === 'auto') {
+              setThemeMode(argument);
+              pushLine(`Theme set to ${argument}.`, 'dim');
+            } else if (argument === 'toggle') {
+              const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+              const next = currentTheme === 'dark' ? 'light' : 'dark';
+              setThemeMode(next);
+              pushLine(`Theme set to ${next}.`, 'dim');
+            } else {
+              pushLine('Usage: theme dark|light|auto|toggle', 'error');
+            }
+            break;
+          case 'open':
+            if (!argument) {
+              pushLine('Usage: open <url>', 'error');
+              break;
+            }
+            navigateTo(argument);
+            break;
+          case 'search':
+            if (argument.startsWith('tags ')) {
+              runTagSearch(argument.slice(5).trim());
+            } else {
+              runSearch(argument);
+            }
+            break;
+          case 'notes': {
+            const [sub, ...rest] = argument.split(' ');
+            if (sub === 'add') {
+              const note = rest.join(' ').trim();
+              if (!note) {
+                pushLine('Usage: notes add <text>', 'error');
+                break;
+              }
+              const notes = readNotes();
+              notes.push(note);
+              writeNotes(notes);
+              pushLine('Note saved.', 'dim');
+              break;
+            }
+            if (sub === 'clear') {
+              writeNotes([]);
+              pushLine('Notes cleared.', 'dim');
+              break;
+            }
+            showNotes();
+            break;
+          }
+          case 'draft':
+            generateTemplate('draft', argument);
+            break;
+          case 'post':
+            generateTemplate('post', argument);
+            break;
+          case 'links':
+            showLinks();
+            break;
+          case 'export':
+            exportOutput();
+            break;
+          case 'toggle':
+            if (argument === 'dock') {
+              toggleDock();
+            } else {
+              pushLine('Usage: toggle dock', 'error');
+            }
+            break;
+          case 'profile':
+            showProfile();
+            break;
+          case 'version':
+            showVersion();
+            break;
+          case 'clear':
+            if (terminalOutput) terminalOutput.innerHTML = '';
+            lastSearchResults = [];
+            break;
+          case 'reload':
+            window.location.reload();
+            break;
+          case 'status': {
+            const theme = window.localStorage.getItem('theme') || 'light';
+            pushLine(`path: ${window.location.pathname}`, 'dim');
+            pushLine(`theme: ${theme}`, 'dim');
+            pushLine(`online: ${navigator.onLine ? 'yes' : 'no'}`, 'dim');
+            break;
+          }
+          case 'reset-layout':
+            Object.keys(window.localStorage).forEach((key) => {
+              if (key.startsWith('dock:panel:')) {
+                window.localStorage.removeItem(key);
+              }
+            });
+            pushLine('Layout reset. Reopen panels to re-center.', 'dim');
+            break;
+          case 'clear-history':
+            history.length = 0;
+            window.localStorage.removeItem(historyKey);
+            pushLine('History cleared.', 'dim');
+            break;
+          case 'exit':
+            closeOverlay();
+            break;
+          default:
+            pushLine(`Unknown command: ${command}`, 'error');
+            pushLine('Type "help" to see available commands.', 'dim');
+            break;
+        }
+      };
+
       if (raw.startsWith('!')) {
         const idx = Number(raw.slice(1));
         if (Number.isInteger(idx) && idx >= 1 && idx <= history.length) {
@@ -757,46 +1116,8 @@ const { pageTitle } = Astro.props;
           pushLine(`$ ${cmdToRun}`, 'command');
           const [cmd, ...rest] = cmdToRun.split(' ');
           const arg = rest.join(' ').trim();
-          switch (cmd.toLowerCase()) {
-            case 'help':
-              showHelp();
-              return;
-            case 'home':
-              navigateTo('/');
-              return;
-            case 'blog':
-              navigateTo('/blog/');
-              return;
-            case 'about':
-              navigateTo('/about/');
-              return;
-            case 'theme':
-              if (arg === 'dark' || arg === 'light') {
-                setTheme(arg);
-                pushLine(`Theme set to ${arg}.`, 'dim');
-              } else {
-                pushLine('Usage: theme dark|light', 'error');
-              }
-              return;
-            case 'open':
-              if (!arg) {
-                pushLine('Usage: open <url>', 'error');
-                return;
-              }
-              navigateTo(arg);
-              return;
-            case 'search':
-              runSearch(arg);
-              return;
-            case 'clear':
-              if (terminalOutput) terminalOutput.innerHTML = '';
-              lastSearchResults = [];
-              return;
-            default:
-              pushLine(`Unknown command: ${cmd}`, 'error');
-              pushLine('Type "help" to see available commands.', 'dim');
-              return;
-          }
+          executeCommand(cmd, arg);
+          return;
         } else {
           pushLine('Usage: !<n> (n from 1 to history length)', 'error');
           return;
@@ -809,81 +1130,7 @@ const { pageTitle } = Astro.props;
       terminalInput.value = '';
       const [cmd, ...rest] = raw.split(' ');
       const arg = rest.join(' ').trim();
-      switch (cmd.toLowerCase()) {
-        case 'help':
-          if (arg) {
-            showHelpFor(arg);
-          } else {
-            showHelp();
-          }
-          break;
-        case 'home':
-          navigateTo('/');
-          break;
-        case 'blog':
-          navigateTo('/blog/');
-          break;
-        case 'about':
-          navigateTo('/about/');
-          break;
-        case 'theme':
-          if (arg === 'dark' || arg === 'light') {
-            setTheme(arg);
-            pushLine(`Theme set to ${arg}.`, 'dim');
-          } else if (arg === 'toggle') {
-            const current = window.localStorage.getItem('theme') || 'light';
-            const next = current === 'dark' ? 'light' : 'dark';
-            setTheme(next);
-            pushLine(`Theme set to ${next}.`, 'dim');
-          } else {
-            pushLine('Usage: theme dark|light|toggle', 'error');
-          }
-          break;
-        case 'open':
-          if (!arg) {
-            pushLine('Usage: open <url>', 'error');
-            break;
-          }
-          navigateTo(arg);
-          break;
-        case 'search':
-          runSearch(arg);
-          break;
-        case 'clear':
-          if (terminalOutput) terminalOutput.innerHTML = '';
-          lastSearchResults = [];
-          break;
-        case 'reload':
-          window.location.reload();
-          break;
-        case 'status': {
-          const theme = window.localStorage.getItem('theme') || 'light';
-          pushLine(`path: ${window.location.pathname}`, 'dim');
-          pushLine(`theme: ${theme}`, 'dim');
-          pushLine(`online: ${navigator.onLine ? 'yes' : 'no'}`, 'dim');
-          break;
-        }
-        case 'reset-layout':
-          Object.keys(window.localStorage).forEach((key) => {
-            if (key.startsWith('dock:panel:')) {
-              window.localStorage.removeItem(key);
-            }
-          });
-          pushLine('Layout reset. Reopen panels to re-center.', 'dim');
-          break;
-        case 'clear-history':
-          history.length = 0;
-          window.localStorage.removeItem(historyKey);
-          pushLine('History cleared.', 'dim');
-          break;
-        case 'exit':
-          closeOverlay();
-          break;
-        default:
-          pushLine(`Unknown command: ${cmd}`, 'error');
-          pushLine('Type "help" to see available commands.', 'dim');
-          break;
-      }
+      executeCommand(cmd, arg);
     });
   </script>
   <script type="module">
