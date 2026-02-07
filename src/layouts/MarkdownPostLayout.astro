@@ -1,37 +1,320 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-const { frontmatter } = Astro.props;
----
-<BaseLayout pageTitle={frontmatter.title}>
-  <p>{frontmatter.pubDate.toLocaleDateString()}</p>
-  <p><em>{frontmatter.description}</em></p>
-  <p>Written by: {frontmatter.author}</p>
-  <img src={frontmatter.image.url} width="300" alt={frontmatter.image.alt} />
+import SectionTreeNode from '../components/SectionTreeNode.astro';
 
-  <div class="tags">
-    {frontmatter.tags.map((tag: string) => (
-      <p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
-    ))}
+const { frontmatter, headings = [] } = Astro.props as {
+  frontmatter: {
+    title: string;
+    pubDate: Date;
+    description: string;
+    author: string;
+    image?: {
+      url: string;
+      alt: string;
+    };
+    tags?: string[];
+  };
+  headings?: Array<{ depth: number; slug: string; text: string }>;
+};
+
+type SectionNode = {
+  depth: number;
+  slug: string;
+  text: string;
+  children: SectionNode[];
+};
+
+const sectionHeadings = headings.filter((heading) => heading.depth >= 1 && heading.depth <= 4);
+
+const buildSectionTree = (items: typeof sectionHeadings) => {
+  const root: SectionNode[] = [];
+  const stack: SectionNode[] = [];
+
+  items.forEach((item) => {
+    const node: SectionNode = { ...item, children: [] };
+    while (stack.length > 0 && stack[stack.length - 1].depth >= node.depth) {
+      stack.pop();
+    }
+    if (stack.length === 0) {
+      root.push(node);
+    } else {
+      stack[stack.length - 1].children.push(node);
+    }
+    stack.push(node);
+  });
+
+  return root;
+};
+
+const sectionTree = buildSectionTree(sectionHeadings);
+---
+
+<BaseLayout pageTitle={frontmatter.title}>
+  <div class="drawer drawer-end lg:drawer-open post-drawer" id="post-drawer-layout">
+    <input id="section-drawer" type="checkbox" class="drawer-toggle" />
+    <div class="drawer-content">
+      <article class="post-layout">
+        <main class="post-content">
+          <div class="post-header-row">
+            <div class="lg:hidden">
+              <label for="section-drawer" class="btn btn-ghost btn-sm px-2" aria-label="打开章节导航">
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4">
+                  <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
+                </svg>
+              </label>
+            </div>
+          </div>
+          <div class="post-meta">
+            <div class="post-meta-row">
+              <div class="post-avatar">
+                <img src="/avatars/default.png" alt={`${frontmatter.author} avatar`} width="36" height="36" loading="lazy" />
+              </div>
+              <p class="author">{frontmatter.author}</p>
+              <p class="publish-date">{frontmatter.pubDate.toLocaleDateString()}</p>
+            </div>
+            <p class="description"><em>{frontmatter.description}</em></p>
+          </div>
+          {frontmatter.image?.url && (
+            <img class="hero-image" src={frontmatter.image.url} width="300" alt={frontmatter.image.alt || ''} />
+          )}
+
+          <div class="tags">
+            {(frontmatter.tags ?? []).map((tag: string) => (
+              <p class="tag"><a href={`/tags/${tag}`}>#{tag}</a></p>
+            ))}
+          </div>
+
+          <div class="markdown-body">
+            <slot />
+          </div>
+        </main>
+      </article>
+    </div>
+    <div class="drawer-side z-20 post-drawer-side">
+      <label for="section-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+      <aside class="min-h-full w-80 rounded-l-3xl border-l border-base-300 bg-base-100 p-5 shadow-sm lg:rounded-3xl lg:border lg:shadow-sm">
+        <br>
+        <br>
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-lg font-semibold">Menu</h2>
+          <button id="toggle-section-sidebar" class="btn btn-ghost btn-xs hidden lg:inline-flex" type="button" aria-label="收起章节导航">
+            ⇤
+          </button>
+        </div>
+        {sectionTree.length > 0 ? (
+          <ul id="section-tree" class="space-y-2">
+            {sectionTree.map((section) => <SectionTreeNode node={section} />)}
+          </ul>
+        ) : (
+          <p class="text-sm text-base-content/60">暂无章节。</p>
+        )}
+      </aside>
+    </div>
   </div>
 
-  <slot />
+  <script is:inline>
+    const drawerLayout = document.getElementById('post-drawer-layout');
+    const sidebarToggle = document.getElementById('toggle-section-sidebar');
+
+    document.querySelectorAll('.section-toggle').forEach((toggleButton) => {
+      toggleButton.addEventListener('click', () => {
+        const listItem = toggleButton.closest('li');
+        const children = listItem?.querySelector(':scope > .section-children');
+        if (!children) return;
+
+        const expanded = toggleButton.getAttribute('data-expanded') !== 'false';
+        const nextExpanded = !expanded;
+        toggleButton.setAttribute('data-expanded', `${nextExpanded}`);
+        toggleButton.setAttribute('aria-expanded', `${nextExpanded}`);
+        toggleButton.textContent = nextExpanded ? '▾' : '▸';
+        children.classList.toggle('hidden', !nextExpanded);
+      });
+    });
+
+    if (sidebarToggle && drawerLayout) {
+      sidebarToggle.addEventListener('click', () => {
+        const collapsed = drawerLayout.classList.toggle('post-sidebar-collapsed');
+        sidebarToggle.textContent = collapsed ? '⇥' : '⇤';
+      });
+    }
+  </script>
 </BaseLayout>
-<!--<style>-->
-<!--  a {-->
-<!--    color: #00539F;-->
-<!--  }-->
 
-<!--  .tags {-->
-<!--    display: flex;-->
-<!--    flex-wrap: wrap;-->
-<!--  }-->
+<style>
+  .post-layout {
+    display: block;
+    min-width: 0;
+  }
 
-<!--  .tag {-->
-<!--    margin: 0.25em;-->
-<!--    border: dotted 1px #a1a1a1;-->
-<!--    border-radius: .5em;-->
-<!--    padding: .5em 1em;-->
-<!--    font-size: 1.15em;-->
-<!--    background-color: #F8FCFD;-->
-<!--  }-->
-<!--</style>-->
+  .post-content {
+    min-width: 0;
+  }
+
+  .post-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  .post-meta {
+    margin-bottom: 1rem;
+    color: color-mix(in oklab, var(--color-base-content) 75%, transparent);
+    font-size: 0.95rem;
+  }
+
+  .post-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .post-avatar {
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 999px;
+    background: hsl(var(--n));
+    color: hsl(var(--nc));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    overflow: hidden;
+  }
+
+  .post-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .post-meta p {
+    margin: 0.2rem 0;
+  }
+
+  .post-meta-row p {
+    margin: 0;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .hero-image {
+    border-radius: 0.85rem;
+    border: 0;
+    margin: 0.5rem 0 1rem;
+    max-width: 100%;
+    height: auto;
+  }
+
+
+  .markdown-body :global(h1),
+  .markdown-body :global(h2),
+  .markdown-body :global(h3),
+  .markdown-body :global(h4) {
+    margin-top: 1.6em;
+    margin-bottom: 0.6em;
+    line-height: 1.25;
+    font-weight: 700;
+  }
+
+  .markdown-body :global(h1) {
+    font-size: clamp(1.8rem, 3vw, 2.2rem);
+    border-bottom: 0;
+    padding-bottom: 0.25em;
+    display: none;
+  }
+
+  .tags .tag {
+    border: 0;
+  }
+
+  .markdown-body :global(h2) {
+    font-size: clamp(1.4rem, 2.2vw, 1.7rem);
+  }
+
+  .markdown-body :global(h3) {
+    font-size: clamp(1.2rem, 2vw, 1.4rem);
+  }
+
+  .markdown-body :global(p),
+  .markdown-body :global(li) {
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  .markdown-body :global(ul),
+  .markdown-body :global(ol) {
+    margin: 0.8rem 0 1rem;
+    padding-left: 1.35rem;
+  }
+
+  .markdown-body :global(code) {
+    background: color-mix(in oklab, var(--color-base-content) 12%, transparent);
+    border-radius: 0.35rem;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.92em;
+  }
+
+  .markdown-body :global(pre) {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    overflow-x: auto;
+    background: color-mix(in oklab, var(--color-base-content) 8%, transparent);
+  }
+
+  .markdown-body :global(pre code) {
+    background: transparent;
+    padding: 0;
+  }
+
+  .markdown-body :global(blockquote) {
+    margin: 1rem 0;
+    padding: 0.75rem 1rem;
+    border-left: 4px solid color-mix(in oklab, var(--color-primary) 65%, white);
+    background: color-mix(in oklab, var(--color-primary) 12%, transparent);
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .tag {
+    margin: 0;
+    border: 1px solid hsl(var(--bc) / 0.2);
+    border-radius: 0.75rem;
+    padding: 0.45rem 0.8rem;
+    font-size: 1rem;
+    background-color: transparent;
+  }
+
+  .section-nav-btn:hover {
+    color: #059669;
+  }
+
+  @media (min-width: 1024px) {
+    .post-drawer .drawer-side > *:not(.drawer-overlay) {
+      transition: width 0.2s ease;
+    }
+
+    .post-sidebar-collapsed .post-drawer-side aside {
+      width: 3.5rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      overflow: hidden;
+    }
+
+    .post-sidebar-collapsed .post-drawer-side h2,
+    .post-sidebar-collapsed .post-drawer-side #section-tree,
+    .post-sidebar-collapsed .post-drawer-side p {
+      display: none;
+    }
+  }
+</style>
