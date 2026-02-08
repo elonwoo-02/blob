@@ -140,7 +140,7 @@ dock/
 
 ## 外部依赖组件
 以下组件不归 Dock 目录管理，但被 Dock 直接引用或联动：
-- `src/components/TerminalModal.astro`
+- `src/components/terminal/TerminalModal.astro`
   - 用途：终端弹窗（Modal）。
   - 关系：由 `ui/Dock.astro` 引入并渲染，Dock 仅负责触发与展示位置，不负责其内部逻辑。
 

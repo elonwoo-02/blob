@@ -3,9 +3,9 @@ import '../styles/global.css';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { buildTagTree, tagToSlug } from '../utils/tags';
-import TagTreeNode from '../components/TagTreeNode.astro';
-import GithubIcon from "../components/icon/GithubIcon.astro";
-import PostActionBar from '../components/PostActionBar.astro';
+import TagTreeNode from '../components/post/TagTreeNode.astro';
+import GithubIcon from "../components/icons/GithubIcon.astro";
+import PostActionBar from '../components/post/PostActionBar.astro';
 
 const pageTitle = '';
 const allPosts = await getCollection('blog');

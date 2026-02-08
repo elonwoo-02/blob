@@ -1,6 +1,6 @@
 ---
-import MenuIcon from './icon/MenuIcon.astro';
-import ThemeIcon from './ThemeIcon.astro';
+import MenuIcon from '../icons/MenuIcon.astro';
+import ThemeToggle from '../shared/ThemeToggle.astro';
 
 const { pageTitle = 'Dimensional Debris' } = Astro.props;
 const currentPath = Astro.url.pathname;
@@ -26,7 +26,7 @@ const navItems = [
       </div>
 
       <div class="navbar-end">
-        <ThemeIcon />
+        <ThemeToggle />
       </div>
     </div>
   </div>

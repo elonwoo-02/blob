@@ -1,0 +1,38 @@
+---
+import Social from './Social.astro';
+
+type FooterLink = { label: string; href: string };
+type SocialLink = { href: string; label: string; icon: 'twitter' | 'youtube' | 'facebook' };
+
+const {
+  primaryLinks = [
+    { label: 'About us', href: '#' },
+    { label: 'Contact', href: '#' },
+    { label: 'Jobs', href: '#' },
+    { label: 'Press kit', href: '#' },
+  ],
+  projectLink = { label: '项目推荐：AISoulmate', href: '' },
+  socialLinks,
+} = Astro.props as {
+  primaryLinks?: FooterLink[];
+  projectLink?: FooterLink;
+  socialLinks?: SocialLink[];
+};
+---
+
+<footer class="footer footer-horizontal footer-center bg-base-200 text-base-content rounded p-10">
+  <nav class="grid grid-flow-col gap-4">
+    {primaryLinks.map((item) => (
+      <a class="link link-hover" href={item.href}>{item.label}</a>
+    ))}
+  </nav>
+  <nav class="grid grid-flow-col gap-4">
+    <a class="link link-hover" href={projectLink.href}>{projectLink.label}</a>
+  </nav>
+
+  <Social links={socialLinks} />
+
+  <aside>
+    <p>Copyright © {new Date().getFullYear()} - All right reserved by Elon Woo</p>
+  </aside>
+</footer>
