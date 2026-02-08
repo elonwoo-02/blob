@@ -9,7 +9,7 @@ image:
 tags: ["git", "workflow", "writing", "devlog"]
 likeCount: 0
 shareCount: 0
-docked: false
+docked: true
 ---
 
 我常把提交信息当作一条会被海风带去远处的短信。它不是写给今天的自己，而是写给某个尚未抵达的你——在某个雨夜、某个凌晨、某个“为什么会这样”的时刻。好的 commit，不是炫技，而是让历史能被读懂，让故事能被追溯。

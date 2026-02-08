@@ -9,7 +9,7 @@ image:
 tags: ["git", "workflow", "tools", "devlog"]
 likeCount: 0
 shareCount: 0
-docked: false
+docked: true
 ---
 
 在我那间终端微微发热的房间里，Git 像一支迟早会开口的笔，记录着每一次修改的潮汐：它不是记忆本身，而是给记忆一个可以返回的港口。下面是我最常用的一组命令与它们各自的应用场景，我把它们写成一份简短的清单，像一封不紧不慢的信。

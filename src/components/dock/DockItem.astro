@@ -1,4 +1,4 @@
----
+﻿---
 interface Props {
   label: string;
   href: string;
@@ -20,7 +20,7 @@ const { label, href, icon, external = false, removable = false, action } = Astro
     rel={external ? 'noreferrer noopener' : undefined}
     aria-label={label}
   >
-    <span class="dock-icon flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white shadow-lg transition-all duration-200 ease-out group-hover:scale-[1.3] group-hover:shadow-2xl">
+    <span class="dock-icon flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white shadow-lg transition-all duration-200 ease-out group-hover:scale-[1.2] group-hover:shadow-2xl">
       <span class="h-6 w-6" set:html={icon} />
     </span>
   </a>
@@ -32,7 +32,8 @@ const { label, href, icon, external = false, removable = false, action } = Astro
       aria-label={`关闭 ${label}`}
       title={`关闭 ${label}`}
     >
-      ✕
+      ×
     </button>
   )}
 </li>
+

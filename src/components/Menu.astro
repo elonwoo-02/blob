@@ -1,9 +1,0 @@
----
-import Dock from "./Dock.astro";
-import ThemeIcon from "./ThemeIcon.astro";
-const { pageTitle } = Astro.props;
----
-
-<div class="hidden md:block relative">
-  <Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
-</div>
