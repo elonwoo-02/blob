@@ -3,9 +3,9 @@ import '../styles/global.css';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { buildTagTree, tagToSlug } from '../utils/tags';
-import TagTreeNode from '../components/TagTreeNode.astro';
-import GithubIcon from "../components/icon/GithubIcon.astro";
-import PostActionBar from '../components/PostActionBar.astro';
+import TagTreeNode from '../components/post/TagTreeNode.astro';
+import GithubIcon from "../components/icons/GithubIcon.astro";
+import PostActionBar from '../components/post/PostActionBar.astro';
 
 const pageTitle = '';
 const allPosts = await getCollection('blog');
@@ -147,6 +147,8 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
                   <a
                     class="group rounded-2xl border border-base-200 bg-base-50/40 p-4 transition hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md"
                     href={`/posts/${post.id}/`}
+                    target="_blank"
+                    rel="noreferrer noopener"
                   >
                     <div class="flex items-center gap-3 text-xs text-base-content/60">
                       <span class="inline-flex h-6 w-6 items-center justify-center rounded-full overflow-hidden">
@@ -176,7 +178,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
               data-post-id={post.id}
             >
               <h3 class="text-xl font-semibold">
-                <a class="" href={`/posts/${post.id}/`}>{post.data.title}</a>
+                <a class="" href={`/posts/${post.id}/`} target="_blank" rel="noreferrer noopener">{post.data.title}</a>
               </h3>
               <div class="mt-2 flex items-center gap-3 text-sm text-base-content/70">
                 <div class="avatar">
@@ -524,7 +526,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
             if (shouldIgnoreCardClick(event.target)) return;
             const href = card.getAttribute('data-post-link');
             if (!href) return;
-            window.location.href = href;
+            window.open(href, '_blank', 'noopener');
           });
 
           card.addEventListener('keydown', (event) => {
@@ -533,7 +535,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
             const href = card.getAttribute('data-post-link');
             if (!href) return;
             event.preventDefault();
-            window.location.href = href;
+            window.open(href, '_blank', 'noopener');
           });
 
           card.setAttribute('tabindex', '0');

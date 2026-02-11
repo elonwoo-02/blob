@@ -1,11 +1,11 @@
 ﻿---
 import '../styles/global.css';
-import Dock from "../components/dock/Dock.astro";
+import Dock from "../components/dock/ui/Dock.astro";
 import ElonFloat from "../components/ElonFloat.astro";
-import MobileDrawer from "../components/MobileDrawer.astro";
-import Footer from "../components/Footer.astro";
+import MobileDrawer from "../components/navigation/MobileDrawer.astro";
+import Footer from "../components/shared/Footer.astro";
 
-const { pageTitle, path = '/' } = Astro.props;
+const { pageTitle, path = '/', mainClass = 'pt-10 md:pt-8' } = Astro.props;
 ---
 
 <html lang="zh-CN">
@@ -23,7 +23,7 @@ const { pageTitle, path = '/' } = Astro.props;
   <Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
 
   <!-- Main content -->
-  <main class="container mx-auto px-4 py-4 pt-7 md:pt-8">
+  <main class={`container mx-auto px-4 py-4 ${mainClass}`}>
     <h1 class="text-4xl font-bold mb-8">{pageTitle}</h1>
     <slot />
   </main>
