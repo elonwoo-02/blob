@@ -1,14 +1,79 @@
 ---
-const { hiddenOnHome = true, path = "" } = Astro.props;
-const shouldShow = hiddenOnHome ? path !== "/" : true;
+const { hiddenOnHome = true, path = "", inline = false, botId = 'elon-bot' } = Astro.props;
+const shouldShow = inline ? true : hiddenOnHome ? path !== '/' : true;
 ---
 
 {shouldShow && (
-  <div id="elon-bot" class="elon-bot" aria-hidden="false">
-    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.51/build/spline-viewer.js" async></script><script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.51/build/spline-viewer.js" async></script>
-    <spline-viewer url="https://prod.spline.design/kvwKEt6NL2A6UhdP/scene.splinecode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAATCAYAAADxlA/3AAAJ+ElEQVR4AQCBAH7/AIJ+hAuCfoQHgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAyCfoQYgn6EIoJ+hCeCfoQngn6EI4J+hBqCfoQPgn6EAoJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6ECYJ+hBCCfoQUAIEAfv8Agn6EC4J+hAeCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQCgn6EEIJ+hByCfoQmgn6EK4J+hCuCfoQngn6EHoJ+hBKCfoQFgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQHgn6EDoJ+hBIAgQB+/wCCfoQLgn6EB4J+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAmCfoQXgn6EJIJ+hC6CfoQzgn6EM4J+hC6CfoQlgn6EGIJ+hAqCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAWCfoQLgn6EDwCBAH7/AIJ+hAuCfoQIgn6EAoJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQFgn6EFIJ+hCOCfoQwgn6EOoJ+hD+CfoQ/gn6EOoJ+hDCCfoQign6EE4J+hASCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EA4J+hAmCfoQMAIEAfv8Agn6EDoJ+hAqCfoQFgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EBIJ+hBKCfoQign6EMoJ+hECCfoRKgn6ET4J+hE+CfoRJgn6EPoJ+hDCCfoQfgn6ED4J+hAGCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQCgn6ECIJ+hAsAgQB+/wCCfoQRgn6EDoJ+hAqCfoQEgn6EAIJ+hACCfoQAgn6EAIJ+hAWCfoQSgn6EIYJ+hDKCfoRDgn6EUYJ+hFyCfoRign6EYYJ+hFqCfoRPgn6EP4J+hC2CfoQcgn6EDIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hASCfoQJgn6EDACBAH7/AIJ+hBWCfoQTgn6EDoJ+hAmCfoQFgn6EAoJ+hAOCfoQIgn6EEYJ+hB+CfoQwgn6EQoJ+hFOCfoRjgn6EboJ+hHOCfoRygn6Ea4J+hF+CfoROgn6EO4J+hCiCfoQXgn6ECYJ+hACCfoQAgn6EAIJ+hACCfoQCgn6EB4J+hAyCfoQOAIEAfv8Agn6EGIJ+hBaCfoQSgn6EDoJ+hAqCfoQIgn6ECoJ+hBCCfoQbgn6EKoJ+hDuCfoROgn6EYYJ+hHCCfoR8gn6EgYJ+hICCfoR5gn6EbIJ+hFqCfoRHgn6EM4J+hCCCfoQRgn6EB4J+hAGCfoQAgn6EAYJ+hAWCfoQKgn6EDoJ+hBEAgQB+/wCCfoQYgn6EFoJ+hBOCfoQPgn6EC4J+hAuCfoQNgn6EFIJ+hCCCfoQvgn6EQYJ+hFWCfoRogn6EeIJ+hIOCfoSJgn6EiIJ+hICCfoRzgn6EYYJ+hE2CfoQ4gn6EJYJ+hBaCfoQKgn6EBIJ+hAKCfoQDgn6EB4J+hAyCfoQPgn6EEgCBAH7/AIJ+hBWCfoQTgn6ED4J+hAyCfoQJgn6ECIJ+hAuCfoQSgn6EHoJ+hC6CfoRAgn6EVIJ+hGeCfoR3gn6Eg4J+hIiCfoSHgn6Ef4J+hHKCfoRggn6ETIJ+hDeCfoQkgn6EFIJ+hAmCfoQCgn6EAIJ+hAKCfoQFgn6ECoJ+hA6CfoQQAIEAfv8Agn6EDoJ+hAyCfoQJgn6EBYJ+hAKCfoQBgn6EBIJ+hAuCfoQWgn6EJoJ+hDiCfoRMgn6EX4J+hG+CfoR6gn6Ef4J+hH6CfoR3gn6EaYJ+hFiCfoRDgn6EL4J+hB2CfoQNgn6EAoJ+hACCfoQAgn6EAIJ+hACCfoQFgn6ECoJ+hAwAgQB+/wCCfoQGgn6EBIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAuCfoQZgn6EK4J+hD6CfoRQgn6EYIJ+hGuCfoRwgn6Eb4J+hGeCfoRagn6ESYJ+hDaCfoQign6EEIJ+hAKCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQEgn6EBgCBAH7/AIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAuCfoQcgn6ELYJ+hD+CfoROgn6EWIJ+hF2CfoRcgn6EVYJ+hEiCfoQ3gn6EJYJ+hBKCfoQCgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQBAIEAfv8Agn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hA2CfoQegn6ELoJ+hDyCfoRGgn6ESoJ+hEmCfoRCgn6ENoJ+hCaCfoQVgn6EA4J+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAAAgQB+/wCCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAoJ+hBGCfoQggn6ELYJ+hDaCfoQ6gn6EOYJ+hDKCfoQmgn6EGIJ+hAeCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAACBAH7/AIJ+hAGCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6ECYJ+hBaCfoQign6EK4J+hC+CfoQtgn6EJ4J+hBuCfoQNgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQDAIEAfv8Agn6ECIJ+hAWCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQFgn6EEYJ+hByCfoQkgn6EKIJ+hCaCfoQggn6EFYJ+hAeCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EBoJ+hAoAgQB+/wCCfoQPgn6EDIJ+hAWCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAOCfoQPgn6EGoJ+hCGCfoQkgn6EI4J+hByCfoQSgn6EBYJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hASCfoQMgn6EEAGBAH7/AIJ+hBSCfoQQgn6ECYJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EA4J+hA+CfoQZgn6EIIJ+hCOCfoQhgn6EG4J+hBGCfoQEgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EB4J+hA+CfoQUKkvQlb8lv2cAAAAASUVORK5CYII=" alt="Spline preview" style="width: 100%; height: 100%;"/></spline-viewer>
+  <div id={botId} class:list={['elon-bot', inline && 'elon-bot--inline']} aria-hidden="false">
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.51/build/spline-viewer.js" async></script>
+    <spline-viewer class="elon-viewer" url="https://prod.spline.design/kvwKEt6NL2A6UhdP/scene.splinecode">
+      <img
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAATCAYAAADxlA/3AAAJ+ElEQVR4AQCBAH7/AIJ+hAuCfoQHgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAyCfoQYgn6EIoJ+hCeCfoQngn6EI4J+hBqCfoQPgn6EAoJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6ECYJ+hBCCfoQUAIEAfv8Agn6EC4J+hAeCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQCgn6EEIJ+hByCfoQmgn6EK4J+hCuCfoQngn6EHoJ+hBKCfoQFgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQHgn6EDoJ+hBIAgQB+/wCCfoQLgn6EB4J+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAmCfoQXgn6EJIJ+hC6CfoQzgn6EM4J+hC6CfoQlgn6EGIJ+hAqCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAWCfoQLgn6EDwCBAH7/AIJ+hAuCfoQIgn6EAoJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQFgn6EFIJ+hCOCfoQwgn6EOoJ+hD+CfoQ/gn6EOoJ+hDCCfoQign6EE4J+hASCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EA4J+hAmCfoQMAIEAfv8Agn6EDoJ+hAqCfoQFgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EBIJ+hBKCfoQign6EMoJ+hECCfoRKgn6ET4J+hE+CfoRJgn6EPoJ+hDCCfoQfgn6ED4J+hAGCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQCgn6ECIJ+hAsAgQB+/wCCfoQRgn6EDoJ+hAqCfoQEgn6EAIJ+hACCfoQAgn6EAIJ+hAWCfoQSgn6EIYJ+hDKCfoRDgn6EUYJ+hFyCfoRign6EYYJ+hFqCfoRPgn6EP4J+hC2CfoQcgn6EDIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hASCfoQJgn6EDACBAH7/AIJ+hBWCfoQTgn6EDoJ+hAmCfoQFgn6EAoJ+hAOCfoQIgn6EEYJ+hB+CfoQwgn6EQoJ+hFOCfoRjgn6EboJ+hHOCfoRygn6Ea4J+hF+CfoROgn6EO4J+hCiCfoQXgn6ECYJ+hACCfoQAgn6EAIJ+hACCfoQCgn6EB4J+hAyCfoQOAIEAfv8Agn6EGIJ+hBaCfoQSgn6EDoJ+hAqCfoQIgn6ECoJ+hBCCfoQbgn6EKoJ+hDuCfoROgn6EYYJ+hHCCfoR8gn6EgYJ+hICCfoR5gn6EbIJ+hFqCfoRHgn6EM4J+hCCCfoQRgn6EB4J+hAGCfoQAgn6EAYJ+hAWCfoQKgn6EDoJ+hBEAgQB+/wCCfoQYgn6EFoJ+hBOCfoQPgn6EC4J+hAuCfoQNgn6EFIJ+hCCCfoQvgn6EQYJ+hFWCfoRogn6EeIJ+hIOCfoSJgn6EiIJ+hICCfoRzgn6EYYJ+hE2CfoQ4gn6EJYJ+hBaCfoQKgn6EBIJ+hAKCfoQDgn6EB4J+hAyCfoQPgn6EEgCBAH7/AIJ+hBWCfoQTgn6ED4J+hAyCfoQJgn6ECIJ+hAuCfoQSgn6EHoJ+hC6CfoRAgn6EVIJ+hGeCfoR3gn6Eg4J+hIiCfoSHgn6Ef4J+hHKCfoRggn6ETIJ+hDeCfoQkgn6EFIJ+hAmCfoQCgn6EAIJ+hAKCfoQFgn6ECoJ+hA6CfoQQAIEAfv8Agn6EDoJ+hAyCfoQJgn6EBYJ+hAKCfoQBgn6EBIJ+hAuCfoQWgn6EJoJ+hDiCfoRMgn6EX4J+hG+CfoR6gn6Ef4J+hH6CfoR3gn6EaYJ+hFiCfoRDgn6EL4J+hB2CfoQNgn6EAoJ+hACCfoQAgn6EAIJ+hACCfoQFgn6ECoJ+hAwAgQB+/wCCfoQGgn6EBIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAuCfoQZgn6EK4J+hD6CfoRQgn6EYIJ+hGuCfoRwgn6Eb4J+hGeCfoRagn6ESYJ+hDaCfoQign6EEIJ+hAKCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQEgn6EBgCBAH7/AIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAuCfoQcgn6ELYJ+hD+CfoROgn6EWIJ+hF2CfoRcgn6EVYJ+hEiCfoQ3gn6EJYJ+hBKCfoQCgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQBAIEAfv8Agn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hA2CfoQegn6ELoJ+hDyCfoRGgn6ESoJ+hEmCfoRCgn6ENoJ+hCaCfoQVgn6EA4J+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAAAgQB+/wCCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAoJ+hBGCfoQggn6ELYJ+hDaCfoQ6gn6EOYJ+hDKCfoQmgn6EGIJ+hAeCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAACBAH7/AIJ+hAGCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6ECYJ+hBaCfoQign6EK4J+hC+CfoQtgn6EJ4J+hBuCfoQNgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQDAIEAfv8Agn6ECIJ+hAWCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQFgn6EEYJ+hByCfoQkgn6EKIJ+hCaCfoQggn6EFYJ+hAeCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EBoJ+hAoAgQB+/wCCfoQPgn6EDIJ+hAWCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hAOCfoQPgn6EGoJ+hCGCfoQkgn6EI4J+hByCfoQSgn6EBYJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hASCfoQMgn6EEAGBAH7/AIJ+hBSCfoQQgn6ECYJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EA4J+hA+CfoQZgn6EIIJ+hCOCfoQhgn6EG4J+hBGCfoQEgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EAIJ+hACCfoQAgn6EB4J+hA+CfoQUKkvQlb8lv2cAAAAASUVORK5CYII="
+        alt="Spline preview"
+      />
+    </spline-viewer>
   </div>
 )}
+
+<script define:vars={{ botId }} is:inline>
+  (() => {
+    const bot = document.getElementById(botId);
+    if (!bot) return;
+
+    let isBursting = false;
+    let burstTimer = null;
+
+    const clearBurstState = () => {
+      bot.classList.remove('is-bursting');
+      bot.style.removeProperty('--dash-x');
+      bot.style.removeProperty('--dash-y');
+      bot.style.removeProperty('--dash-rotate');
+      isBursting = false;
+      if (burstTimer) {
+        window.clearTimeout(burstTimer);
+        burstTimer = null;
+      }
+    };
+
+    const triggerBurst = () => {
+      if (isBursting) return;
+      isBursting = true;
+
+      const dashX = Math.round(Math.random() * 34 - 17);
+      const dashY = -Math.round(Math.random() * 24 + 8);
+      const turns = Math.random() > 0.5 ? 720 : -720;
+
+      bot.style.setProperty('--dash-x', `${dashX}px`);
+      bot.style.setProperty('--dash-y', `${dashY}px`);
+      bot.style.setProperty('--dash-rotate', `${turns}deg`);
+
+      bot.classList.remove('is-bursting');
+      void bot.offsetWidth;
+      bot.classList.add('is-bursting');
+
+      burstTimer = window.setTimeout(clearBurstState, 650);
+    };
+
+    bot.addEventListener('animationend', (event) => {
+      if (event.target !== bot) return;
+      if (event.animationName !== 'elon-burst') return;
+      clearBurstState();
+    });
+
+    if ('PointerEvent' in window) {
+      bot.addEventListener(
+        'pointerdown',
+        (event) => {
+          if (event.pointerType === 'mouse' && event.button !== 0) return;
+          triggerBurst();
+        },
+        { passive: true },
+      );
+    } else {
+      bot.addEventListener('touchstart', triggerBurst, { passive: true });
+    }
+  })();
+</script>
 
 <style>
   .elon-bot {
@@ -24,9 +89,91 @@ const shouldShow = hiddenOnHome ? path !== "/" : true;
     transform-origin: center;
     transform-style: preserve-3d;
     perspective: 800px;
+    touch-action: manipulation;
+    cursor: pointer;
+    will-change: transform, filter;
+    --dash-x: 0px;
+    --dash-y: 0px;
+    --dash-rotate: 0deg;
+  }
+
+  .elon-bot--inline {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    width: 100%;
+    height: auto;
+    min-height: 150px;
+    aspect-ratio: 1 / 1;
+    z-index: 1;
+    perspective: none;
+  }
+
+  .elon-viewer {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .elon-viewer img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 
   .elon-bot.is-hidden {
     display: none;
+  }
+
+  .elon-bot.is-bursting {
+    animation: elon-burst 0.62s cubic-bezier(0.2, 0.86, 0.25, 1) both,
+      elon-code-flicker 0.62s steps(2, end) both;
+  }
+
+  @keyframes elon-burst {
+    0% {
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    }
+    35% {
+      transform: translate3d(var(--dash-x), calc(var(--dash-y) - 10px), 0)
+        rotate(var(--dash-rotate))
+        scale(1.05);
+    }
+    72% {
+      transform: translate3d(calc(var(--dash-x) * -0.25), calc(var(--dash-y) * 0.2), 0)
+        rotate(calc(var(--dash-rotate) * -0.2))
+        scale(0.98);
+    }
+    100% {
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    }
+  }
+
+  @keyframes elon-code-flicker {
+    0%,
+    100% {
+      filter: none;
+    }
+    20% {
+      filter: hue-rotate(24deg) saturate(1.2);
+    }
+    40% {
+      filter: hue-rotate(-18deg) contrast(1.2);
+    }
+    60% {
+      filter: brightness(1.15) saturate(1.15);
+    }
+    80% {
+      filter: hue-rotate(12deg) contrast(1.1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .elon-bot.is-bursting {
+      animation: none;
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+      filter: none;
+    }
   }
 </style>

@@ -1,65 +1,675 @@
 ---
-import '../styles/global.css';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ElonFloat from "../components/ElonFloat.astro";
 
+const pageTitle = '';
 
-const pageTitle = "关于我";
-
-const identity = {
-firstName: "莎拉",
-country: "加拿大",
-occupation: "技术撰稿人",
-hobbies: ["摄影", "观鸟", "棒球"],
+const profile = {
+  name: 'Elon Woo',
+  title: 'Creative Full-Stack Developer',
+  email: 'gongzi_1076@163.com',
+  phone: '+86 *** **** ****',
+  location: '*, China',
+  availableNow: true,
+  age: 26,
 };
 
-const skills = ["HTML", "CSS", "JavaScript", "React", "Astro", "Writing Docs"];
+const education = [
+  {
+    method: 'ynov_connect',
+    level: 'Mastere',
+    range: '2020.09 -> 2024.06',
+    type: 'Computer Science',
+  },
+  // {
+  //   method: 'ican',
+  //   level: 'Bachelor',
+  //   range: '2021.09 -> 2024.06',
+  //   type: 'Game Design + Frontend Design',
+  // },
+];
 
-const happy = true;
-const finished = true;
-const goal = 3;
+const experiences = [
+  {
+    method: 'studio_prema',
+    role: 'Game Developer Intern',
+    range: '2024.09 -> 2024.11',
+    site: 'https://afjv.com/',
+    detail:
+      'Implemented gameplay features and optimized content pipelines in Unity; collaborated with game artists on integration quality.',
+  },
+  {
+    method: 'association_lab',
+    role: 'Tech Lead (Volunteer)',
+    range: '2023.05 -> 2024.08',
+    site: 'https://dimensional-debris.dev/',
+    detail:
+      'Led a small cross-functional team, shipped internal tooling, and stabilized release workflows for community events.',
+  },
+  {
+    method: 'freelance_web',
+    role: 'Frontend Engineer',
+    range: '2021.01 -> now',
+    site: 'https://github.com/elon',
+    detail:
+      'Built custom Astro and React experiences with strong visual identity, performance focus, and reusable component architecture.',
+  },
+];
 
-const skillColor = "crimson";
-const fontWeight = "bold";
-const textCase = "uppercase";
+const sidebarByLang = {
+  python: [
+    { title: 'PLATFORMS', items: ['Windows', 'Linux', 'Mobile'] },
+    { title: 'LANGUAGES', items: ['Python', 'JavaScript', 'Bash', 'HTML/CSS'] },
+    { title: 'TOOLS', items: ['Unity3D', 'Unreal', 'Godot', 'JetBrains', 'VSCode', 'Photoshop', 'Blender'] },
+    { title: 'MEDIA', items: ['itch.io/elon', 'linkedin.com/in/elon', 'github.com/elon'] },
+    { title: 'SPOKEN_LANGUAGES', items: ['Francais: C1', 'Anglais: B2', 'Polonais: B2'] },
+    { title: 'PROFILE', items: ['Curious', 'Rigorous', 'Collaborative'] },
+  ],
+  go: [
+    { title: 'platforms []string', items: ['Windows', 'Linux', 'Mobile'] },
+    { title: 'languages []string', items: ['Go', 'TypeScript', 'JavaScript', 'Python', 'Bash', 'HTML/CSS'] },
+    { title: 'tools []string', items: ['Unity3D', 'Unreal', 'Godot', 'JetBrains', 'VSCode', 'Photoshop', 'Blender'] },
+    { title: 'media []string', items: ['itch.io/elon', 'linkedin.com/in/elon', 'github.com/elon'] },
+    { title: 'spoken []string', items: ['Francais: C1', 'Anglais: B2', 'Polonais: B2'] },
+    { title: 'profile []string', items: ['Curious', 'Rigorous', 'Collaborative'] },
+  ],
+  zh: [
+    { title: '平台', items: ['Windows', 'Linux', '移动端'] },
+    { title: '技术栈', items: ['Python', 'Go', 'TypeScript', 'JavaScript', 'C#', 'HTML/CSS'] },
+    { title: '工具', items: ['Unity3D', 'Unreal', 'Godot', 'JetBrains', 'VSCode', 'Photoshop', 'Blender'] },
+    { title: '媒体链接', items: ['itch.io/elon', 'linkedin.com/in/elon', 'github.com/elon'] },
+    { title: '语言能力', items: ['法语: C1', '英语: B2', '波兰语: B2'] },
+    { title: '个人特质', items: ['好奇', '严谨', '协作'] },
+  ],
+};
 ---
 
+<BaseLayout pageTitle={pageTitle} showElonFloat={false}>
+  <section class="resume-screen">
+    <aside class="resume-sidebar">
+      <div class="avatar-panel">
+        <!--<img src="../../public/avatars/default.png" alt="resume avatar" loading="lazy" />-->
+        <ElonFloat inline={true} botId="elon-bot-inline"/>
+      </div>
 
-<html lang="zh-CN">
+      {Object.entries(sidebarByLang).map(([lang, sections]) => (
+        <div class:list={['sidebar-lang-panel', lang === 'python' && 'is-active']} data-lang-sidebar={lang}>
+          {sections.map((section) => (
+            <section class="side-section">
+              <p class="side-title">
+                <span class="kw">{section.title}</span> <span class="id">= [</span>
+              </p>
+              <ul>
+                {section.items.map((item) => (
+                  <li>
+                    <span class="str">'{item}'</span>,
+                  </li>
+                ))}
+              </ul>
+              <p class="side-tail">]</p>
+            </section>
+          ))}
+        </div>
+      ))}
+    </aside>
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width" />
-  <title>{pageTitle}</title>
-</head>
+    <article class="resume-editor">
+      <div class="editor-top">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+        <span class="tab-name" id="resume-tab-name">resume.py</span>
 
-<body>
-  <BaseLayout pageTitle={pageTitle} skillColor={skillColor} fontWeight={fontWeight} textCase={textCase}>
-    <h2>……和我的新 Astro 网站！</h2>
+        <div class="lang-switcher">
+          <label for="resume-language">Display</label>
+          <select id="resume-language" aria-label="Select resume language">
+            <option value="python">Python</option>
+            <option value="go">Go</option>
+            <option value="zh">中文</option>
+          </select>
+        </div>
+      </div>
 
-    <p>我正在学习 Astro 的入门教程。这是我网站上的第二个页面，也是我自己建立的第一页面！</p>
+      <div class="editor-body">
+        <div class="code-lang-panel is-active" data-lang-code="python">
+          <p class="code-line comment"># Looking for internship opportunities on Unity3D / Unreal Engine</p>
+          <p class="code-line comment"># 4 days in company, 1 day in school. Available immediately.</p>
 
-    <p>随着我完成更多教程，该站点将更新，所以请继续查看我的旅程将如何进行吧！</p>
+          <section class="code-section">
+            <h2 class="section-title">
+              <span class="kw">class</span> <span class="type">Information</span><span class="id">:</span>
+            </h2>
+            <p class="code-line indent brace">{'{'}</p>
+            <p class="code-line indent">
+              <span class="id">name</span>: <span class="type">str</span> = <span class="str">'{profile.name}'</span>
+            </p>
+            <p class="code-line indent">
+              <span class="id">title</span>: <span class="type">str</span> = <span class="str">'{profile.title}'</span>
+            </p>
+            <p class="code-line indent">
+              <span class="id">email</span>: <span class="type">str</span> = <span class="str">'{profile.email}'</span>
+            </p>
+            <p class="code-line indent">
+              <span class="id">phone</span>: <span class="type">str</span> = <span class="str">'{profile.phone}'</span>
+            </p>
+            <p class="code-line indent">
+              <span class="id">location</span>: <span class="type">str</span> = <span class="str">'{profile.location}'</span>
+            </p>
+            <p class="code-line indent">
+              <span class="id">available_now</span>: <span class="type">bool</span> ={' '}
+              <span class="num">{profile.availableNow ? 'True' : 'False'}</span>
+            </p>
+            <p class="code-line indent">
+              <span class="id">age</span>: <span class="type">int</span> = <span class="num">{profile.age}</span>
+            </p>
+            <p class="code-line indent brace">{'}'}</p>
+          </section>
 
-    <p>以下是关于我的几个事实：</p>
-    <ul>
-      <li>我的名字是{identity.firstName}.</li>
-      <li>我住在{identity.country}。我的职业是{identity.occupation}。</li>
-      {identity.hobbies.length >= 2 &&
-      <li>我的两个习惯：{identity.hobbies[0]}和{identity.hobbies[1]}</li>
+          <section class="code-section">
+            <h2 class="section-title">
+              <span class="kw">class</span> <span class="type">Education</span><span class="id">:</span>
+            </h2>
+            <p class="code-line indent brace">{'{'}</p>
+            {education.map((item) => (
+              <div class="method-block">
+                <p class="code-line indent">
+                  <span class="kw">def</span> <span class="method">{item.method}</span><span class="id">(self):</span>
+                </p>
+                <p class="code-line indent2 brace">{'{'}</p>
+                <p class="code-line indent2">
+                  <span class="id">level</span> = <span class="str">'{item.level}'</span>
+                </p>
+                <p class="code-line indent2">
+                  <span class="id">period</span> = <span class="str">'{item.range}'</span>
+                </p>
+                <p class="code-line indent2">
+                  <span class="id">major</span> = <span class="str">'{item.type}'</span>
+                </p>
+                <p class="code-line indent2 brace">{'}'}</p>
+              </div>
+            ))}
+            <p class="code-line indent brace">{'}'}</p>
+          </section>
+
+          <section class="code-section">
+            <h2 class="section-title">
+              <span class="kw">class</span> <span class="type">Experiences</span><span class="id">:</span>
+            </h2>
+            <p class="code-line indent brace">{'{'}</p>
+            {experiences.map((item) => (
+              <div class="method-block">
+                <p class="code-line indent">
+                  <span class="kw">def</span> <span class="method">{item.method}</span><span class="id">(self):</span>
+                </p>
+                <p class="code-line indent2 brace">{'{'}</p>
+                <p class="code-line indent2">
+                  <span class="id">role</span> = <span class="str">'{item.role}'</span>
+                </p>
+                <p class="code-line indent2">
+                  <span class="id">period</span> = <span class="str">'{item.range}'</span>
+                </p>
+                <p class="code-line indent2">
+                  <span class="id">link</span> = <span class="str">'{item.site}'</span>
+                </p>
+                <p class="code-line indent2 comment"># {item.detail}</p>
+                <p class="code-line indent2 brace">{'}'}</p>
+              </div>
+            ))}
+            <p class="code-line indent brace">{'}'}</p>
+          </section>
+        </div>
+
+        <div class="code-lang-panel" data-lang-code="go">
+          <p class="code-line comment">// Looking for internship opportunities on Unity3D / Unreal Engine</p>
+          <p class="code-line comment">// 4 days in company, 1 day in school. Available immediately.</p>
+
+          <section class="code-section">
+            <h2 class="section-title">
+              <span class="kw">type</span> <span class="type">Information</span> <span class="kw">struct</span>
+            </h2>
+            <p class="code-line indent brace">{'{'}</p>
+            <p class="code-line indent"><span class="id">Name</span> <span class="type">string</span></p>
+            <p class="code-line indent"><span class="id">Title</span> <span class="type">string</span></p>
+            <p class="code-line indent"><span class="id">Email</span> <span class="type">string</span></p>
+            <p class="code-line indent"><span class="id">Phone</span> <span class="type">string</span></p>
+            <p class="code-line indent"><span class="id">Location</span> <span class="type">string</span></p>
+            <p class="code-line indent"><span class="id">AvailableNow</span> <span class="type">bool</span></p>
+            <p class="code-line indent"><span class="id">Age</span> <span class="type">int</span></p>
+            <p class="code-line indent brace">{'}'}</p>
+            <p class="code-line indent"></p>
+            <p class="code-line indent">
+              <span class="kw">var</span> <span class="id">profile</span> = <span class="type">Information</span>
+            </p>
+            <p class="code-line indent brace">{'{'}</p>
+            <p class="code-line indent2"><span class="id">Name</span>: <span class="str">"{profile.name}"</span>,</p>
+            <p class="code-line indent2"><span class="id">Title</span>: <span class="str">"{profile.title}"</span>,</p>
+            <p class="code-line indent2"><span class="id">Email</span>: <span class="str">"{profile.email}"</span>,</p>
+            <p class="code-line indent2"><span class="id">Phone</span>: <span class="str">"{profile.phone}"</span>,</p>
+            <p class="code-line indent2"><span class="id">Location</span>: <span class="str">"{profile.location}"</span>,</p>
+            <p class="code-line indent2">
+              <span class="id">AvailableNow</span>: <span class="num">{profile.availableNow ? 'true' : 'false'}</span>,
+            </p>
+            <p class="code-line indent2"><span class="id">Age</span>: <span class="num">{profile.age}</span>,</p>
+            <p class="code-line indent brace">{'}'}</p>
+          </section>
+
+          <section class="code-section">
+            <h2 class="section-title">
+              <span class="kw">func</span> <span class="method">loadEducation</span>()
+            </h2>
+            <p class="code-line indent brace">{'{'}</p>
+            {education.map((item) => (
+              <div class="method-block">
+                <p class="code-line indent">
+                  <span class="id">{item.method}</span> := <span class="kw">map</span>[<span class="type">string</span>]
+                  <span class="type">string</span>
+                </p>
+                <p class="code-line indent brace">{'{'}</p>
+                <p class="code-line indent2"><span class="str">"level"</span>: <span class="str">"{item.level}"</span>,</p>
+                <p class="code-line indent2"><span class="str">"period"</span>: <span class="str">"{item.range}"</span>,</p>
+                <p class="code-line indent2"><span class="str">"major"</span>: <span class="str">"{item.type}"</span>,</p>
+                <p class="code-line indent brace">{'}'}</p>
+              </div>
+            ))}
+            <p class="code-line indent brace">{'}'}</p>
+          </section>
+
+          <section class="code-section">
+            <h2 class="section-title">
+              <span class="kw">func</span> <span class="method">loadExperiences</span>()
+            </h2>
+            <p class="code-line indent brace">{'{'}</p>
+            {experiences.map((item) => (
+              <div class="method-block">
+                <p class="code-line indent">
+                  <span class="id">{item.method}</span> := <span class="kw">map</span>[<span class="type">string</span>]
+                  <span class="type">string</span>
+                </p>
+                <p class="code-line indent brace">{'{'}</p>
+                <p class="code-line indent2"><span class="str">"role"</span>: <span class="str">"{item.role}"</span>,</p>
+                <p class="code-line indent2"><span class="str">"period"</span>: <span class="str">"{item.range}"</span>,</p>
+                <p class="code-line indent2"><span class="str">"link"</span>: <span class="str">"{item.site}"</span>,</p>
+                <p class="code-line indent2 comment">// {item.detail}</p>
+                <p class="code-line indent brace">{'}'}</p>
+              </div>
+            ))}
+            <p class="code-line indent brace">{'}'}</p>
+          </section>
+        </div>
+
+        <div class="code-lang-panel" data-lang-code="zh">
+          <p class="code-line comment"># 目标：寻找 Unity3D / Unreal Engine 相关岗位</p>
+          <p class="code-line comment"># 工作安排：每周 4 天企业 + 1 天学校，可立即到岗</p>
+
+          <section class="code-section">
+            <h2 class="section-title">
+              <span class="id">个人信息</span> <span class="id">=</span>
+            </h2>
+            <p class="code-line indent brace">{'{'}</p>
+            <p class="code-line indent"><span class="str">"姓名"</span>: <span class="str">"{profile.name}"</span>,</p>
+            <p class="code-line indent"><span class="str">"职位"</span>: <span class="str">"{profile.title}"</span>,</p>
+            <p class="code-line indent"><span class="str">"邮箱"</span>: <span class="str">"{profile.email}"</span>,</p>
+            <p class="code-line indent"><span class="str">"电话"</span>: <span class="str">"{profile.phone}"</span>,</p>
+            <p class="code-line indent"><span class="str">"地点"</span>: <span class="str">"{profile.location}"</span>,</p>
+            <p class="code-line indent">
+              <span class="str">"可入职"</span>: <span class="num">{profile.availableNow ? '是' : '否'}</span>,
+            </p>
+            <p class="code-line indent"><span class="str">"年龄"</span>: <span class="num">{profile.age}</span>,</p>
+            <p class="code-line indent brace">{'}'}</p>
+          </section>
+
+          <section class="code-section">
+            <h2 class="section-title">
+              <span class="id">教育经历</span> <span class="id">= [</span>
+            </h2>
+            {education.map((item) => (
+              <div class="method-block">
+                <p class="code-line indent brace">{'{'}</p>
+                <p class="code-line indent2"><span class="str">"函数名"</span>: <span class="str">"{item.method}()"</span>,</p>
+                <p class="code-line indent2"><span class="str">"学历"</span>: <span class="str">"{item.level}"</span>,</p>
+                <p class="code-line indent2"><span class="str">"时间"</span>: <span class="str">"{item.range}"</span>,</p>
+                <p class="code-line indent2"><span class="str">"方向"</span>: <span class="str">"{item.type}"</span>,</p>
+                <p class="code-line indent brace">{'}'}</p>
+              </div>
+            ))}
+            <p class="code-line indent">]</p>
+          </section>
+
+          <section class="code-section">
+            <h2 class="section-title">
+              <span class="id">项目与经历</span> <span class="id">= [</span>
+            </h2>
+            {experiences.map((item) => (
+              <div class="method-block">
+                <p class="code-line indent brace">{'{'}</p>
+                <p class="code-line indent2"><span class="str">"方法名"</span>: <span class="str">"{item.method}()"</span>,</p>
+                <p class="code-line indent2"><span class="str">"角色"</span>: <span class="str">"{item.role}"</span>,</p>
+                <p class="code-line indent2"><span class="str">"周期"</span>: <span class="str">"{item.range}"</span>,</p>
+                <p class="code-line indent2"><span class="str">"链接"</span>: <span class="str">"{item.site}"</span>,</p>
+                <p class="code-line indent2 comment"># {item.detail}</p>
+                <p class="code-line indent brace">{'}'}</p>
+              </div>
+            ))}
+            <p class="code-line indent">]</p>
+          </section>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <script is:inline>
+    const languageStorageKey = 'about:resume-language';
+    const languageSelect = document.getElementById('resume-language');
+    const tabName = document.getElementById('resume-tab-name');
+    const sidebarPanels = Array.from(document.querySelectorAll('[data-lang-sidebar]'));
+    const codePanels = Array.from(document.querySelectorAll('[data-lang-code]'));
+    const tabNameByLang = {
+      python: 'resume.py',
+      go: 'resume.go',
+      zh: 'resume.zh-CN',
+    };
+    const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
+
+    const applyLanguage = (rawLang) => {
+      const lang = hasOwn(tabNameByLang, rawLang) ? rawLang : 'python';
+      sidebarPanels.forEach((panel) => {
+        const panelLang = panel.getAttribute('data-lang-sidebar');
+        panel.classList.toggle('is-active', panelLang === lang);
+      });
+      codePanels.forEach((panel) => {
+        const panelLang = panel.getAttribute('data-lang-code');
+        panel.classList.toggle('is-active', panelLang === lang);
+      });
+      if (tabName) {
+        tabName.textContent = tabNameByLang[lang];
       }
-    </ul>
-    <p>我的技能是：</p>
-    <ul>
-      {skills.map((skill) => <li class="skill">{skill}</li>)}
-    </ul>
+      if (languageSelect) {
+        languageSelect.value = lang;
+      }
+      try {
+        localStorage.setItem(languageStorageKey, lang);
+      } catch {}
+    };
 
-    {happy && <p>我非常乐意学习 Astro！</p>}
+    let initialLanguage = 'python';
+    try {
+      const savedLanguage = localStorage.getItem(languageStorageKey);
+      if (savedLanguage && hasOwn(tabNameByLang, savedLanguage)) {
+        initialLanguage = savedLanguage;
+      }
+    } catch {}
 
-    {finished && <p>我完成了这节教程！</p>}
+    applyLanguage(initialLanguage);
 
-    {goal === 3 ? <p>我的目标是在三天内完成。</p> : <p>我的目标不是 3 天。</p>}
+    languageSelect?.addEventListener('change', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLSelectElement)) return;
+      applyLanguage(target.value);
+    });
+  </script>
+</BaseLayout>
 
-  </BaseLayout>
-</body>
+<style>
+  :global(#elon-bot) {
+    display: none !important;
+  }
 
-</html>
+  :global(main.container) {
+    max-width: 1200px;
+  }
+
+  .resume-screen {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    border: 1px solid #1c2530;
+    border-radius: 0.9rem;
+    overflow: hidden;
+    overflow-x: hidden;
+    background: #0e1218;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    min-height: 72vh;
+  }
+
+  .resume-sidebar {
+    background: linear-gradient(180deg, #0b1016 0%, #0a0e13 100%);
+    border-right: 1px solid #1c2530;
+    padding: 1rem 0.9rem;
+    overflow: auto;
+    min-width: 0;
+  }
+
+  .sidebar-lang-panel {
+    display: none;
+  }
+
+  .sidebar-lang-panel.is-active {
+    display: block;
+  }
+
+  .avatar-panel {
+    border: 1px solid #253444;
+    border-radius: 0.35rem;
+    background: #111a22;
+    padding: 0.35rem;
+    margin-bottom: 1rem;
+  }
+
+  .avatar-panel img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 0.2rem;
+  }
+
+  .side-section {
+    border-top: 1px dashed #1c2530;
+    padding-top: 0.65rem;
+    margin-top: 0.65rem;
+  }
+
+  .side-title {
+    margin: 0;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+  }
+
+  .side-section ul {
+    margin: 0.45rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.22rem;
+  }
+
+  .side-section li {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    color: #b9c7d6;
+    font-size: 0.76rem;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  .side-tail {
+    margin: 0.35rem 0 0;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    color: #f2f5f8;
+    font-size: 0.8rem;
+  }
+
+  .resume-editor {
+    background: linear-gradient(180deg, #0f141b 0%, #0d1117 100%);
+    overflow: auto;
+    min-width: 0;
+  }
+
+  .editor-top {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    border-bottom: 1px solid #1c2530;
+    background: #121924;
+    padding: 0.65rem 0.85rem;
+  }
+
+  .dot {
+    width: 0.62rem;
+    height: 0.62rem;
+    border-radius: 999px;
+    display: inline-block;
+  }
+
+  .dot.red {
+    background: #f16d75;
+  }
+
+  .dot.yellow {
+    background: #f3cf5a;
+  }
+
+  .dot.green {
+    background: #6edb8c;
+  }
+
+  .tab-name {
+    margin-left: 0.4rem;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.76rem;
+    color: #8ea2b9;
+    min-width: 0;
+  }
+
+  .lang-switcher {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.74rem;
+    color: #8ea2b9;
+  }
+
+  .lang-switcher select {
+    border: 1px solid #2a3a4d;
+    background: #0d1420;
+    color: #dce8f2;
+    border-radius: 0.35rem;
+    padding: 0.3rem 0.45rem;
+    font-size: 0.75rem;
+    outline: none;
+  }
+
+  .lang-switcher select:focus {
+    border-color: #48c6ff;
+    box-shadow: 0 0 0 1px rgba(72, 198, 255, 0.3);
+  }
+
+  .editor-body {
+    padding: 1rem 1.05rem 1.4rem;
+  }
+
+  .code-lang-panel {
+    display: none;
+  }
+
+  .code-lang-panel.is-active {
+    display: block;
+  }
+
+  .code-section {
+    margin-top: 1rem;
+  }
+
+  .section-title {
+    margin: 0;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 1.08rem;
+    line-height: 1.45;
+  }
+
+  .method-block {
+    margin-top: 0.55rem;
+    padding-left: 0.35rem;
+    border-left: 1px dashed #1f3141;
+  }
+
+  .code-line {
+    margin: 0;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.86rem;
+    line-height: 1.58;
+    color: #c6d2df;
+  }
+
+  .indent {
+    padding-left: 1.2rem;
+  }
+
+  .indent2 {
+    padding-left: 2.2rem;
+  }
+
+  .kw {
+    color: #48c6ff;
+  }
+
+  .type {
+    color: #67e0b2;
+  }
+
+  .id {
+    color: #f2f5f8;
+  }
+
+  .str {
+    color: #c9a16f;
+  }
+
+  .num {
+    color: #f2dd79;
+  }
+
+  .method {
+    color: #60e8ac;
+  }
+
+  .comment {
+    color: #67a768;
+  }
+
+  .brace {
+    color: #9bc0e4;
+  }
+
+  @media (max-width: 980px) {
+    .resume-screen {
+      grid-template-columns: 1fr;
+    }
+
+    .resume-sidebar {
+      border-right: 0;
+      border-bottom: 1px solid #1c2530;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .editor-top {
+      align-items: flex-start;
+    }
+
+    .lang-switcher {
+      width: 100%;
+      margin-left: 0;
+      justify-content: space-between;
+    }
+
+    .lang-switcher select {
+      width: min(240px, 100%);
+    }
+  }
+</style>
