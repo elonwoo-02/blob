@@ -6,6 +6,8 @@ import { buildTagTree, tagToSlug } from '../utils/tags';
 import TagTreeNode from '../components/post/TagTreeNode.astro';
 import GithubIcon from "../components/icons/GithubIcon.astro";
 import PostActionBar from '../components/post/PostActionBar.astro';
+import TimelineSection from '../components/TimelineSection.astro';
+import { blogTimeline } from '../data/developmentTimeline';
 
 const pageTitle = '';
 const allPosts = await getCollection('blog');
@@ -231,6 +233,13 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
           </div>
         </div>
       </section>
+
+      <TimelineSection
+        entries={blogTimeline}
+        title="Blog 时间轴"
+        subtitle="记录博客页面的关键演进。"
+        tagLabel="博客日志"
+      />
 
       <div id="toast" class="toast hidden" role="status" aria-live="polite">
         <div class="toast-surface">已复制链接</div>

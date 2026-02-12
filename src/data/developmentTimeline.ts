@@ -1,0 +1,73 @@
+// TimelineEntry 表示时间轴一条记录的结构
+export interface TimelineEntry {
+  date: string;
+  title: string;
+  tag: string;
+  summary: string;
+  details: string[];
+}
+
+// 首页时间轴数据：突出首页模块的建设历程
+export const indexTimeline: TimelineEntry[] = [
+  {
+    date: '2026-02-08',
+    title: '英雄区初步框架',
+    tag: 'index',
+    summary: '在首页搭建带有雷达徽章与终端输出的控制台英雄区。',
+    details: [
+      '用翡翠边框卡片与模拟终端日志定调整体视觉。',
+      '确保主英雄区在宽屏与移动端都能保持布局稳定。',
+    ],
+  },
+  {
+    date: '2026-02-12',
+    title: '搭建网页开发时间轴',
+    tag: 'index',
+    summary: '',
+    details: [
+      '仿照Tailwind Components搭建时间轴。',
+      '重构时间轴组件，组件化设计：TimelineSection.astro, developmentTimeline.ts。'
+    ],
+  },
+];
+
+// About 页面时间轴数据：记录头像与视觉相关迭代
+export const aboutTimeline: TimelineEntry[] = [
+  {
+    date: '2026-02-12',
+    title: '简历照片 3D 悬浮',
+    tag: 'About',
+    summary: '',
+    details: [
+      '将 About 页的头像升级为 3D 悬浮 Tailwind 组件，以新的 hover 结构替代静态头像。',
+    ],
+  },
+];
+
+// Blog 页面时间轴数据：展示博客模块的内容演进
+export const blogTimeline: TimelineEntry[] = [
+  {
+    date: '2026-02-12',
+    title: '博客热力图',
+    tag: 'Blog',
+    summary: '在博客页引入 GitHub 风格热力图展示发布节奏。',
+    details: [
+      '绘制 7×53 的活动格子，用深浅色表示提交频次。',
+      '将组件放在抽屉布局内，与置顶文章和阅读列表并列。',
+    ],
+  },
+];
+
+// Bookmarks 页面时间轴数据：记录收藏面板的功能调整
+export const bookmarksTimeline: TimelineEntry[] = [
+  {
+    date: '2026-02-12',
+    title: '书签控制面板',
+    tag: 'Bookmarks',
+    summary: '构建书签面板，内含本地存储与即时清除按钮。',
+    details: [
+      '卡片网格配合清除按钮与空状态提示。',
+      '保留收藏记录，便于后续查阅策略。',
+    ],
+  },
+];
