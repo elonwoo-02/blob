@@ -1,4 +1,6 @@
-﻿  const overlay = document.getElementById('shortcut-overlay');
+﻿import { initTerminalInteraction } from './terminalInteraction.js';
+
+const overlay = document.getElementById('shortcut-overlay');
   const terminalPanel = document.getElementById('terminal-panel');
   const terminalModal = document.querySelector('.shortcut-modal');
   const terminalTitlebar = document.querySelector('.shortcut-titlebar');
@@ -17,13 +19,17 @@
   updateClock();
   window.setInterval(updateClock, 30000);
   const openOverlay = (panel) => {
+    overlay?.classList.add('flex');
     overlay?.classList.remove('hidden');
     overlay?.setAttribute('aria-hidden', 'false');
+    panel?.classList.add('flex');
     panel?.classList.remove('hidden');
   };
   const closeOverlay = () => {
+    overlay?.classList.remove('flex');
     overlay?.classList.add('hidden');
     overlay?.setAttribute('aria-hidden', 'true');
+    terminalPanel?.classList.remove('flex');
     terminalPanel?.classList.add('hidden');
   };
   const navigateTo = (path) => {
@@ -64,149 +70,8 @@
     terminalInput?.focus();
   };
 
-  // 统一交互引擎：将“拖拽移动 + 八方向缩放”合并到同一套 Pointer 事件流程。
-  if (terminalModal) {
-    const handles = terminalModal.querySelectorAll('.terminal-resize-handle');
-    const minWidth = 420;
-    const minHeight = 320;
-
-    // 当前交互会话快照；为空表示没有活跃的拖拽/缩放过程。
-    let interaction = null;
-    // 保存最新指针位置，配合 requestAnimationFrame 做写入节流。
-    let pointerX = 0;
-    let pointerY = 0;
-    let rafId = 0;
-
-    // 在同一帧内只执行一次样式写入，降低高频 pointermove 带来的重排压力。
-    const scheduleApply = () => {
-      if (rafId) return;
-      rafId = window.requestAnimationFrame(() => {
-        rafId = 0;
-        applyInteraction();
-      });
-    };
-
-    // 根据当前会话类型（drag/resize）计算位置与尺寸，并写入 DOM。
-    const applyInteraction = () => {
-      if (!interaction) return;
-
-      const deltaX = pointerX - interaction.startX;
-      const deltaY = pointerY - interaction.startY;
-
-      if (interaction.mode === 'drag') {
-        terminalModal.style.left = `${interaction.startLeft + deltaX}px`;
-        terminalModal.style.top = `${interaction.startTop + deltaY}px`;
-        terminalModal.style.transform = 'translate(0, 0)';
-        return;
-      }
-
-      let nextWidth = interaction.startWidth;
-      let nextHeight = interaction.startHeight;
-      let nextLeft = interaction.startLeft;
-      let nextTop = interaction.startTop;
-      const dirs = interaction.dirFlags;
-
-      if (dirs.e) {
-        nextWidth = Math.max(minWidth, interaction.startWidth + deltaX);
-      }
-      if (dirs.s) {
-        nextHeight = Math.max(minHeight, interaction.startHeight + deltaY);
-      }
-      if (dirs.w) {
-        const next = Math.max(minWidth, interaction.startWidth - deltaX);
-        nextLeft = interaction.startLeft + (interaction.startWidth - next);
-        nextWidth = next;
-      }
-      if (dirs.n) {
-        const next = Math.max(minHeight, interaction.startHeight - deltaY);
-        nextTop = interaction.startTop + (interaction.startHeight - next);
-        nextHeight = next;
-      }
-
-      terminalModal.style.left = `${nextLeft}px`;
-      terminalModal.style.top = `${nextTop}px`;
-      terminalModal.style.width = `${nextWidth}px`;
-      terminalModal.style.height = `${nextHeight}px`;
-      terminalModal.style.transform = 'translate(0, 0)';
-    };
-
-    // 结束当前交互：清理 rAF 与全局监听，释放 pointer capture。
-    const endInteraction = (pointerId) => {
-      if (!interaction || interaction.pointerId !== pointerId) return;
-      if (rafId) {
-        window.cancelAnimationFrame(rafId);
-        rafId = 0;
-      }
-      terminalModal.releasePointerCapture?.(pointerId);
-      interaction = null;
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('pointercancel', onPointerUp);
-    };
-
-    const onPointerMove = (event) => {
-      if (!interaction || interaction.pointerId !== event.pointerId) return;
-      pointerX = event.clientX;
-      pointerY = event.clientY;
-      scheduleApply();
-    };
-
-    const onPointerUp = (event) => {
-      if (!interaction || interaction.pointerId !== event.pointerId) return;
-      // 结束前做一次同步写入，避免最后一帧未刷新的位置差。
-      pointerX = event.clientX;
-      pointerY = event.clientY;
-      applyInteraction();
-      endInteraction(event.pointerId);
-    };
-
-    // 创建交互会话：drag 来自标题栏，resize 来自手柄。
-    const beginInteraction = (event, mode, direction = '') => {
-      if (event.button !== 0) return;
-      event.preventDefault();
-      if (mode === 'resize') {
-        // 缩放手柄需要阻断冒泡，避免触发标题栏拖拽。
-        event.stopPropagation();
-      }
-
-      const rect = terminalModal.getBoundingClientRect();
-      pointerX = event.clientX;
-      pointerY = event.clientY;
-      interaction = {
-        mode,
-        pointerId: event.pointerId,
-        startX: event.clientX,
-        startY: event.clientY,
-        startLeft: rect.left,
-        startTop: rect.top,
-        startWidth: rect.width,
-        startHeight: rect.height,
-        dirFlags: {
-          n: direction.includes('n'),
-          s: direction.includes('s'),
-          e: direction.includes('e'),
-          w: direction.includes('w'),
-        },
-      };
-
-      terminalModal.setPointerCapture?.(event.pointerId);
-      window.addEventListener('pointermove', onPointerMove, { passive: true });
-      window.addEventListener('pointerup', onPointerUp);
-      window.addEventListener('pointercancel', onPointerUp);
-    };
-
-    if (terminalTitlebar) {
-      terminalTitlebar.addEventListener('pointerdown', (event) => {
-        beginInteraction(event, 'drag');
-      });
-    }
-
-    handles.forEach((handle) => {
-      handle.addEventListener('pointerdown', (event) => {
-        beginInteraction(event, 'resize', handle.dataset.resize || '');
-      });
-    });
-  }
+  // Terminal pointer interaction.
+  initTerminalInteraction(terminalModal, terminalTitlebar);
   const getPreferredTheme = () =>
     window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 
@@ -729,5 +594,7 @@
     const arg = rest.join(' ').trim();
     executeCommand(cmd, arg);
   });
+
+
 
 
