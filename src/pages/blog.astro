@@ -49,9 +49,9 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-      <div class="blog-page">
+      <div class="blog-page blog-page--index-theme">
       <section class="space-y-4">
-        <div class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm">
+        <div class="rounded-3xl border border-emerald-500/30 bg-black/80 p-6 text-slate-100 shadow-[0_0_40px_rgba(16,185,129,0.15)]">
           <div class="mb-4 flex items-center justify-between gap-3">
             <div>
               <h1 class="text-2xl font-bold">Blog Timeline</h1>
@@ -118,14 +118,14 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
                   </svg>
                 </label>
               </div>
-              <div id="active-tag-panel" class="hidden flex-1 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-2 text-sm">
+              <div id="active-tag-panel" class="hidden flex-1 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-100">
                 当前筛选：<span id="active-tag-name" class="font-semibold"></span>
                 <button id="clear-tag-filter" type="button" class="btn btn-ghost btn-xs ml-2">清除</button>
               </div>
             </div>
             <div id="post-list" class="space-y-4">
           {pinnedPosts.length > 0 && (
-            <section class="rounded-3xl border border-base-300 bg-base-100 p-5 shadow-sm">
+            <section class="rounded-3xl border border-emerald-500/30 bg-black/70 p-5 text-slate-100 shadow-[0_0_24px_rgba(16,185,129,0.12)]">
               <div class="mb-3 flex items-center justify-between">
                 <div>
                   <p class="text-sm uppercase tracking-[0.2em] text-base-content/50">置顶文章</p>
@@ -135,7 +135,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
               <div class="grid gap-3 sm:grid-cols-2">
                 {pinnedPosts.map((post) => (
                   <a
-                    class="group rounded-2xl border border-base-200 bg-base-50/40 p-4 transition hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md"
+                    class="group rounded-2xl border border-emerald-500/20 bg-black/60 p-4 transition hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-[0_8px_28px_rgba(16,185,129,0.2)]"
                     href={`/posts/${post.id}/`}
                     target="_blank"
                     rel="noreferrer noopener"
@@ -161,7 +161,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
           )}
           {sortedPosts.map((post) => (
             <article
-              class="rounded-3xl border border-base-300 bg-base-100 p-5 shadow-sm transition hover:shadow-md"
+              class="rounded-3xl border border-emerald-500/25 bg-black/70 p-5 text-slate-100 shadow-[0_0_22px_rgba(16,185,129,0.1)] transition hover:border-emerald-400 hover:shadow-[0_10px_34px_rgba(16,185,129,0.2)]"
               data-post-card
               data-post-link={`/posts/${post.id}/`}
               data-tags={getPostTagPaths(post.data.tags)}
@@ -207,7 +207,7 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
           <div class="drawer-side z-20 blog-drawer-side">
             <label for="tag-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
 
-            <aside class="min-h-full w-80 rounded-r-3xl border-r border-base-300 bg-base-100 p-5 shadow-sm lg:rounded-3xl lg:border lg:shadow-sm">
+            <aside class="min-h-full w-80 rounded-r-3xl border-r border-emerald-500/25 bg-black/75 p-5 text-slate-100 shadow-[0_0_22px_rgba(16,185,129,0.1)] lg:rounded-3xl lg:border lg:shadow-[0_0_22px_rgba(16,185,129,0.1)]">
               <br>
               <br>
               <div class="mb-4 flex items-center justify-between">
@@ -534,14 +534,28 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
       </script>
 
       <style is:inline>
-        .blog-page .border,
-        .blog-page .border-base-300,
-        .blog-page .border-primary\/30,
-        .blog-page .border-dashed,
-        .blog-page .border-black\/5,
-        .blog-page .border-r {
-          border-width: 0 !important;
-          border-color: transparent !important;
+        .blog-page--index-theme {
+          color: rgb(226 232 240);
+        }
+
+        .blog-page--index-theme h1,
+        .blog-page--index-theme h2,
+        .blog-page--index-theme h3 {
+          color: rgb(167 243 208);
+        }
+
+        .blog-page--index-theme p,
+        .blog-page--index-theme span,
+        .blog-page--index-theme time {
+          color: rgb(203 213 225 / 0.95);
+        }
+
+        .blog-page--index-theme .btn-ghost {
+          color: rgb(110 231 183);
+        }
+
+        .blog-page--index-theme .btn-ghost:hover {
+          background: rgb(16 185 129 / 0.16);
         }
 
         .toast {
@@ -561,35 +575,55 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
         }
 
         .toast-surface {
-          background: hsl(var(--b1));
-          border: 1px solid hsl(var(--bc) / 0.15);
-          color: hsl(var(--bc));
+          background: rgb(0 0 0 / 0.78);
+          border: 1px solid rgb(16 185 129 / 0.4);
+          color: rgb(167 243 208);
           border-radius: 999px;
           padding: 0.55rem 0.9rem;
           font-size: 0.85rem;
-          box-shadow: 0 10px 25px hsl(var(--bc) / 0.12);
+          box-shadow: 0 10px 28px rgb(16 185 129 / 0.2);
         }
 
         [data-post-card] .card-tag {
-          border: none;
-          box-shadow: none;
+          border: 1px solid rgb(16 185 129 / 0.35);
+          background: rgb(16 185 129 / 0.12);
+          color: rgb(167 243 208);
+          box-shadow: 0 0 0 transparent;
           padding: 0.28rem 0.65rem;
         }
 
         [data-post-card] .card-tag:hover {
-          color: #059669;
+          border-color: rgb(52 211 153 / 0.9);
+          background: rgb(16 185 129 / 0.24);
+          color: rgb(209 250 229);
         }
 
         .tag-nav-btn.is-active {
-          background: rgba(5, 150, 105, 0.2);
-          color: #059669;
+          background: rgb(16 185 129 / 0.24);
+          color: rgb(209 250 229);
           border-radius: 999px;
           padding-left: 0.35rem;
           padding-right: 0.35rem;
         }
 
         .tag-nav-btn:hover {
-          color: #059669;
+          color: rgb(167 243 208);
+        }
+
+        .blog-page--index-theme #post-list a:hover {
+          color: rgb(110 231 183);
+        }
+
+        .blog-page--index-theme .badge-success {
+          border-color: rgb(16 185 129 / 0.45);
+          color: rgb(167 243 208);
+          background: rgb(16 185 129 / 0.1);
+        }
+
+        .blog-page--index-theme #empty-filter-state {
+          border-color: rgb(16 185 129 / 0.25);
+          background: rgb(0 0 0 / 0.7);
+          color: rgb(203 213 225);
         }
 
         @media (min-width: 1024px) {
