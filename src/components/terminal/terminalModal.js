@@ -8,13 +8,6 @@
   const titlebars = document.querySelectorAll('.shortcut-titlebar');
   const dock = document.querySelector('#mac-dock');
 
-  let sequence = '';
-  let sequenceTimer = null;
-  const isEditableTarget = (target) => {
-    if (!target) return false;
-    const tag = target.tagName?.toLowerCase?.();
-    return target.isContentEditable || ['input', 'textarea', 'select'].includes(tag);
-  };
   const updateClock = () => {
     const now = new Date();
     const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -505,53 +498,8 @@
     event.preventDefault();
     openTerminal();
   });
-  document.addEventListener('keydown', (event) => {
-    const key = event.key;
-    if (key === 'Escape' && !overlay?.classList.contains('hidden')) {
-      event.preventDefault();
-      closeOverlay();
-      return;
-    }
-
-    if (event.metaKey || event.ctrlKey || event.altKey) return;
-    if (isEditableTarget(event.target)) return;
-
-    if (key === 'k' || key === 'K') {
-      event.preventDefault();
-      openTerminal();
-      return;
-    }
-
-    if (key === 'h' || key === 'H') {
-      event.preventDefault();
-      navigateTo('/');
-      return;
-    }
-
-    if (key === 'g' || key === 'G') {
-      sequence = 'g';
-      window.clearTimeout(sequenceTimer);
-      sequenceTimer = window.setTimeout(() => {
-        sequence = '';
-      }, 800);
-      return;
-    }
-
-    if (sequence === 'g') {
-      if (key === 'b' || key === 'B') {
-        event.preventDefault();
-        sequence = '';
-        navigateTo('/blog/');
-        return;
-      }
-      if (key === 'a' || key === 'A') {
-        event.preventDefault();
-        sequence = '';
-        navigateTo('/about/');
-        return;
-      }
-    }
-  });
+  window.addEventListener('terminal:open', openTerminal);
+  window.addEventListener('terminal:close', closeOverlay);
   const elonBot = document.getElementById('elon-bot');
   if (elonBot && window.self !== window.top) {
     elonBot.classList.add('is-hidden');

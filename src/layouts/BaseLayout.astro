@@ -27,8 +27,8 @@ const {
   <MobileDrawer pageTitle={pageTitle} />
   <Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
 
-  <!--Terminal Modal-->
-  <div class="flex justify-center justify-items-center z-70">
+  <!-- Terminal entry shell: mount point only, terminal internals stay in TerminalModal -->
+  <div id="terminal-container" class="relative z-40">
     <TerminalModal />
   </div>
 
@@ -47,6 +47,7 @@ const {
   </div>
   <script>
     import "../scripts/capacitor-runtime.js";
+    import "../scripts/globalShortcuts.js";
   </script>
 </body>
 </html>

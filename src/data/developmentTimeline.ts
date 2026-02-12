@@ -29,6 +29,16 @@ export const baseLayoutTimeline: TimelineEntry[] = [
       '拖拽与缩放统一为 Pointer 事件交互引擎，并用 requestAnimationFrame 节流。'
     ],
   },
+  {
+    date: '2026-02-12',
+    title: '优化快捷键',
+    tag: 'BaseLayout',
+    summary: '',
+    details: [
+      '实现全局的快捷键逻辑：H-主页，B-博客，A-关于，T-回到页顶，K-终端，M-切换主题，G-转到页面',
+      '快捷键再做成“可配置映射表”（比如把 H、g+b、g+a 抽成常量），方便后续改键位',
+    ],
+  },
 ];
 
 // 首页时间轴数据：突出首页模块的建设历程

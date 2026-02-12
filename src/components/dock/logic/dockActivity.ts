@@ -80,6 +80,30 @@ export const createActivityManager = (
 
   const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
+  const closePanel = (panel: HTMLElement) => {
+    if (panel.dataset.href) {
+      onRemove(panel.dataset.href);
+      callbacks?.onClose?.(panel.dataset.href);
+    }
+    panel.remove();
+    setLayerVisibility();
+  };
+
+  const closeTopVisiblePanel = () => {
+    if (!activityLayer) return false;
+    const windows = Array.from(activityLayer.querySelectorAll('.dock-activity-window'))
+      .filter((panel) => !(panel as HTMLElement).classList.contains('hidden')) as HTMLElement[];
+    if (!windows.length) return false;
+
+    const topPanel = windows
+      .sort((a, b) => (Number(a.style.zIndex) || 0) - (Number(b.style.zIndex) || 0))
+      .pop();
+    if (!topPanel) return false;
+
+    closePanel(topPanel);
+    return true;
+  };
+
   const buildWindow = (item: ActivityItem) => {
     if (!activityLayer || !activityTemplate) return null;
     const fragment = activityTemplate.content.cloneNode(true) as DocumentFragment;
@@ -110,12 +134,7 @@ export const createActivityManager = (
     const openButton = panel.querySelector('[data-action="open"]');
 
     closeButton?.addEventListener('click', () => {
-      if (panel.dataset.href) {
-        onRemove(panel.dataset.href);
-        callbacks?.onClose?.(panel.dataset.href);
-      }
-      panel.remove();
-      setLayerVisibility();
+      closePanel(panel);
     });
 
     minimizeButton?.addEventListener('click', () => {
@@ -310,6 +329,10 @@ export const createActivityManager = (
       if ((event.target as HTMLElement | null)?.closest('.dock-activity-window')) return;
       if ((event.target as HTMLElement | null)?.closest('#mac-dock')) return;
       closeAll();
+    });
+
+    window.addEventListener('dock:close-top-activity', () => {
+      closeTopVisiblePanel();
     });
   };
 
