@@ -6,6 +6,62 @@ import { App } from '@capacitor/app';
 const isCapacitor = typeof window !== 'undefined' && !!window.Capacitor;
 
 if (isCapacitor) {
+  const EXIT_CONFIRM_ROUTES = new Set(['/', '/blog', '/about']);
+  const EXIT_CONFIRM_WINDOW_MS = 1800;
+  let lastBackPressAt = 0;
+  let backToastTimer = null;
+
+  const getCurrentRoute = () => {
+    let pathname = window.location.pathname || '/';
+    const assetMarker = '/android_asset/public';
+    const assetIndex = pathname.indexOf(assetMarker);
+    if (assetIndex >= 0) {
+      const trimmed = pathname.slice(assetIndex + assetMarker.length);
+      pathname = trimmed || '/';
+    }
+    pathname = pathname.replace(/\/index\.html$/i, '/');
+    pathname = pathname.replace(/\/+$/, '');
+    return pathname || '/';
+  };
+
+  const needsExitConfirm = () => EXIT_CONFIRM_ROUTES.has(getCurrentRoute());
+
+  const showExitToast = () => {
+    let toast = document.getElementById('app-back-exit-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'app-back-exit-toast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      toast.textContent = '\u518d\u8fd4\u56de\u4e00\u6b21\u9000\u51fa\u5e94\u7528';
+      Object.assign(toast.style, {
+        position: 'fixed',
+        left: '50%',
+        bottom: '28px',
+        transform: 'translateX(-50%)',
+        zIndex: '9999',
+        pointerEvents: 'none',
+        background: 'rgba(0, 0, 0, 0.78)',
+        color: '#fff',
+        borderRadius: '999px',
+        padding: '8px 14px',
+        fontSize: '13px',
+        lineHeight: '1.2',
+        opacity: '0',
+        transition: 'opacity 180ms ease',
+      });
+      document.body.appendChild(toast);
+    }
+
+    toast.style.opacity = '1';
+    if (backToastTimer) {
+      window.clearTimeout(backToastTimer);
+    }
+    backToastTimer = window.setTimeout(() => {
+      toast.style.opacity = '0';
+    }, 1200);
+  };
+
   // Only enable back-button handling when running from file-like origins.
   const isFileLike =
     window.location.protocol === 'file:' ||
@@ -17,7 +73,19 @@ if (isCapacitor) {
       if (canGoBack) {
         window.history.back();
       } else {
-        App.exitApp();
+        if (!needsExitConfirm()) {
+          App.exitApp();
+          return;
+        }
+
+        const now = Date.now();
+        if (now - lastBackPressAt <= EXIT_CONFIRM_WINDOW_MS) {
+          App.exitApp();
+          return;
+        }
+
+        lastBackPressAt = now;
+        showExitToast();
       }
     });
   }

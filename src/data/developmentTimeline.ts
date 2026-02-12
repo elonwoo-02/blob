@@ -7,6 +7,33 @@ export interface TimelineEntry {
   details: string[];
 }
 
+// 安卓端的开发记录
+export const androidTimeline: TimelineEntry[] = [
+  {
+    date: '2026-02-12',
+    title: '优化手机端页面显示',
+    tag: 'Android',
+    summary: '',
+    details: [
+      '处理页面返回和应用退出逻辑。',
+      '添加dock栏。',
+    ],
+  },
+];
+
+// MarkdownPostLayout的开发记录
+export const markdownPostLayoutTimeline: TimelineEntry[] = [
+  {
+    date: '2026-02-12',
+    title: '',
+    tag: 'Post',
+    summary: '',
+    details: [
+      '',
+    ],
+  },
+];
+
 // 网页布局
 export const baseLayoutTimeline: TimelineEntry[] = [
   {
