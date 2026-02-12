@@ -16,6 +16,7 @@ export const baseLayoutTimeline: TimelineEntry[] = [
     summary: '',
     details: [
       '使用Rodin将图片转为.glb文件，使用Spline生成嵌入代码。',
+      'PlayBot不在手机端显示，在网页端由快捷键P控制出现或消失。'
     ],
   },
   {
@@ -26,7 +27,8 @@ export const baseLayoutTimeline: TimelineEntry[] = [
     details: [
       '使用Tailwind重新书写组件代码。',
       '将 Terminal 结构、样式、逻辑分离到 terminal 目录（.astro/.css/.js）。',
-      '拖拽与缩放统一为 Pointer 事件交互引擎，并用 requestAnimationFrame 节流。'
+      '拖拽与缩放统一为 Pointer 事件交互引擎，并用 requestAnimationFrame 节流。',
+      '将拖拽与缩放功能独立。',
     ],
   },
   {

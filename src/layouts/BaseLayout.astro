@@ -28,7 +28,7 @@ const {
   <Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
 
   <!-- Terminal entry shell: mount point only, terminal internals stay in TerminalModal -->
-  <div id="terminal-container" class="relative z-40">
+  <div id="shortcut-overlay" class="shortcut-overlay fixed inset-0 z-40 hidden flex items-center justify-center bg-[rgba(5,8,12,0.55)] backdrop-blur-sm" aria-hidden="true">
     <TerminalModal />
   </div>
 
@@ -42,7 +42,7 @@ const {
   <Footer />
 
   <!-- TODO: Add AIbot command to route AI assistant interactions via terminal. -->
-  <div class="fixed left-0 bottom-0 z-70 w-50 h-50">
+  <div id="elon-bot" class="hidden md:block fixed left-0 bottom-0 z-70 w-50 h-50">
     <PlayBot />
   </div>
   <script>

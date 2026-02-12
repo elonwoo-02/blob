@@ -9,6 +9,7 @@ const SHORTCUTS = {
   homeKey: 'h',
   backToTopKey: 't',
   themeToggleKey: 'm',
+  botToggleKey: 'p',
   blogKey: 'b',
   aboutKey: 'a',
 };
@@ -52,6 +53,23 @@ const toggleTheme = () => {
   window.localStorage.setItem('theme', nextTheme);
 };
 
+const botStorageKey = 'bot-hidden';
+const botElement = document.getElementById('elon-bot');
+
+const applyBotVisibility = (hidden) => {
+  if (!botElement) return;
+  botElement.style.display = hidden ? 'none' : '';
+  botElement.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+};
+
+const toggleBot = () => {
+  const nextHidden = window.localStorage.getItem(botStorageKey) !== '1';
+  window.localStorage.setItem(botStorageKey, nextHidden ? '1' : '0');
+  applyBotVisibility(nextHidden);
+};
+
+applyBotVisibility(window.localStorage.getItem(botStorageKey) === '1');
+
 const singleKeyActionMap = {
   [SHORTCUTS.terminalToggleKey]: () => dispatchTerminal('open'),
   [SHORTCUTS.homeKey]: () => navigateTo('/'),
@@ -65,6 +83,7 @@ const singleKeyActionMap = {
       toggleTheme();
     }
   },
+  [SHORTCUTS.botToggleKey]: () => toggleBot(),
   [SHORTCUTS.blogKey]: () => navigateTo('/blog/'),
   [SHORTCUTS.aboutKey]: () => navigateTo('/about/'),
 };
