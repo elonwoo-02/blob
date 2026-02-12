@@ -28,7 +28,7 @@ export const baseLayoutTimeline: TimelineEntry[] = [
       '使用Tailwind重新书写组件代码。',
       '将 Terminal 结构、样式、逻辑分离到 terminal 目录（.astro/.css/.js）。',
       '拖拽与缩放统一为 Pointer 事件交互引擎，并用 requestAnimationFrame 节流。',
-      '将拖拽与缩放功能独立。',
+      '将拖拽与缩放功能，命令功能独立。',
     ],
   },
   {
