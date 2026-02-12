@@ -46,36 +46,83 @@ const navItems = [
     </li>
   ))}
       <li><a href="https://github.com/elonwoo-02/" target="_blank" rel="noreferrer">GitHub</a></li>
+      <li><button onclick="exitApp()" class="w-full text-left px-4 py-2 hover:bg-base-300 transition-colors">Exit App</button></li>
     </ul>
   </div>
 </div>
 
 <div class="dock dock-sm md:hidden">
-  <a href="/" data-nav-path="/" class={isDockActive('/') ? 'dock-active' : ''} aria-label="Home">
+  <a href="/" data-nav-path="/" data-mobile-dock-link class={isDockActive('/') ? 'dock-active' : ''} aria-label="Home">
      <svg class="size-[1.2em]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V10.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
   </a>
 
-  <a href="/blog/" data-nav-path="/blog/" class={isDockActive('/blog/') ? 'dock-active' : ''} aria-label="Blog">
+  <a href="/blog/" data-nav-path="/blog/" data-mobile-dock-link class={isDockActive('/blog/') ? 'dock-active' : ''} aria-label="Blog">
     <svg class="size-[1.2em]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 7h8M8 11h8M8 15h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
   </a>
 
-  <a href="/about/" data-nav-path="/about/" class={isDockActive('/about/') ? 'dock-active' : ''} aria-label="About">
+  <a href="/about/" data-nav-path="/about/" data-mobile-dock-link class={isDockActive('/about/') ? 'dock-active' : ''} aria-label="About">
     <svg class="size-[1.2em]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
   </a>
 </div>
 
 <script>
+  const normalizePath = (path) => (path === '/' ? '/' : path.replace(/\/+$/, ''));
   const isFileScheme = window.location.protocol === 'file:' || window.location.origin === 'null';
-  if (isFileScheme) {
+  const navLinks = Array.from(document.querySelectorAll('[data-nav-path]'));
+  const dockLinks = Array.from(document.querySelectorAll('[data-mobile-dock-link]'));
+  const currentPath = normalizePath(window.location.pathname);
+
+  if (isFileScheme && navLinks.length > 0) {
     const base = window.location.href.replace(/[^/]*$/, '');
-    const links = document.querySelectorAll('[data-nav-path]');
-    links.forEach((link) => {
+    navLinks.forEach((link) => {
       const rawPath = link.getAttribute('data-nav-path') || '';
       if (!rawPath || rawPath.startsWith('http')) return;
       const normalized = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
       link.setAttribute('href', new URL(normalized, base).toString());
     });
   }
+
+  const prefetchedHrefs = new Set();
+  const prefetchDocument = (href) => {
+    if (!href || prefetchedHrefs.has(href)) return;
+    prefetchedHrefs.add(href);
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.as = 'document';
+    link.href = href;
+    document.head.appendChild(link);
+  };
+
+  dockLinks.forEach((link) => {
+    link.style.touchAction = 'manipulation';
+    link.style.webkitTapHighlightColor = 'transparent';
+
+    const path = link.getAttribute('data-nav-path') || '';
+    const prefetchIfNeeded = () => {
+      if (normalizePath(path) === currentPath) return;
+      prefetchDocument(link.getAttribute('href') || '');
+    };
+
+    link.addEventListener('click', (event) => {
+      if (normalizePath(path) === currentPath) {
+        event.preventDefault();
+      }
+    });
+
+    // Prime next page fetch as soon as user starts touching the dock item.
+    link.addEventListener(
+      'pointerdown',
+      prefetchIfNeeded,
+      { passive: true },
+    );
+
+    // iOS Safari can fire touch before pointer events; prefetch early.
+    link.addEventListener(
+      'touchstart',
+      prefetchIfNeeded,
+      { passive: true },
+    );
+  });
 </script>
 
 <!-- Menu behavior -->

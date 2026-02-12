@@ -26,3 +26,5 @@ pnpm-debug.log*
 AGENTS.md
 
 .windsurfsrc/pages/test.astro
+
+.windsurf/
