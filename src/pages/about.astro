@@ -86,12 +86,24 @@ const sidebarByLang = {
 
 <BaseLayout pageTitle={pageTitle} showElonFloat={false}>
   <section class="resume-screen">
+    <!--简历侧边栏-->
     <aside class="resume-sidebar">
-      <div class="avatar-panel">
-        <!--<img src="../../public/avatars/default.png" alt="resume avatar" loading="lazy" />-->
-        <ElonFloat inline={true} botId="elon-bot-inline"/>
+      <!--3D image hover effect from Tailwind Component-->
+      <div class="avatar-panel hover-3d">
+        <!-- content -->
+        <figure class="max-w-100 rounded-2xl">
+          <img src="/avatars/default.png" alt="resume avatar" loading="lazy"/>
+        </figure>
+        <!-- 8 empty divs needed for the 3D effect -->
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
       </div>
-
       {Object.entries(sidebarByLang).map(([lang, sections]) => (
         <div class:list={['sidebar-lang-panel', lang === 'python' && 'is-active']} data-lang-sidebar={lang}>
           {sections.map((section) => (
@@ -112,7 +124,7 @@ const sidebarByLang = {
         </div>
       ))}
     </aside>
-
+    <!--简历主体-->
     <article class="resume-editor">
       <div class="editor-top">
         <span class="dot red"></span>
