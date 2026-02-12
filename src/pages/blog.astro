@@ -6,8 +6,6 @@ import { buildTagTree, tagToSlug } from '../utils/tags';
 import TagTreeNode from '../components/post/TagTreeNode.astro';
 import GithubIcon from "../components/icons/GithubIcon.astro";
 import PostActionBar from '../components/post/PostActionBar.astro';
-import TimelineSection from '../components/TimelineSection.astro';
-import { blogTimeline } from '../data/developmentTimeline';
 
 const pageTitle = '';
 const allPosts = await getCollection('blog');
@@ -50,17 +48,7 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
 const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提交', '9+ 次提交'];
 ---
 
-<html lang="zh-cn">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>{pageTitle}</title>
-  </head>
-
-  <body>
-    <BaseLayout pageTitle={pageTitle}>
+<BaseLayout pageTitle={pageTitle}>
       <div class="blog-page">
       <section class="space-y-4">
         <div class="rounded-3xl border border-base-300 bg-base-100 p-6 shadow-sm">
@@ -233,13 +221,6 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
           </div>
         </div>
       </section>
-
-      <TimelineSection
-        entries={blogTimeline}
-        title="Blog 时间轴"
-        subtitle="记录博客页面的关键演进。"
-        tagLabel="博客日志"
-      />
 
       <div id="toast" class="toast hidden" role="status" aria-live="polite">
         <div class="toast-surface">已复制链接</div>
@@ -632,5 +613,3 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
       </div>
 
     </BaseLayout>
-  </body>
-</html>

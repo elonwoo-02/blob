@@ -1,7 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import TimelineSection from '../components/TimelineSection.astro';
-import { aboutTimeline } from '../data/developmentTimeline';
 import Avatar3D from "../components/resume/Avatar3D.astro";
 
 const pageTitle = '';
@@ -358,13 +356,6 @@ const sidebarByLang = {
       </div>
     </article>
   </section>
-
-  <TimelineSection
-    entries={aboutTimeline}
-    title="About 时间轴"
-    subtitle="记录 About 页的视觉调整。"
-    tagLabel="关于更新"
-  />
 
   <script is:inline>
     const languageStorageKey = 'about:resume-language';

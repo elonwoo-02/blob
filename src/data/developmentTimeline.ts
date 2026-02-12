@@ -7,6 +7,7 @@ export interface TimelineEntry {
   details: string[];
 }
 
+// 网页布局
 export const baseLayoutTimeline: TimelineEntry[] = [
   {
     date: '2026-02-12',
@@ -15,6 +16,17 @@ export const baseLayoutTimeline: TimelineEntry[] = [
     summary: '',
     details: [
       '使用Rodin将图片转为.glb文件，使用Spline生成嵌入代码。',
+    ],
+  },
+  {
+    date: '2026-02-12',
+    title: '重构Terminal模态框组件',
+    tag: 'BaseLayout',
+    summary: '',
+    details: [
+      '使用Tailwind重新书写组件代码。',
+      '将 Terminal 结构、样式、逻辑分离到 terminal 目录（.astro/.css/.js）。',
+      '拖拽与缩放统一为 Pointer 事件交互引擎，并用 requestAnimationFrame 节流。'
     ],
   },
 ];
