@@ -6,25 +6,9 @@ import { App } from '@capacitor/app';
 const isCapacitor = typeof window !== 'undefined' && !!window.Capacitor;
 
 if (isCapacitor) {
-  const EXIT_CONFIRM_ROUTES = new Set(['/', '/blog', '/about']);
   const EXIT_CONFIRM_WINDOW_MS = 1800;
   let lastBackPressAt = 0;
   let backToastTimer = null;
-
-  const getCurrentRoute = () => {
-    let pathname = window.location.pathname || '/';
-    const assetMarker = '/android_asset/public';
-    const assetIndex = pathname.indexOf(assetMarker);
-    if (assetIndex >= 0) {
-      const trimmed = pathname.slice(assetIndex + assetMarker.length);
-      pathname = trimmed || '/';
-    }
-    pathname = pathname.replace(/\/index\.html$/i, '/');
-    pathname = pathname.replace(/\/+$/, '');
-    return pathname || '/';
-  };
-
-  const needsExitConfirm = () => EXIT_CONFIRM_ROUTES.has(getCurrentRoute());
 
   const showExitToast = () => {
     let toast = document.getElementById('app-back-exit-toast');
@@ -73,11 +57,6 @@ if (isCapacitor) {
       if (canGoBack) {
         window.history.back();
       } else {
-        if (!needsExitConfirm()) {
-          App.exitApp();
-          return;
-        }
-
         const now = Date.now();
         if (now - lastBackPressAt <= EXIT_CONFIRM_WINDOW_MS) {
           App.exitApp();

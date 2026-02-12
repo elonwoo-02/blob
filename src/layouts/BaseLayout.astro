@@ -23,6 +23,10 @@ const {
 </head>
 
 <body class="min-h-screen bg-base-100 text-base-content pb-24">
+  <div id="app-launch-splash" class="app-launch-splash hidden" aria-hidden="true">
+    <p class="app-launch-text">Holy, Elon</p>
+  </div>
+
   <!-- Global navigation -->
   <MobileDrawer pageTitle={pageTitle} />
   <Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
@@ -48,7 +52,73 @@ const {
   <script>
     import "../scripts/capacitor-runtime.js";
     import "../scripts/globalShortcuts.js";
+
+    const splash = document.getElementById('app-launch-splash');
+    const isCapacitorRuntime = typeof window !== 'undefined' && 'Capacitor' in window;
+    const isFileLike = window.location.protocol === 'file:' ||
+      window.location.origin === 'null' ||
+      window.location.href.includes('/android_asset/');
+
+    if (splash && isCapacitorRuntime && isFileLike) {
+      splash.classList.remove('hidden');
+      requestAnimationFrame(() => splash.classList.add('is-visible'));
+
+      window.setTimeout(() => {
+        splash.classList.remove('is-visible');
+        splash.classList.add('is-leaving');
+      }, 1050);
+
+      window.setTimeout(() => {
+        splash.remove();
+      }, 1500);
+    }
   </script>
+
+  <style is:inline>
+    .app-launch-splash {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 35% 22%, rgba(16, 185, 129, 0.16), transparent 58%), #08100d;
+      opacity: 0;
+      transition: opacity 260ms ease;
+      pointer-events: none;
+    }
+
+    .app-launch-splash.hidden {
+      display: none;
+    }
+
+    .app-launch-splash.is-visible {
+      opacity: 1;
+    }
+
+    .app-launch-splash.is-leaving {
+      opacity: 0;
+    }
+
+    .app-launch-text {
+      margin: 0;
+      color: #d1fae5;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: clamp(2rem, 6.2vw, 3.4rem);
+      font-style: italic;
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 14px rgba(52, 211, 153, 0.38), 0 0 42px rgba(16, 185, 129, 0.18);
+      transform: translateY(6px);
+      opacity: 0;
+      animation: app-launch-rise 560ms ease-out 120ms forwards;
+    }
+
+    @keyframes app-launch-rise {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
 </body>
 </html>
 
