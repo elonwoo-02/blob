@@ -11,7 +11,6 @@ import DockBotItem from './items/DockBotItem.astro';
 import DockBackToTop from './items/DockBackToTopItem.astro';
 import DockThemeToggle from './items/DockThemeToggleItem.astro';
 import DockRssLink from './items/DockRssLinkItem.astro';
-import type { AstroComponentFactory } from 'astro/runtime/server';
 
 const { pageTitle = '页面', currentPath = '/' } = Astro.props;
 
@@ -20,7 +19,7 @@ const dockPayload = {
   currentPath,
 };
 
-const dockItems: AstroComponentFactory[] = [
+const dockItems = [
   DockHomeItem,
   DockBlogItem,
   DockAboutItem,
@@ -30,13 +29,13 @@ const dockItems: AstroComponentFactory[] = [
   DockBotItem,
 ];
 
-const actionItems: AstroComponentFactory[] = [
+const actionItems = [
   DockBackToTop,
   DockThemeToggle,
   DockRssLink,
 ];
 
-const externalDockItems: AstroComponentFactory[] = [];
+const externalDockItems: any[] = [];
 
 const leftItems = [...dockItems, ...actionItems];
 ---

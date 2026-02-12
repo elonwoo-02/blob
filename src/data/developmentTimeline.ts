@@ -7,6 +7,18 @@ export interface TimelineEntry {
   details: string[];
 }
 
+export const baseLayoutTimeline: TimelineEntry[] = [
+  {
+    date: '2026-02-12',
+    title: '设计PlayBot组件',
+    tag: 'BaseLayout',
+    summary: '',
+    details: [
+      '使用Rodin将图片转为.glb文件，使用Spline生成嵌入代码。',
+    ],
+  },
+];
+
 // 首页时间轴数据：突出首页模块的建设历程
 export const indexTimeline: TimelineEntry[] = [
   {

@@ -2,7 +2,7 @@
 export interface DockEntry {
   label: string;
   href: string;
-  icon: string;
+  icon?: string;
 }
 
 export interface PanelState {

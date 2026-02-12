@@ -1,5 +1,5 @@
 ---
-import type { TagNode } from '../utils/tags';
+import type { TagNode } from '../../utils/tags';
 
 interface Props {
   node: TagNode;
@@ -37,7 +37,7 @@ const { node } = Astro.props;
 
   {node.children.length > 0 && (
     <ul class="tag-children mt-2 space-y-2 pl-4">
-      {node.children.map((child) => <Astro.self node={child} />)}
+      {node.children.map((child: TagNode) => <Astro.self node={child} />)}
     </ul>
   )}
 </li>

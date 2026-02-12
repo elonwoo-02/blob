@@ -11,7 +11,7 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
-const countReadingTime = (text) => {
+const countReadingTime = (text: string) => {
   const wordMatches = text.match(/[A-Za-z0-9]+/g) || [];
   const cjkMatches = text.match(/[\u4e00-\u9fff]/g) || [];
   const total = wordMatches.length + cjkMatches.length;

@@ -5,7 +5,8 @@
     "**/*"
   ],
   "exclude": [
-    "dist"
+    "dist",
+    "src/components/terminal/TerminalModal.astro"
   ],
   "compilerOptions": {
     "jsx": "react-jsx",

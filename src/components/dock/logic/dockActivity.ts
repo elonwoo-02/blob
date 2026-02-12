@@ -264,9 +264,11 @@ export const createActivityManager = (
     };
 
     if (titlebar) {
-      titlebar.addEventListener('pointerdown', startDrag);
+      titlebar.addEventListener('pointerdown', startDrag as EventListener);
     }
-    resizeHandles.forEach((handle) => handle.addEventListener('pointerdown', startResize));
+    resizeHandles.forEach((handle) =>
+      (handle as HTMLElement).addEventListener('pointerdown', startResize as EventListener),
+    );
     panel.addEventListener('pointerdown', () => bringToFront(panel));
 
     return panel;

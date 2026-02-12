@@ -2,7 +2,14 @@ import { getCollection } from 'astro:content';
 
 export async function GET() {
   const posts = await getCollection('blog');
-  const items = [
+  type SearchItem = {
+    title: string;
+    url: string;
+    description?: string;
+    tags?: string[];
+  };
+
+  const items: SearchItem[] = [
     { title: 'Home', url: '/' },
     { title: 'Blog', url: '/blog/' },
     { title: 'About', url: '/about/' },
@@ -11,10 +18,11 @@ export async function GET() {
 
   posts.forEach((post) => {
     const tags = Array.isArray(post.data.tags) ? post.data.tags : [];
-    const description = post.data.description ?? post.data.summary ?? '';
+    const description = post.data.description ?? '';
+    const slug = post.id.replace(/\.md$/, '');
     items.push({
-      title: post.data.title ?? post.slug,
-      url: `/posts/${post.slug}/`,
+      title: post.data.title ?? slug,
+      url: `/posts/${slug}/`,
       description,
       tags,
     });

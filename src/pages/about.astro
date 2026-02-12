@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ElonFloat from "../components/ElonFloat.astro";
 import TimelineSection from '../components/TimelineSection.astro';
 import { aboutTimeline } from '../data/developmentTimeline';
 import Avatar3D from "../components/resume/Avatar3D.astro";
@@ -53,7 +52,7 @@ const experiences = [
     method: 'freelance_web',
     role: 'Frontend Engineer',
     range: '2021.01 -> now',
-    site: 'https://github.com/elon',
+    site: 'https://elonwoo-02.github.com',
     detail:
       'Built custom Astro and React experiences with strong visual identity, performance focus, and reusable component architecture.',
   },
@@ -62,10 +61,10 @@ const experiences = [
 const sidebarByLang = {
   python: [
     { title: 'PLATFORMS', items: ['Windows', 'Linux', 'Mobile'] },
-    { title: 'LANGUAGES', items: ['Python', 'JavaScript', 'Bash', 'HTML/CSS'] },
-    { title: 'TOOLS', items: ['Unity3D', 'Unreal', 'Godot', 'JetBrains', 'VSCode', 'Photoshop', 'Blender'] },
-    { title: 'MEDIA', items: ['itch.io/elon', 'linkedin.com/in/elon', 'github.com/elon'] },
-    { title: 'SPOKEN_LANGUAGES', items: ['Francais: C1', 'Anglais: B2', 'Polonais: B2'] },
+    { title: 'LANGUAGES', items: ['Python', 'Java', 'Goland', 'HTML/CSS'] },
+    { title: 'TOOLS', items: ['Unity3D', 'Unreal', 'Godot', 'JetBrains', 'VSCode'] },
+    { title: 'MEDIA', items: ['https://elonwoo-02.github.com', '*', '*'] },
+    { title: 'SPOKEN_LANGUAGES', items: ['English: CET-6', '*: *', '*: *'] },
     { title: 'PROFILE', items: ['Curious', 'Rigorous', 'Collaborative'] },
   ],
   go: [
@@ -420,9 +419,6 @@ const sidebarByLang = {
 </BaseLayout>
 
 <style>
-  :global(#elon-bot) {
-    display: none !important;
-  }
 
   :global(main.container) {
     max-width: 1200px;

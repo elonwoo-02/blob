@@ -1,13 +1,12 @@
 ﻿---
 import '../styles/global.css';
 import Dock from "../components/dock/ui/Dock.astro";
-import ElonFloat from "../components/ElonFloat.astro";
+import PlayBot from "../components/PlayBot.astro";
 import MobileDrawer from "../components/navigation/MobileDrawer.astro";
 import Footer from "../components/shared/Footer.astro";
 
 const {
   pageTitle,
-  path = '/',
   mainClass = 'pt-10 md:pt-8',
   showElonFloat = true,
 } = Astro.props;
@@ -37,11 +36,14 @@ const {
   <Footer />
 
   <!-- TODO: Add AIbot command to route AI assistant interactions via terminal. -->
-  <!-- Floating mascot (hidden on home) -->
-  {showElonFloat && <ElonFloat path={Astro.url.pathname} />}
-
+  <div class="fixed left-0 bottom-0 z-70 w-50 h-50">
+    <PlayBot />
+  </div>
   <script>
     import "../scripts/capacitor-runtime.js";
   </script>
 </body>
 </html>
+
+
+
