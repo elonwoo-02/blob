@@ -11,6 +11,7 @@ const navItems = [
   { href: '/', label: 'Home' },
   { href: '/blog/', label: 'Blog' },
   { href: '/about/', label: 'About' },
+  { href: '/moment/', label: 'Moment' },
   { href: '/', label: 'Bot'}
 ];
 
@@ -63,13 +64,16 @@ const navItems = [
   <a href="/about/" data-nav-path="/about/" data-mobile-dock-link class={isDockActive('/about/') ? 'dock-active' : ''} aria-label="About">
     <svg class="size-[1.2em]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
   </a>
+  <a href="/moment/" data-nav-path="/moment/" data-mobile-dock-link class={isDockActive('/moment/') ? 'dock-active' : ''} aria-label="Moment">
+    <svg class="size-[1.2em]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M8 10h8M8 14h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </a>
 </div>
 
 <script>
-  const normalizePath = (path) => (path === '/' ? '/' : path.replace(/\/+$/, ''));
+  const normalizePath = (path: string) => (path === '/' ? '/' : path.replace(/\/+$/, ''));
   const isFileScheme = window.location.protocol === 'file:' || window.location.origin === 'null';
-  const navLinks = Array.from(document.querySelectorAll('[data-nav-path]'));
-  const dockLinks = Array.from(document.querySelectorAll('[data-mobile-dock-link]'));
+  const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-nav-path]'));
+  const dockLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-mobile-dock-link]'));
   const currentPath = normalizePath(window.location.pathname);
 
   if (isFileScheme && navLinks.length > 0) {
@@ -83,7 +87,7 @@ const navItems = [
   }
 
   const prefetchedHrefs = new Set();
-  const prefetchDocument = (href) => {
+  const prefetchDocument = (href: string) => {
     if (!href || prefetchedHrefs.has(href)) return;
     prefetchedHrefs.add(href);
     const link = document.createElement('link');
@@ -95,7 +99,7 @@ const navItems = [
 
   dockLinks.forEach((link) => {
     link.style.touchAction = 'manipulation';
-    link.style.webkitTapHighlightColor = 'transparent';
+    link.style.setProperty('-webkit-tap-highlight-color', 'transparent');
 
     const path = link.getAttribute('data-nav-path') || '';
     const prefetchIfNeeded = () => {
