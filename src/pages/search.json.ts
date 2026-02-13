@@ -13,6 +13,7 @@ export async function GET() {
     { title: 'Home', url: '/' },
     { title: 'Blog', url: '/blog/' },
     { title: 'About', url: '/about/' },
+    { title: 'Moment', url: '/moment/' },
     { title: 'Tags', url: '/tags/' },
   ];
 

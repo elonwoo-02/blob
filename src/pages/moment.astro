@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pageTitle = 'Moment';
+
+const posts = [
+  {
+    name: '林夏',
+    avatar: '夏',
+    time: '2小时前',
+    text: '今天的晚霞像被柚子汽水泡过，走到江边刚好赶上最后一抹橘色。',
+    images: ['#f59e0b', '#fb7185', '#60a5fa'],
+    location: '滨江步道',
+    likes: ['阿泽', 'Mia', '小李'],
+    comments: [
+      { name: '阿泽', text: '这配色太治愈了！' },
+      { name: '林夏', text: '@阿泽 下次一起去拍。' },
+    ],
+  },
+  {
+    name: '周南',
+    avatar: '南',
+    time: '昨天 23:16',
+    text: '加班结束，便利店热牛奶 + 饭团，打工人深夜续命套餐。',
+    images: ['#94a3b8'],
+    location: '',
+    likes: ['Elon', 'Cindy'],
+    comments: [{ name: 'Cindy', text: '辛苦啦，早点休息。' }],
+  },
+];
+---
+
+<BaseLayout pageTitle={pageTitle} mainClass="pt-16 md:pt-8 max-w-3xl">
+  <section class="overflow-hidden rounded-3xl border border-base-300 bg-base-100 shadow-sm">
+    <div class="relative h-52 bg-gradient-to-br from-emerald-300 via-cyan-300 to-blue-400 md:h-64">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.45),transparent_45%)]"></div>
+      <div class="absolute bottom-4 right-4 flex items-end gap-3">
+        <p class="text-sm font-medium text-slate-700">Elon Woo</p>
+        <div class="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-white bg-slate-200 text-lg font-bold text-slate-700 shadow-md">EW</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-6 space-y-6">
+    {posts.map((post) => (
+      <article class="rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm md:p-5">
+        <div class="flex gap-3">
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-100 font-semibold text-emerald-700">{post.avatar}</div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center justify-between gap-3">
+              <h2 class="truncate text-sm font-semibold text-sky-700">{post.name}</h2>
+              <button class="text-xs text-base-content/50 hover:text-base-content">···</button>
+            </div>
+            <p class="mt-2 text-sm leading-relaxed text-base-content/90">{post.text}</p>
+
+            <div class={`mt-3 grid gap-1.5 ${post.images.length === 1 ? 'grid-cols-1 max-w-[11rem]' : 'grid-cols-3 max-w-[16rem]'}`}>
+              {post.images.map((color) => (
+                <div class="aspect-square rounded-md" style={`background:${color}`}></div>
+              ))}
+            </div>
+
+            <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-base-content/60">
+              {post.location && <span class="rounded-full bg-base-200 px-2 py-0.5">📍 {post.location}</span>}
+              <span>{post.time}</span>
+            </div>
+
+            <div class="mt-3 rounded-lg bg-base-200/80 px-3 py-2 text-xs">
+              <p class="text-sky-700">❤️ {post.likes.join('，')}</p>
+              <div class="mt-1 space-y-1 text-base-content/80">
+                {post.comments.map((comment) => (
+                  <p><span class="font-medium text-sky-700">{comment.name}</span>：{comment.text}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    ))}
+  </section>
+</BaseLayout>
