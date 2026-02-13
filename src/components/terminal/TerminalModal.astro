@@ -1,16 +1,15 @@
 ﻿---
 const {
-  panelId = "terminal-panel",
-  outputId = "terminal-output",
-  inputId = "terminal-input",
-  titleId = "terminal-title",
-  title = "terminal://command",
+     panelId = "terminal-panel",
+     outputId = "terminal-output",
+     inputId = "terminal-input",
+     titleId = "terminal-title",
+     title = "terminal://command",
 } = Astro.props;
 ---
 
 <!-- 模态窗口容器：支持拖拽移动与缩放，初始位置固定在视口中心。 -->
 <div class="shortcut-modal absolute h-[min(78vh,720px)] min-h-90 w-[min(760px,94vw)] min-w-105 rounded-xl border border-black/50 bg-[#1e1e1e] shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_18px_50px_rgba(0,0,0,0.55)]" role="dialog" aria-modal="true">
-
   <!-- 终端主面板：通过 aria-labelledby 关联标题 -->
   <div id={panelId} class="shortcut-panel h-full flex flex-col" aria-labelledby={titleId}>
 

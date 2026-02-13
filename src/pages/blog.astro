@@ -49,601 +49,488 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-      <div class="blog-page blog-page--index-theme">
-      <section class="space-y-4">
-        <div class="rounded-3xl border border-emerald-500/30 bg-black/80 p-6 text-slate-100 shadow-[0_0_40px_rgba(16,185,129,0.15)]">
-          <div class="mb-4 flex items-center justify-between gap-3">
-            <div>
-              <h1 class="text-2xl font-bold">Blog Timeline</h1>
-              <p class="text-sm text-base-content/70">GitHub 风格贡献热力图</p>
-            </div>
-            <a class="w-10 h-10" href="https://github.com/" target="_blank" rel="noreferrer">
-              <GithubIcon/>
-            </a>
+  <div class="blog-page blog-page--index-theme">
+    <section class="space-y-4">
+      <div class="rounded-3xl">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <h1 class="text-2xl font-bold">Blog Timeline</h1>
+            <p class="text-sm text-base-content/70">GitHub 风格贡献热力图</p>
           </div>
+          <a class="w-10 h-10" href="https://github.com/" target="_blank" rel="noreferrer">
+            <GithubIcon/>
+          </a>
+        </div>
 
-          <div class="overflow-x-auto pb-2">
-            <div class="grid min-w-[860px] grid-flow-col gap-1">
-              {heatmap.map((week) => (
-                <div class="grid grid-rows-7 gap-1">
-                  {week.map((day) => (
-                    <div
-                      class:list={[
-                        'h-3 w-3 rounded-[3px] border border-black/5',
-                        day.level === 0 && 'bg-base-300/70',
-                        day.level === 1 && 'bg-emerald-200',
-                        day.level === 2 && 'bg-emerald-400',
-                        day.level === 3 && 'bg-emerald-600',
-                        day.level === 4 && 'bg-emerald-800'
-                      ]}
-                      title={`${day.date} · ${day.count} commits`}
-                      aria-label={`${day.date} ${levelText[day.level]}`}
-                    ></div>
-                  ))}
-                </div>
+        <div class="overflow-x-auto pb-2">
+          <div class="grid min-w-[860px] grid-flow-col gap-1">
+            {heatmap.map((week) => (
+              <div class="grid grid-rows-7 gap-1">
+                {week.map((day) => (
+                  <div
+                    class:list={[
+                      'h-3 w-3 rounded-[3px]',
+                      day.level === 0 && 'bg-base-300/70',
+                      day.level === 1 && 'bg-emerald-200',
+                      day.level === 2 && 'bg-emerald-400',
+                      day.level === 3 && 'bg-emerald-600',
+                      day.level === 4 && 'bg-emerald-800'
+                    ]}
+                    title={`${day.date} · ${day.count} commits`}
+                    aria-label={`${day.date} ${levelText[day.level]}`}
+                  ></div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-3 text-xs text-base-content/70">
+          <span>Less</span>
+          {levelText.map((text, level) => (
+            <span class="inline-flex items-center gap-1">
+              <span
+                class:list={[
+                  'h-3 w-3 rounded-[3px]',
+                  level === 0 && 'bg-base-300/70',
+                  level === 1 && 'bg-emerald-200',
+                  level === 2 && 'bg-emerald-400',
+                  level === 3 && 'bg-emerald-600',
+                  level === 4 && 'bg-emerald-800'
+                ]}
+              ></span>{text}
+            </span>
+          ))}
+          <span>More</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-4">
+      <div class="drawer lg:drawer-open blog-drawer" id="blog-drawer-layout">
+        <input id="tag-drawer" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content">
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="lg:hidden">
+              <label for="tag-drawer" class="btn btn-ghost btn-sm px-2" aria-label="打开标签抽屉">
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4">
+                  <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
+                </svg>
+              </label>
+            </div>
+            <div id="active-tag-panel" class="hidden flex-1 rounded-2xl px-4 py-2 text-sm">
+              当前筛选：<span id="active-tag-name" class="font-semibold"></span>
+              <button id="clear-tag-filter" type="button" class="btn btn-ghost btn-xs ml-2">清除</button>
+            </div>
+          </div>
+          <div id="post-list" class="space-y-4">
+        {pinnedPosts.length > 0 && (
+          <section class="rounded-3xl">
+            <div class="mb-3 flex items-center justify-between">
+              <div>
+                <p class="text-sm uppercase tracking-[0.2em] text-base-content/50">置顶文章</p>
+              </div>
+              <span class="badge badge-success badge-outline">Pinned</span>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+              {pinnedPosts.map((post) => (
+                <a
+                  class="group rounded-2xl p-4 transition hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(16,185,129,0.2)]"
+                  href={`/posts/${post.id}/`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <div class="flex items-center gap-3 text-xs text-base-content/60">
+                    <span class="inline-flex h-6 w-6 items-center justify-center rounded-full overflow-hidden">
+                      <img src="/avatars/default.png" alt={`${post.data.author} avatar`} width="24" height="24" loading="lazy" />
+                    </span>
+                    <span>{post.data.author}</span>
+                    <span>·</span>
+                    <time datetime={post.data.pubDate.toISOString()}>
+                      {post.data.pubDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
+                    </time>
+                  </div>
+                  <h3 class="mt-2 text-base font-semibold text-base-content">
+                    {post.data.title}
+                  </h3>
+                  <p class="mt-2 line-clamp-2 text-sm text-base-content/70">{post.data.description}</p>
+                </a>
               ))}
             </div>
-          </div>
-
-          <div class="mt-4 flex flex-wrap items-center gap-3 text-xs text-base-content/70">
-            <span>Less</span>
-            {levelText.map((text, level) => (
-              <span class="inline-flex items-center gap-1">
-                <span
-                  class:list={[
-                    'h-3 w-3 rounded-[3px] border border-black/5',
-                    level === 0 && 'bg-base-300/70',
-                    level === 1 && 'bg-emerald-200',
-                    level === 2 && 'bg-emerald-400',
-                    level === 3 && 'bg-emerald-600',
-                    level === 4 && 'bg-emerald-800'
-                  ]}
-                ></span>{text}
-              </span>
-            ))}
-            <span>More</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="mt-4">
-        <div class="drawer lg:drawer-open blog-drawer" id="blog-drawer-layout">
-          <input id="tag-drawer" type="checkbox" class="drawer-toggle" />
-          <div class="drawer-content">
-            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <div class="lg:hidden">
-                <label for="tag-drawer" class="btn btn-ghost btn-sm px-2" aria-label="打开标签抽屉">
-                  <svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4">
-                    <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
-                  </svg>
-                </label>
-              </div>
-              <div id="active-tag-panel" class="hidden flex-1 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-100">
-                当前筛选：<span id="active-tag-name" class="font-semibold"></span>
-                <button id="clear-tag-filter" type="button" class="btn btn-ghost btn-xs ml-2">清除</button>
-              </div>
-            </div>
-            <div id="post-list" class="space-y-4">
-          {pinnedPosts.length > 0 && (
-            <section class="rounded-3xl border border-emerald-500/30 bg-black/70 p-5 text-slate-100 shadow-[0_0_24px_rgba(16,185,129,0.12)]">
-              <div class="mb-3 flex items-center justify-between">
-                <div>
-                  <p class="text-sm uppercase tracking-[0.2em] text-base-content/50">置顶文章</p>
+          </section>
+        )}
+        {sortedPosts.map((post) => (
+          <article
+            class="rounded-3xl transition hover:shadow-[0_10px_34px_rgba(16,185,129,0.2)]"
+            data-post-card
+            data-post-link={`/posts/${post.id}/`}
+            data-tags={getPostTagPaths(post.data.tags)}
+            data-post-id={post.id}
+          >
+            <h3 class="text-xl font-semibold">
+              <a class="" href={`/posts/${post.id}/`} target="_blank" rel="noreferrer noopener">{post.data.title}</a>
+            </h3>
+            <div class="mt-2 flex items-center gap-3 text-sm text-base-content/70">
+              <div class="avatar">
+                <div class="w-8 rounded-full overflow-hidden">
+                  <img src="/avatars/default.png" alt={`${post.data.author} avatar`} width="32" height="32" loading="lazy" />
                 </div>
-                <span class="badge badge-success badge-outline">Pinned</span>
               </div>
-              <div class="grid gap-3 sm:grid-cols-2">
-                {pinnedPosts.map((post) => (
-                  <a
-                    class="group rounded-2xl border border-emerald-500/20 bg-black/60 p-4 transition hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-[0_8px_28px_rgba(16,185,129,0.2)]"
-                    href={`/posts/${post.id}/`}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
-                    <div class="flex items-center gap-3 text-xs text-base-content/60">
-                      <span class="inline-flex h-6 w-6 items-center justify-center rounded-full overflow-hidden">
-                        <img src="/avatars/default.png" alt={`${post.data.author} avatar`} width="24" height="24" loading="lazy" />
-                      </span>
-                      <span>{post.data.author}</span>
-                      <span>·</span>
-                      <time datetime={post.data.pubDate.toISOString()}>
-                        {post.data.pubDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
-                      </time>
-                    </div>
-                    <h3 class="mt-2 text-base font-semibold text-base-content group-hover:text-emerald-700">
-                      {post.data.title}
-                    </h3>
-                    <p class="mt-2 line-clamp-2 text-sm text-base-content/70">{post.data.description}</p>
-                  </a>
-                ))}
-              </div>
-            </section>
-          )}
-          {sortedPosts.map((post) => (
-            <article
-              class="rounded-3xl border border-emerald-500/25 bg-black/70 p-5 text-slate-100 shadow-[0_0_22px_rgba(16,185,129,0.1)] transition hover:border-emerald-400 hover:shadow-[0_10px_34px_rgba(16,185,129,0.2)]"
-              data-post-card
-              data-post-link={`/posts/${post.id}/`}
-              data-tags={getPostTagPaths(post.data.tags)}
-              data-post-id={post.id}
-            >
-              <h3 class="text-xl font-semibold">
-                <a class="" href={`/posts/${post.id}/`} target="_blank" rel="noreferrer noopener">{post.data.title}</a>
-              </h3>
-              <div class="mt-2 flex items-center gap-3 text-sm text-base-content/70">
-                <div class="avatar">
-                  <div class="w-8 rounded-full overflow-hidden">
-                    <img src="/avatars/default.png" alt={`${post.data.author} avatar`} width="32" height="32" loading="lazy" />
-                  </div>
-                </div>
-                <span class="font-medium text-base-content">{post.data.author}</span>
-                <time datetime={post.data.pubDate.toISOString()}>
-                  {post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' })}
-                </time>
-              </div>
-
-              <div class="mt-3 flex flex-wrap gap-1">
-                {post.data.tags.map((tag: string) => (
-                  <button class="badge tag-filter-btn card-tag" data-tag={tag} data-tag-slug={tagToSlug(tag)} type="button">#{tag}</button>
-                ))}
-              </div>
-
-              <div>
-                <p class="mt-2 text-sm leading-6 text-base-content/80">{post.data.description}</p>
-              </div>
-
-              <div class="mt-4">
-                <PostActionBar
-                  likeCount={post.data.likeCount ?? 0}
-                  shareCount={post.data.shareCount ?? 0}
-                  docked={post.data.docked ?? false}
-                />
-              </div>
-            </article>
-          ))}
+              <span class="font-medium text-base-content">{post.data.author}</span>
+              <time datetime={post.data.pubDate.toISOString()}>
+                {post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' })}
+              </time>
             </div>
-            <p id="empty-filter-state" class="mt-6 hidden rounded-2xl border border-dashed border-base-300 bg-base-100 p-6 text-center text-base-content/70">暂无文章匹配该标签。</p>
-          </div>
-          <div class="drawer-side z-20 blog-drawer-side">
-            <label for="tag-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
 
-            <aside class="min-h-full w-80 rounded-r-3xl border-r border-emerald-500/25 bg-black/75 p-5 text-slate-100 shadow-[0_0_22px_rgba(16,185,129,0.1)] lg:rounded-3xl lg:border lg:shadow-[0_0_22px_rgba(16,185,129,0.1)]">
-              <br>
-              <br>
-              <div class="mb-4 flex items-center justify-between">
-                <h2 class="text-lg font-semibold">Tags</h2>
-                <button id="toggle-sidebar" class="btn btn-ghost btn-xs hidden lg:inline-flex" type="button" aria-label="收起标签侧边栏">⇥</button>
-              </div>
-              <ul id="tag-tree" class="space-y-2">
-                {tagTree.map((tag) => <TagTreeNode node={tag} />)}
-              </ul>
-            </aside>
+            <div class="mt-3 flex flex-wrap gap-1">
+              {post.data.tags.map((tag: string) => (
+                <button class="badge tag-filter-btn card-tag" data-tag={tag} data-tag-slug={tagToSlug(tag)} type="button">#{tag}</button>
+              ))}
+            </div>
+
+            <div>
+              <p class="mt-2 text-sm leading-6 text-base-content/80">{post.data.description}</p>
+            </div>
+
+            <div class="mt-4">
+              <PostActionBar
+                likeCount={post.data.likeCount ?? 0}
+                shareCount={post.data.shareCount ?? 0}
+                docked={post.data.docked ?? false}
+              />
+            </div>
+          </article>
+        ))}
           </div>
+          <p id="empty-filter-state" class="mt-6 hidden rounded-2xl bg-base-100 p-6 text-center text-base-content/70">暂无文章匹配该标签。</p>
         </div>
-      </section>
+        <div class="drawer-side z-20 blog-drawer-side">
+          <label for="tag-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
 
-      <div id="toast" class="toast hidden" role="status" aria-live="polite">
+          <aside class="min-h-full w-80 rounded-r-3xl lg:rounded-3xl">
+            <br>
+            <br>
+            <div class="mb-4 flex items-center justify-between">
+              <h2 class="text-lg font-semibold">Tags</h2>
+              <button id="toggle-sidebar" class="btn btn-ghost btn-xs hidden lg:inline-flex" type="button" aria-label="收起标签侧边栏">⇥</button>
+            </div>
+            <ul id="tag-tree" class="space-y-2">
+              {tagTree.map((tag) => <TagTreeNode node={tag} />)}
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast hidden" role="status" aria-live="polite">
         <div class="toast-surface">已复制链接</div>
       </div>
 
-      <script is:inline>
-        const drawerLayout = document.getElementById('blog-drawer-layout');
-        const sidebarToggle = document.getElementById('toggle-sidebar');
-        const activeTagPanel = document.getElementById('active-tag-panel');
-        const activeTagName = document.getElementById('active-tag-name');
-        const clearFilterButton = document.getElementById('clear-tag-filter');
-        const postCards = Array.from(document.querySelectorAll('[data-post-card]'));
-        const tagNavButtons = Array.from(document.querySelectorAll('.tag-nav-btn'));
-        const emptyState = document.getElementById('empty-filter-state');
-        const toast = document.getElementById('toast');
-        let toastTimer = null;
-        const actionStoragePrefix = 'blog:action:';
-        const bookmarkKey = 'blog:bookmarks';
-        const canStore = (() => {
-          try {
-            localStorage.setItem(`${actionStoragePrefix}ping`, '1');
-            localStorage.removeItem(`${actionStoragePrefix}ping`);
-            return true;
-          } catch (error) {
-            return false;
-          }
-        })();
+    <!--<script is:inline>-->
+    <!--  const drawerLayout = document.getElementById('blog-drawer-layout');-->
+    <!--  const sidebarToggle = document.getElementById('toggle-sidebar');-->
+    <!--  const activeTagPanel = document.getElementById('active-tag-panel');-->
+    <!--  const activeTagName = document.getElementById('active-tag-name');-->
+    <!--  const clearFilterButton = document.getElementById('clear-tag-filter');-->
+    <!--  const postCards = Array.from(document.querySelectorAll('[data-post-card]'));-->
+    <!--  const tagNavButtons = Array.from(document.querySelectorAll('.tag-nav-btn'));-->
+    <!--  const emptyState = document.getElementById('empty-filter-state');-->
+    <!--  const toast = document.getElementById('toast');-->
+    <!--  let toastTimer = null;-->
+    <!--  const actionStoragePrefix = 'blog:action:';-->
+    <!--  const bookmarkKey = 'blog:bookmarks';-->
+    <!--  const canStore = (() => {-->
+    <!--    try {-->
+    <!--      localStorage.setItem(`${actionStoragePrefix}ping`, '1');-->
+    <!--      localStorage.removeItem(`${actionStoragePrefix}ping`);-->
+    <!--      return true;-->
+    <!--    } catch (error) {-->
+    <!--      return false;-->
+    <!--    }-->
+    <!--  })();-->
 
-        const getStoredNumber = (key, fallback) => {
-          if (!canStore) return fallback;
-          const raw = localStorage.getItem(key);
-          const value = raw === null ? NaN : Number(raw);
-          return Number.isFinite(value) ? value : fallback;
-        };
+    <!--  const getStoredNumber = (key, fallback) => {-->
+    <!--    if (!canStore) return fallback;-->
+    <!--    const raw = localStorage.getItem(key);-->
+    <!--    const value = raw === null ? NaN : Number(raw);-->
+    <!--    return Number.isFinite(value) ? value : fallback;-->
+    <!--  };-->
 
-        const getStoredBool = (key, fallback) => {
-          if (!canStore) return fallback;
-          const raw = localStorage.getItem(key);
-          if (raw === '1') return true;
-          if (raw === '0') return false;
-          return fallback;
-        };
+    <!--  const getStoredBool = (key, fallback) => {-->
+    <!--    if (!canStore) return fallback;-->
+    <!--    const raw = localStorage.getItem(key);-->
+    <!--    if (raw === '1') return true;-->
+    <!--    if (raw === '0') return false;-->
+    <!--    return fallback;-->
+    <!--  };-->
 
-        const setStoredValue = (key, value) => {
-          if (!canStore) return;
-          localStorage.setItem(key, value);
-        };
+    <!--  const setStoredValue = (key, value) => {-->
+    <!--    if (!canStore) return;-->
+    <!--    localStorage.setItem(key, value);-->
+    <!--  };-->
 
-        const readBookmarks = () => {
-          if (!canStore) return [];
-          try {
-            return JSON.parse(localStorage.getItem(bookmarkKey) || '[]');
-          } catch (error) {
-            return [];
-          }
-        };
+    <!--  const readBookmarks = () => {-->
+    <!--    if (!canStore) return [];-->
+    <!--    try {-->
+    <!--      return JSON.parse(localStorage.getItem(bookmarkKey) || '[]');-->
+    <!--    } catch (error) {-->
+    <!--      return [];-->
+    <!--    }-->
+    <!--  };-->
 
-        const writeBookmarks = (items) => {
-          if (!canStore) return;
-          localStorage.setItem(bookmarkKey, JSON.stringify(items.slice(-200)));
-        };
+    <!--  const writeBookmarks = (items) => {-->
+    <!--    if (!canStore) return;-->
+    <!--    localStorage.setItem(bookmarkKey, JSON.stringify(items.slice(-200)));-->
+    <!--  };-->
 
-        const getInitialCount = (button) => {
-          const raw = button.getAttribute('data-initial-count');
-          const value = raw === null ? NaN : Number(raw);
-          return Number.isFinite(value) ? value : 0;
-        };
+    <!--  const getInitialCount = (button) => {-->
+    <!--    const raw = button.getAttribute('data-initial-count');-->
+    <!--    const value = raw === null ? NaN : Number(raw);-->
+    <!--    return Number.isFinite(value) ? value : 0;-->
+    <!--  };-->
 
-        const updateLabel = (button, isActive) => {
-          const labelEl = button.querySelector('.post-action-label');
-          if (!labelEl) return;
-          const activeLabel = button.getAttribute('data-active-label') || labelEl.textContent || '';
-          const inactiveLabel = button.getAttribute('data-inactive-label') || labelEl.textContent || '';
-          labelEl.textContent = isActive ? activeLabel : inactiveLabel;
-        };
+    <!--  const updateLabel = (button, isActive) => {-->
+    <!--    const labelEl = button.querySelector('.post-action-label');-->
+    <!--    if (!labelEl) return;-->
+    <!--    const activeLabel = button.getAttribute('data-active-label') || labelEl.textContent || '';-->
+    <!--    const inactiveLabel = button.getAttribute('data-inactive-label') || labelEl.textContent || '';-->
+    <!--    labelEl.textContent = isActive ? activeLabel : inactiveLabel;-->
+    <!--  };-->
 
-        const updateCount = (button, count) => {
-          const countEl = button.querySelector('.post-action-count');
-          if (!countEl) return;
-          countEl.textContent = `${count}`;
-        };
+    <!--  const updateCount = (button, count) => {-->
+    <!--    const countEl = button.querySelector('.post-action-count');-->
+    <!--    if (!countEl) return;-->
+    <!--    countEl.textContent = `${count}`;-->
+    <!--  };-->
 
-        const showToast = (message) => {
-          if (!toast) return;
-          const surface = toast.querySelector('.toast-surface');
-          if (surface) {
-            surface.textContent = message;
-          }
-          toast.classList.remove('hidden');
-          toast.classList.add('is-visible');
-          if (toastTimer) window.clearTimeout(toastTimer);
-          toastTimer = window.setTimeout(() => {
-            toast.classList.remove('is-visible');
-            toastTimer = window.setTimeout(() => {
-              toast.classList.add('hidden');
-            }, 220);
-          }, 1600);
-        };
+    <!--  const showToast = (message) => {-->
+    <!--    if (!toast) return;-->
+    <!--    const surface = toast.querySelector('.toast-surface');-->
+    <!--    if (surface) {-->
+    <!--      surface.textContent = message;-->
+    <!--    }-->
+    <!--    toast.classList.remove('hidden');-->
+    <!--    toast.classList.add('is-visible');-->
+    <!--    if (toastTimer) window.clearTimeout(toastTimer);-->
+    <!--    toastTimer = window.setTimeout(() => {-->
+    <!--      toast.classList.remove('is-visible');-->
+    <!--      toastTimer = window.setTimeout(() => {-->
+    <!--        toast.classList.add('hidden');-->
+    <!--      }, 220);-->
+    <!--    }, 1600);-->
+    <!--  };-->
 
-        const applyTagFilter = (tag) => {
-          let visibleCount = 0;
-          postCards.forEach((card) => {
-            const tags = (card.getAttribute('data-tags') || '').split('|');
-            const matched = !tag || tags.some((value) => value === tag || value.startsWith(`${tag}/`));
-            card.classList.toggle('hidden', !matched);
-            if (matched) visibleCount += 1;
-          });
+    <!--  const applyTagFilter = (tag) => {-->
+    <!--    let visibleCount = 0;-->
+    <!--    postCards.forEach((card) => {-->
+    <!--      const tags = (card.getAttribute('data-tags') || '').split('|');-->
+    <!--      const matched = !tag || tags.some((value) => value === tag || value.startsWith(`${tag}/`));-->
+    <!--      card.classList.toggle('hidden', !matched);-->
+    <!--      if (matched) visibleCount += 1;-->
+    <!--    });-->
 
-          if (tagNavButtons.length > 0) {
-            tagNavButtons.forEach((button) => {
-              const buttonTag = button.getAttribute('data-tag') || '';
-              button.classList.toggle('is-active', Boolean(tag) && buttonTag === tag);
-            });
-          }
+    <!--    if (tagNavButtons.length > 0) {-->
+    <!--      tagNavButtons.forEach((button) => {-->
+    <!--        const buttonTag = button.getAttribute('data-tag') || '';-->
+    <!--        button.classList.toggle('is-active', Boolean(tag) && buttonTag === tag);-->
+    <!--      });-->
+    <!--    }-->
 
-          if (activeTagPanel && activeTagName) {
-            activeTagPanel.classList.toggle('hidden', !tag);
-            activeTagName.textContent = tag ? `#${tag}` : '';
-          }
+    <!--    if (activeTagPanel && activeTagName) {-->
+    <!--      activeTagPanel.classList.toggle('hidden', !tag);-->
+    <!--      activeTagName.textContent = tag ? `#${tag}` : '';-->
+    <!--    }-->
 
-          if (emptyState) {
-            emptyState.classList.toggle('hidden', visibleCount > 0);
-          }
-        };
+    <!--    if (emptyState) {-->
+    <!--      emptyState.classList.toggle('hidden', visibleCount > 0);-->
+    <!--    }-->
+    <!--  };-->
 
-        document.querySelectorAll('.tag-filter-btn').forEach((button) => {
-          button.addEventListener('click', () => {
-            applyTagFilter(button.getAttribute('data-tag') || '');
-          });
-        });
+    <!--  document.querySelectorAll('.tag-filter-btn').forEach((button) => {-->
+    <!--    button.addEventListener('click', () => {-->
+    <!--      applyTagFilter(button.getAttribute('data-tag') || '');-->
+    <!--    });-->
+    <!--  });-->
 
-        if (clearFilterButton) {
-          clearFilterButton.addEventListener('click', () => applyTagFilter(''));
-        }
+    <!--  if (clearFilterButton) {-->
+    <!--    clearFilterButton.addEventListener('click', () => applyTagFilter(''));-->
+    <!--  }-->
 
-        document.querySelectorAll('.tag-toggle').forEach((toggleButton) => {
-          toggleButton.addEventListener('click', () => {
-            const listItem = toggleButton.closest('li');
-            const children = listItem?.querySelector(':scope > .tag-children');
-            if (!children) return;
+    <!--  document.querySelectorAll('.tag-toggle').forEach((toggleButton) => {-->
+    <!--    toggleButton.addEventListener('click', () => {-->
+    <!--      const listItem = toggleButton.closest('li');-->
+    <!--      const children = listItem?.querySelector(':scope > .tag-children');-->
+    <!--      if (!children) return;-->
 
-            const expanded = toggleButton.getAttribute('data-expanded') !== 'false';
-            const nextExpanded = !expanded;
-            toggleButton.setAttribute('data-expanded', `${nextExpanded}`);
-            toggleButton.setAttribute('aria-expanded', `${nextExpanded}`);
-            toggleButton.textContent = nextExpanded ? '▾' : '▸';
-            children.classList.toggle('hidden', !nextExpanded);
-          });
-        });
+    <!--      const expanded = toggleButton.getAttribute('data-expanded') !== 'false';-->
+    <!--      const nextExpanded = !expanded;-->
+    <!--      toggleButton.setAttribute('data-expanded', `${nextExpanded}`);-->
+    <!--      toggleButton.setAttribute('aria-expanded', `${nextExpanded}`);-->
+    <!--      toggleButton.textContent = nextExpanded ? '▾' : '▸';-->
+    <!--      children.classList.toggle('hidden', !nextExpanded);-->
+    <!--    });-->
+    <!--  });-->
 
-        if (sidebarToggle && drawerLayout) {
-          sidebarToggle.addEventListener('click', () => {
-            const collapsed = drawerLayout.classList.toggle('blog-sidebar-collapsed');
-            sidebarToggle.textContent = collapsed ? '⇤' : '⇥';
-          });
-        }
+    <!--  if (sidebarToggle && drawerLayout) {-->
+    <!--    sidebarToggle.addEventListener('click', () => {-->
+    <!--      const collapsed = drawerLayout.classList.toggle('blog-sidebar-collapsed');-->
+    <!--      sidebarToggle.textContent = collapsed ? '⇤' : '⇥';-->
+    <!--    });-->
+    <!--  }-->
 
-        postCards.forEach((card) => {
-          const postId = card.getAttribute('data-post-id');
-          if (!postId) return;
+    <!--  postCards.forEach((card) => {-->
+    <!--    const postId = card.getAttribute('data-post-id');-->
+    <!--    if (!postId) return;-->
 
-          card.querySelectorAll('.post-action-btn').forEach((button) => {
-            const action = button.getAttribute('data-action');
-            if (!action) return;
+    <!--    card.querySelectorAll('.post-action-btn').forEach((button) => {-->
+    <!--      const action = button.getAttribute('data-action');-->
+    <!--      if (!action) return;-->
 
-            const baseCount = getInitialCount(button);
-            const likeKey = `${actionStoragePrefix}like:${postId}`;
-            const shareKey = `${actionStoragePrefix}share:${postId}`;
-            const dockKey = `${actionStoragePrefix}dock:${postId}`;
+    <!--      const baseCount = getInitialCount(button);-->
+    <!--      const likeKey = `${actionStoragePrefix}like:${postId}`;-->
+    <!--      const shareKey = `${actionStoragePrefix}share:${postId}`;-->
+    <!--      const dockKey = `${actionStoragePrefix}dock:${postId}`;-->
 
-            if (action === 'like') {
-              let liked = getStoredBool(likeKey, button.classList.contains('is-active'));
-              button.classList.toggle('is-active', liked);
-              updateLabel(button, liked);
-              updateCount(button, baseCount + (liked ? 1 : 0));
+    <!--      if (action === 'like') {-->
+    <!--        let liked = getStoredBool(likeKey, button.classList.contains('is-active'));-->
+    <!--        button.classList.toggle('is-active', liked);-->
+    <!--        updateLabel(button, liked);-->
+    <!--        updateCount(button, baseCount + (liked ? 1 : 0));-->
 
-              const resolveBookmarkPayload = () => {
-                const title = card.querySelector('h3 a')?.textContent?.trim() || postId;
-                const description = card.querySelector('p.mt-2')?.textContent?.trim() || '';
-                const url = card.getAttribute('data-post-link') || '';
-                return {
-                  slug: postId,
-                  title,
-                  description,
-                  url,
-                };
-              };
+    <!--        const resolveBookmarkPayload = () => {-->
+    <!--          const title = card.querySelector('h3 a')?.textContent?.trim() || postId;-->
+    <!--          const description = card.querySelector('p.mt-2')?.textContent?.trim() || '';-->
+    <!--          const url = card.getAttribute('data-post-link') || '';-->
+    <!--          return {-->
+    <!--            slug: postId,-->
+    <!--            title,-->
+    <!--            description,-->
+    <!--            url,-->
+    <!--          };-->
+    <!--        };-->
 
-              if (liked) {
-                const list = readBookmarks();
-                const payload = resolveBookmarkPayload();
-                if (!list.some((item) => item.slug === payload.slug)) {
-                  list.push(payload);
-                  writeBookmarks(list);
-                }
-              }
+    <!--        if (liked) {-->
+    <!--          const list = readBookmarks();-->
+    <!--          const payload = resolveBookmarkPayload();-->
+    <!--          if (!list.some((item) => item.slug === payload.slug)) {-->
+    <!--            list.push(payload);-->
+    <!--            writeBookmarks(list);-->
+    <!--          }-->
+    <!--        }-->
 
-              button.addEventListener('click', (event) => {
-                event.stopPropagation();
-                liked = !liked;
-                setStoredValue(likeKey, liked ? '1' : '0');
-                button.classList.toggle('is-active', liked);
-                updateLabel(button, liked);
-                updateCount(button, baseCount + (liked ? 1 : 0));
-                const list = readBookmarks();
-                const payload = resolveBookmarkPayload();
-                if (liked) {
-                  if (!list.some((item) => item.slug === payload.slug)) {
-                    list.push(payload);
-                  }
-                  writeBookmarks(list);
-                } else {
-                  writeBookmarks(list.filter((item) => item.slug !== payload.slug));
-                }
-              });
-              return;
-            }
+    <!--        button.addEventListener('click', (event) => {-->
+    <!--          event.stopPropagation();-->
+    <!--          liked = !liked;-->
+    <!--          setStoredValue(likeKey, liked ? '1' : '0');-->
+    <!--          button.classList.toggle('is-active', liked);-->
+    <!--          updateLabel(button, liked);-->
+    <!--          updateCount(button, baseCount + (liked ? 1 : 0));-->
+    <!--          const list = readBookmarks();-->
+    <!--          const payload = resolveBookmarkPayload();-->
+    <!--          if (liked) {-->
+    <!--            if (!list.some((item) => item.slug === payload.slug)) {-->
+    <!--              list.push(payload);-->
+    <!--            }-->
+    <!--            writeBookmarks(list);-->
+    <!--          } else {-->
+    <!--            writeBookmarks(list.filter((item) => item.slug !== payload.slug));-->
+    <!--          }-->
+    <!--        });-->
+    <!--        return;-->
+    <!--      }-->
 
-            if (action === 'share') {
-              let total = getStoredNumber(shareKey, baseCount);
-              updateCount(button, total);
+    <!--      if (action === 'share') {-->
+    <!--        let total = getStoredNumber(shareKey, baseCount);-->
+    <!--        updateCount(button, total);-->
 
-              const resolveShareUrl = () => {
-                const href = card.getAttribute('data-post-link') || '';
-                if (!href) return window.location.href;
-                try {
-                  return new URL(href, window.location.origin).toString();
-                } catch (error) {
-                  return window.location.href;
-                }
-              };
+    <!--        const resolveShareUrl = () => {-->
+    <!--          const href = card.getAttribute('data-post-link') || '';-->
+    <!--          if (!href) return window.location.href;-->
+    <!--          try {-->
+    <!--            return new URL(href, window.location.origin).toString();-->
+    <!--          } catch (error) {-->
+    <!--            return window.location.href;-->
+    <!--          }-->
+    <!--        };-->
 
-              const persistShare = () => {
-                total += 1;
-                setStoredValue(shareKey, `${total}`);
-                updateCount(button, total);
-              };
+    <!--        const persistShare = () => {-->
+    <!--          total += 1;-->
+    <!--          setStoredValue(shareKey, `${total}`);-->
+    <!--          updateCount(button, total);-->
+    <!--        };-->
 
-              button.addEventListener('click', async (event) => {
-                event.stopPropagation();
-                const shareUrl = resolveShareUrl();
+    <!--        button.addEventListener('click', async (event) => {-->
+    <!--          event.stopPropagation();-->
+    <!--          const shareUrl = resolveShareUrl();-->
 
-                if (navigator.share) {
-                  try {
-                    await navigator.share({
-                      title: document.title,
-                      url: shareUrl
-                    });
-                    persistShare();
-                  } catch (error) {
-                    // User cancelled or share failed.
-                  }
-                  return;
-                }
+    <!--          if (navigator.share) {-->
+    <!--            try {-->
+    <!--              await navigator.share({-->
+    <!--                title: document.title,-->
+    <!--                url: shareUrl-->
+    <!--              });-->
+    <!--              persistShare();-->
+    <!--            } catch (error) {-->
+    <!--              // User cancelled or share failed.-->
+    <!--            }-->
+    <!--            return;-->
+    <!--          }-->
 
-                if (navigator.clipboard?.writeText) {
-                  try {
-                    await navigator.clipboard.writeText(shareUrl);
-                    persistShare();
-                    showToast('已复制链接');
-                    return;
-                  } catch (error) {
-                    // fall through
-                  }
-                }
+    <!--          if (navigator.clipboard?.writeText) {-->
+    <!--            try {-->
+    <!--              await navigator.clipboard.writeText(shareUrl);-->
+    <!--              persistShare();-->
+    <!--              showToast('已复制链接');-->
+    <!--              return;-->
+    <!--            } catch (error) {-->
+    <!--              // fall through-->
+    <!--            }-->
+    <!--          }-->
 
-                window.prompt('复制链接分享:', shareUrl);
-              });
-              return;
-            }
+    <!--          window.prompt('复制链接分享:', shareUrl);-->
+    <!--        });-->
+    <!--        return;-->
+    <!--      }-->
 
-            if (action === 'dock') {
-              let docked = getStoredBool(dockKey, button.classList.contains('is-active'));
-              button.classList.toggle('is-active', docked);
-              updateLabel(button, docked);
+    <!--      if (action === 'dock') {-->
+    <!--        let docked = getStoredBool(dockKey, button.classList.contains('is-active'));-->
+    <!--        button.classList.toggle('is-active', docked);-->
+    <!--        updateLabel(button, docked);-->
 
-              button.addEventListener('click', (event) => {
-                event.stopPropagation();
-                docked = !docked;
-                setStoredValue(dockKey, docked ? '1' : '0');
-                button.classList.toggle('is-active', docked);
-                updateLabel(button, docked);
-              });
-            }
-          });
-        });
+    <!--        button.addEventListener('click', (event) => {-->
+    <!--          event.stopPropagation();-->
+    <!--          docked = !docked;-->
+    <!--          setStoredValue(dockKey, docked ? '1' : '0');-->
+    <!--          button.classList.toggle('is-active', docked);-->
+    <!--          updateLabel(button, docked);-->
+    <!--        });-->
+    <!--      }-->
+    <!--    });-->
+    <!--  });-->
 
-        const shouldIgnoreCardClick = (target) =>
-          Boolean(target.closest('a, button, input, label, textarea, select, [role="button"]'));
+    <!--  const shouldIgnoreCardClick = (target) =>-->
+    <!--    Boolean(target.closest('a, button, input, label, textarea, select, [role="button"]'));-->
 
-        postCards.forEach((card) => {
-          card.addEventListener('click', (event) => {
-            if (shouldIgnoreCardClick(event.target)) return;
-            const href = card.getAttribute('data-post-link');
-            if (!href) return;
-            window.open(href, '_blank', 'noopener');
-          });
+    <!--  postCards.forEach((card) => {-->
+    <!--    card.addEventListener('click', (event) => {-->
+    <!--      if (shouldIgnoreCardClick(event.target)) return;-->
+    <!--      const href = card.getAttribute('data-post-link');-->
+    <!--      if (!href) return;-->
+    <!--      window.open(href, '_blank', 'noopener');-->
+    <!--    });-->
 
-          card.addEventListener('keydown', (event) => {
-            if (event.key !== 'Enter' && event.key !== ' ') return;
-            if (shouldIgnoreCardClick(event.target)) return;
-            const href = card.getAttribute('data-post-link');
-            if (!href) return;
-            event.preventDefault();
-            window.open(href, '_blank', 'noopener');
-          });
+    <!--    card.addEventListener('keydown', (event) => {-->
+    <!--      if (event.key !== 'Enter' && event.key !== ' ') return;-->
+    <!--      if (shouldIgnoreCardClick(event.target)) return;-->
+    <!--      const href = card.getAttribute('data-post-link');-->
+    <!--      if (!href) return;-->
+    <!--      event.preventDefault();-->
+    <!--      window.open(href, '_blank', 'noopener');-->
+    <!--    });-->
 
-          card.setAttribute('tabindex', '0');
-          card.setAttribute('role', 'link');
-        });
-      </script>
-
-      <style is:inline>
-        .blog-page--index-theme {
-          color: rgb(226 232 240);
-        }
-
-        .blog-page--index-theme h1,
-        .blog-page--index-theme h2,
-        .blog-page--index-theme h3 {
-          color: rgb(167 243 208);
-        }
-
-        .blog-page--index-theme p,
-        .blog-page--index-theme span,
-        .blog-page--index-theme time {
-          color: rgb(203 213 225 / 0.95);
-        }
-
-        .blog-page--index-theme .btn-ghost {
-          color: rgb(110 231 183);
-        }
-
-        .blog-page--index-theme .btn-ghost:hover {
-          background: rgb(16 185 129 / 0.16);
-        }
-
-        .toast {
-          position: fixed;
-          bottom: 1.5rem;
-          right: 1.5rem;
-          z-index: 60;
-          pointer-events: none;
-          opacity: 0;
-          transform: translateY(6px);
-          transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-
-        .toast.is-visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .toast-surface {
-          background: rgb(0 0 0 / 0.78);
-          border: 1px solid rgb(16 185 129 / 0.4);
-          color: rgb(167 243 208);
-          border-radius: 999px;
-          padding: 0.55rem 0.9rem;
-          font-size: 0.85rem;
-          box-shadow: 0 10px 28px rgb(16 185 129 / 0.2);
-        }
-
-        [data-post-card] .card-tag {
-          border: 1px solid rgb(16 185 129 / 0.35);
-          background: rgb(16 185 129 / 0.12);
-          color: rgb(167 243 208);
-          box-shadow: 0 0 0 transparent;
-          padding: 0.28rem 0.65rem;
-        }
-
-        [data-post-card] .card-tag:hover {
-          border-color: rgb(52 211 153 / 0.9);
-          background: rgb(16 185 129 / 0.24);
-          color: rgb(209 250 229);
-        }
-
-        .tag-nav-btn.is-active {
-          background: rgb(16 185 129 / 0.24);
-          color: rgb(209 250 229);
-          border-radius: 999px;
-          padding-left: 0.35rem;
-          padding-right: 0.35rem;
-        }
-
-        .tag-nav-btn:hover {
-          color: rgb(167 243 208);
-        }
-
-        .blog-page--index-theme #post-list a:hover {
-          color: rgb(110 231 183);
-        }
-
-        .blog-page--index-theme .badge-success {
-          border-color: rgb(16 185 129 / 0.45);
-          color: rgb(167 243 208);
-          background: rgb(16 185 129 / 0.1);
-        }
-
-        .blog-page--index-theme #empty-filter-state {
-          border-color: rgb(16 185 129 / 0.25);
-          background: rgb(0 0 0 / 0.7);
-          color: rgb(203 213 225);
-        }
-
-        @media (min-width: 1024px) {
-          .blog-drawer .drawer-side > *:not(.drawer-overlay) {
-            transition: width 0.2s ease;
-          }
-
-          .blog-sidebar-collapsed .blog-drawer-side aside {
-            width: 3.5rem;
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-            overflow: hidden;
-          }
-
-          .blog-sidebar-collapsed .blog-drawer-side h2,
-          .blog-sidebar-collapsed .blog-drawer-side #tag-tree {
-            display: none;
-          }
-        }
-      </style>
-      </div>
-
-    </BaseLayout>
+    <!--    card.setAttribute('tabindex', '0');-->
+    <!--    card.setAttribute('role', 'link');-->
+    <!--  });-->
+    <!--</script>-->
+    </div>
+</BaseLayout>

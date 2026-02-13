@@ -1,5 +1,5 @@
 ---
-import type { TimelineEntry } from '../../data/developmentTimeline.ts';
+import type { TimelineEntry } from './developmentTimeline.ts';
 
 // TimelineSectionProps 封装了组件的输入参数：条目数组、标题、副标题、右侧标签
 interface TimelineSectionProps {
@@ -20,18 +20,18 @@ const {
 const displayEntries = entries;
 ---
 
-<section class="mt-12 rounded-3xl border border-emerald-500/30 bg-black/70 p-6 text-slate-100 shadow-[inset_0_0_20px_rgba(16,185,129,0.15)]">
+<section class="mt-12 rounded-3xl p-6 ">
   <!-- 标题行：包含时间轴名称、副标题以及右侧标签 -->
   <div class="mb-6 flex flex-wrap items-center gap-4">
     <div>
-      <p class="text-xs font-mono uppercase tracking-[0.4em] text-emerald-400">dev log</p>
-      <h3 class="text-2xl font-semibold text-emerald-200">{title}</h3>
-      <p class="text-sm text-slate-400">{subtitle}</p>
+      <!--<p class="text-xs font-mono uppercase tracking-[0.4em] text-emerald-400">dev log</p>-->
+      <h3 class="text-2xl font-semibold">{title}</h3>
+      <p class="text-sm">{subtitle}</p>
     </div>
-    <span class="ml-auto rounded-full border border-emerald-500/40 bg-black/40 px-3 py-1 text-xs text-emerald-200">{tagLabel}</span>
+    <span class="ml-auto rounded-full px-3 py-1 text-xs border border-emerald-500/40 shadow-[inset_0_0_20px_rgba(16,185,129,0.15)]">{tagLabel}</span>
   </div>
-  <!-- 时间轴主体：各条目之间用分割线区分 -->
-  <div class="divide-y divide-emerald-500/10">
+  <!-- 时间轴主体：各条目之间暂时无分割 -->
+  <div class="">
     {displayEntries.map((entry, index) => {
       const isLast = index === displayEntries.length - 1;
       const padding = index === 0 ? 'pt-0' : 'pt-6';
@@ -50,10 +50,10 @@ const displayEntries = entries;
                 <span>{entry.date}</span>
                 <span class="rounded-full border border-emerald-500/40 px-3 py-1 text-[10px]">{entry.tag}</span>
               </div>
-              <h4 class="text-lg font-semibold text-slate-100">{entry.title}</h4>
-              <p class="text-sm text-slate-300">{entry.summary}</p>
+              <h4 class="text-lg font-semibold">{entry.title}</h4>
+              <p class="text-sm">{entry.summary}</p>
               <!-- 细节清单 -->
-              <ul class="space-y-1 text-sm text-slate-400">
+              <ul class="space-y-1 text-sm">
                 {entry.details.map((detail) => (
                   <li class="flex items-start gap-2">
                     <span class="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-400"></span>

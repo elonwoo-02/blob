@@ -30,7 +30,7 @@ export const baseLayoutTimeline: TimelineEntry[] = [
   {
     date: '2026-02-12',
     title: '设计 PlayBot 组件',
-    tag: 'BaseLayout',
+    tag: 'style',
     summary: '',
     details: [
       '使用 Rodin 将图片转换为 glb 文件，并使用 Spline 生成嵌入代码。',
@@ -40,7 +40,7 @@ export const baseLayoutTimeline: TimelineEntry[] = [
   {
     date: '2026-02-12',
     title: '重构 Terminal 模态框组件',
-    tag: 'BaseLayout',
+    tag: 'refector',
     summary: '',
     details: [
       '使用 Tailwind 重写组件。',
@@ -64,7 +64,7 @@ export const indexTimeline: TimelineEntry[] = [
   {
     date: '2026-02-08',
     title: '首页 Hero 初版',
-    tag: 'index',
+    tag: 'style',
     summary: '在首页搭建带终端输出风格的信息区块。',
     details: [
       '使用高对比视觉风格与模拟终端日志。',
@@ -74,7 +74,7 @@ export const indexTimeline: TimelineEntry[] = [
   {
     date: '2026-02-12',
     title: '搭建网页开发时间轴',
-    tag: 'index',
+    tag: 'feat',
     summary: '',
     details: [
       '新增时间轴展示。',

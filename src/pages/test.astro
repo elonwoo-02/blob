@@ -1,20 +1,41 @@
 ---
-import TerminalModal from "../components/terminal/TerminalModal.astro";
-import '../styles/global.css';
 
----
-<head>
-  <meta charset="utf-8" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/icon_favicon32x32.png" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <meta name="viewport" content="width=device-width" />
-  <meta name="generator" content={Astro.generator} />
-</head>
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SectionTreeNode from "../components/post/SectionTreeNode.astro";---
 
-<body class="min-h-screen bg-base-100 text-base-content pb-24">
+<BaseLayout>
+    <div class="drawer drawer-end lg:drawer-open post-drawer" id="post-drawer-layout">
+    <input id="section-drawer" type="checkbox" class="drawer-toggle" />
+    <div class="drawer-content">
+      <article class="post-layout">
+        <main class="post-content">
+          <div class="post-header-row">
+            <div class="lg:hidden">
+              <label for="section-drawer" class="btn btn-ghost btn-sm px-2" aria-label="打开章节导航">
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4">
+                  <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
+                </svg>
+              </label>
+            </div>
+          </div>
 
-    <div id="shortcut-overlay" class="shortcut-overlay fixed inset-0 z-40 flex items-center justify-center bg-[rgba(5,8,12,0.55)] backdrop-blur-sm" aria-hidden="true">
-        <TerminalModal title="command line" />
+          <div class="markdown-body">
+            <slot />
+          </div>
+        </main>
+      </article>
     </div>
+    <div class="drawer-side z-20 post-drawer-side">
+      <label for="section-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+      <aside class="min-h-full w-80 rounded-l-3xl border-l border-base-300 bg-base-100 p-5 shadow-sm lg:rounded-3xl lg:border lg:shadow-sm">
+        <ul>
+          <li>
+            dfa
+          </li>
+          <li>sga</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
 
-</body>
+</BaseLayout>
