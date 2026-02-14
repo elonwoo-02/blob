@@ -1,0 +1,84 @@
+---
+import '../styles/global.css';
+
+const notes = [
+  {
+    time: 'Pinned · 2026-02-13 20:35',
+    title: '#philosophy / tiny habits',
+    content:
+      'Treat learning like short-form streams: tiny and frequent. Focus on one thing at a time, remove vanity goals, and keep moving with honest momentum.',
+  },
+  {
+    time: '2026-02-13 15:38',
+    title: '#work / reminder',
+    content:
+      'Ship the first onboarding draft this week. Keep it concise: access setup, troubleshooting path, and one quick-start checklist for day one.',
+  },
+  {
+    time: '2026-02-12 09:14',
+    title: '#daily / reflection',
+    content:
+      'The afternoon felt lighter after batching replies into two windows. Keep the same rhythm tomorrow and protect two deep-focus blocks.',
+  },
+];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>flomo style notes</title>
+  </head>
+  <body class="min-h-screen bg-[#f3f4f6] text-slate-500 antialiased">
+    <main class="mx-auto flex min-h-screen w-full max-w-[1200px] gap-10 px-6 py-8 lg:px-8">
+      <aside class="hidden w-72 shrink-0 lg:flex lg:flex-col">
+        <div class="flex h-full flex-col rounded-[2rem] bg-[#f3f4f6] px-2 py-3">
+          <div class="mb-8 flex items-center justify-between px-3 text-slate-400">
+            <button type="button" class="rounded-full p-2 hover:bg-white/40" aria-label="toggle drawer">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <span class="text-sm">memo</span>
+          </div>
+
+          <div class="mb-10 px-3">
+            <p class="text-4xl font-semibold tracking-tight text-slate-500">1603</p>
+            <p class="mt-1 text-xs uppercase tracking-[0.24em] text-slate-400">notes</p>
+          </div>
+
+          <nav class="space-y-2 px-2 text-[15px]">
+            <a href="#" class="block rounded-2xl bg-[#36c773] px-4 py-2.5 font-medium text-white">Memo</a>
+            <a href="#" class="block rounded-2xl px-4 py-2.5 text-slate-400 hover:bg-white/40">Daily Review</a>
+            <a href="#" class="block rounded-2xl px-4 py-2.5 text-slate-400 hover:bg-white/40">Tags</a>
+            <a href="#" class="block rounded-2xl px-4 py-2.5 text-slate-400 hover:bg-white/40">Trash</a>
+          </nav>
+        </div>
+      </aside>
+
+      <section class="flex min-w-0 flex-1 flex-col">
+        <header class="mb-6 flex items-center justify-center">
+          <h1 class="text-5xl font-semibold tracking-tight text-slate-500">flomo</h1>
+        </header>
+
+        <div class="space-y-5 pb-24">
+          {notes.map((note) => (
+            <article class="rounded-3xl bg-white px-7 py-6 shadow-[0_6px_20px_rgba(15,23,42,0.04)]">
+              <p class="mb-3 text-sm text-slate-400">{note.time}</p>
+              <p class="mb-4 inline-flex rounded-xl bg-slate-100/80 px-3 py-1 text-sm text-slate-400">{note.title}</p>
+              <p class="text-[1.02rem] leading-8 text-slate-500/90">{note.content}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
+
+    <button
+      type="button"
+      aria-label="add note"
+      class="fixed bottom-10 right-8 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[#36c773] text-5xl font-light leading-none text-white shadow-[0_12px_26px_rgba(54,199,115,0.35)]"
+    >
+      +
+    </button>
+  </body>
+</html>
