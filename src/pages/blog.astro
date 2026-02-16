@@ -1,20 +1,39 @@
 ---
+// ============================================
+// 博客页面 - Blog Page
+// ============================================
+// 功能说明：
+// 1. 支持Article和Moment两种视图切换
+// 2. Article视图：展示所有博客文章列表，支持按标签筛选
+// 3. Moment视图：展示朋友圈动态（类似微信朋友圈）
+// 4. 左侧drawer sidebar包含博客更新热力图、视图切换和标签树
+// ============================================
+
 import '../styles/global.css';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { buildTagTree, tagToSlug } from '../utils/tags';
-import TagTreeNode from '../components/post/TagTreeNode.astro';
 import GithubIcon from "../components/icons/GithubIcon.astro";
 import PostActionBar from '../components/post/PostActionBar.astro';
+import DrawerToggle from '../components/ui/DrawerToggle.astro';
+import BlogDrawerSidebar from '../components/blog/BlogDrawerSidebar.astro';
+import MomentView from '../components/views/MomentView.astro';
 
 const pageTitle = '';
+
+// 获取所有博客文章并按发布日期降序排序
 const allPosts = await getCollection('blog');
 const sortedPosts = [...allPosts].sort(
   (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
 );
+
+// 筛选出置顶文章
 const pinnedPosts = sortedPosts.filter((post) => post.data.docked);
+
+// 构建标签树结构（支持多级标签）
 const tagTree = buildTagTree(sortedPosts);
 
+// 展开标签路径：将 "技术/前端/React" 展开为 ["技术", "技术/前端", "技术/前端/React"]
 const expandTagPaths = (tag: string) => {
   const segments = tag
     .split('/')
@@ -23,20 +42,30 @@ const expandTagPaths = (tag: string) => {
   return segments.map((_, index) => segments.slice(0, index + 1).join('/'));
 };
 
+// 获取文章的所有标签路径（包括父级标签）
 const getPostTagPaths = (tags: string[]) =>
   [...new Set(tags.flatMap((tag) => expandTagPaths(tag)))].join('|');
 
+// ============================================
+// 生成博客更新热力图数据（GitHub风格）
+// ============================================
+// 显示过去364天（52周）的活动数据
 const startDate = new Date();
 startDate.setDate(startDate.getDate() - 364);
+
 const formatDate = (date: Date) =>
   `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(2, '0')}-${`${date.getDate()}`.padStart(2, '0')}`;
 
+// 生成53周 x 7天的热力图数据
 const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
   Array.from({ length: 7 }, (_, dayIndex) => {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + weekIndex * 7 + dayIndex);
+    
+    // 模拟活动强度（实际项目中应从数据库获取）
     const raw = (weekIndex * 3 + dayIndex * 5 + date.getDate()) % 10;
     const level = raw < 2 ? 0 : raw < 4 ? 1 : raw < 7 ? 2 : raw < 9 ? 3 : 4;
+    
     return {
       date: formatDate(date),
       count: level * 2,
@@ -44,86 +73,29 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
     };
   })
 );
-
-const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提交', '9+ 次提交'];
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-  <div class="blog-page blog-page--index-theme">
-    <section class="space-y-4">
-      <div class="rounded-3xl">
-        <div class="mb-4 flex items-center justify-between gap-3">
-          <div>
-            <h1 class="text-2xl font-bold">Blog Timeline</h1>
-            <p class="text-sm text-base-content/70">GitHub 风格贡献热力图</p>
-          </div>
-          <a class="w-10 h-10" href="https://github.com/" target="_blank" rel="noreferrer">
-            <GithubIcon/>
-          </a>
+  <!-- Drawer侧边栏切换按钮 -->
+  <DrawerToggle />
+  
+  <!-- Blog专用Drawer侧边栏（包含热力图和标签树） -->
+  <BlogDrawerSidebar heatmap={heatmap} tagTree={tagTree} />
+  
+  <!-- 主内容区域 - 当drawer打开时会自动调整margin-left -->
+  <div id="main-content" class="blog-page blog-page--index-theme" style="transition: margin-left 500ms cubic-bezier(0.4, 0, 0.2, 1);">
+    <!-- Article视图 - 默认显示 -->
+    <div id="article-view" class="view-content">
+      <section class="mt-4 space-y-4">
+        <!-- 当前标签筛选面板 - 选择标签后显示 -->
+        <div id="active-tag-panel" class="hidden rounded-2xl bg-base-200/50 px-4 py-3 text-sm">
+          当前筛选：<span id="active-tag-name" class="font-semibold"></span>
+          <button id="clear-tag-filter" type="button" class="btn btn-ghost btn-xs ml-2">清除</button>
         </div>
-
-        <div class="overflow-x-auto pb-2">
-          <div class="grid min-w-[860px] grid-flow-col gap-1">
-            {heatmap.map((week) => (
-              <div class="grid grid-rows-7 gap-1">
-                {week.map((day) => (
-                  <div
-                    class:list={[
-                      'h-3 w-3 rounded-[3px]',
-                      day.level === 0 && 'bg-base-300/70',
-                      day.level === 1 && 'bg-emerald-200',
-                      day.level === 2 && 'bg-emerald-400',
-                      day.level === 3 && 'bg-emerald-600',
-                      day.level === 4 && 'bg-emerald-800'
-                    ]}
-                    title={`${day.date} · ${day.count} commits`}
-                    aria-label={`${day.date} ${levelText[day.level]}`}
-                  ></div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div class="mt-4 flex flex-wrap items-center gap-3 text-xs text-base-content/70">
-          <span>Less</span>
-          {levelText.map((text, level) => (
-            <span class="inline-flex items-center gap-1">
-              <span
-                class:list={[
-                  'h-3 w-3 rounded-[3px]',
-                  level === 0 && 'bg-base-300/70',
-                  level === 1 && 'bg-emerald-200',
-                  level === 2 && 'bg-emerald-400',
-                  level === 3 && 'bg-emerald-600',
-                  level === 4 && 'bg-emerald-800'
-                ]}
-              ></span>{text}
-            </span>
-          ))}
-          <span>More</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="mt-4">
-      <div class="drawer lg:drawer-open blog-drawer" id="blog-drawer-layout">
-        <input id="tag-drawer" type="checkbox" class="drawer-toggle" />
-        <div class="drawer-content">
-          <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div class="lg:hidden">
-              <label for="tag-drawer" class="btn btn-ghost btn-sm px-2" aria-label="打开标签抽屉">
-                <svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4">
-                  <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
-                </svg>
-              </label>
-            </div>
-            <div id="active-tag-panel" class="hidden flex-1 rounded-2xl px-4 py-2 text-sm">
-              当前筛选：<span id="active-tag-name" class="font-semibold"></span>
-              <button id="clear-tag-filter" type="button" class="btn btn-ghost btn-xs ml-2">清除</button>
-            </div>
-          </div>
-          <div id="post-list" class="space-y-4">
+        
+        <!-- 文章列表 -->
+      <div id="post-list" class="space-y-4">
+        <!-- 置顶文章区域 -->
         {pinnedPosts.length > 0 && (
           <section class="rounded-3xl">
             <div class="mb-3 flex items-center justify-between">
@@ -159,6 +131,8 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
             </div>
           </section>
         )}
+        
+        <!-- 所有文章列表 -->
         {sortedPosts.map((post) => (
           <article
             class="rounded-3xl transition hover:shadow-[0_10px_34px_rgba(16,185,129,0.2)]"
@@ -167,9 +141,12 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
             data-tags={getPostTagPaths(post.data.tags)}
             data-post-id={post.id}
           >
+            <!-- 文章标题 -->
             <h3 class="text-xl font-semibold">
-              <a class="" href={`/posts/${post.id}/`} target="_blank" rel="noreferrer noopener">{post.data.title}</a>
+              <a href={`/posts/${post.id}/`} target="_blank" rel="noreferrer noopener">{post.data.title}</a>
             </h3>
+            
+            <!-- 作者和日期信息 -->
             <div class="mt-2 flex items-center gap-3 text-sm text-base-content/70">
               <div class="avatar">
                 <div class="w-8 rounded-full overflow-hidden">
@@ -182,16 +159,19 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
               </time>
             </div>
 
+            <!-- 文章标签 -->
             <div class="mt-3 flex flex-wrap gap-1">
               {post.data.tags.map((tag: string) => (
                 <button class="badge tag-filter-btn card-tag" data-tag={tag} data-tag-slug={tagToSlug(tag)} type="button">#{tag}</button>
               ))}
             </div>
 
+            <!-- 文章描述 -->
             <div>
               <p class="mt-2 text-sm leading-6 text-base-content/80">{post.data.description}</p>
             </div>
 
+            <!-- 文章操作栏（点赞、分享、收藏） -->
             <div class="mt-4">
               <PostActionBar
                 likeCount={post.data.likeCount ?? 0}
@@ -201,336 +181,133 @@ const levelText = ['0 次提交', '1-2 次提交', '3-5 次提交', '6-8 次提�
             </div>
           </article>
         ))}
-          </div>
-          <p id="empty-filter-state" class="mt-6 hidden rounded-2xl bg-base-100 p-6 text-center text-base-content/70">暂无文章匹配该标签。</p>
-        </div>
-        <div class="drawer-side z-20 blog-drawer-side">
-          <label for="tag-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-
-          <aside class="min-h-full w-80 rounded-r-3xl lg:rounded-3xl">
-            <br>
-            <br>
-            <div class="mb-4 flex items-center justify-between">
-              <h2 class="text-lg font-semibold">Tags</h2>
-              <button id="toggle-sidebar" class="btn btn-ghost btn-xs hidden lg:inline-flex" type="button" aria-label="收起标签侧边栏">⇥</button>
-            </div>
-            <ul id="tag-tree" class="space-y-2">
-              {tagTree.map((tag) => <TagTreeNode node={tag} />)}
-            </ul>
-          </aside>
-        </div>
       </div>
+      
+      <!-- 空状态提示 - 当筛选后没有匹配文章时显示 -->
+      <p id="empty-filter-state" class="mt-6 hidden rounded-2xl bg-base-100 p-6 text-center text-base-content/70">
+        暂无文章匹配该标签。
+      </p>
     </section>
-
-    <div id="toast" class="toast hidden" role="status" aria-live="polite">
-        <div class="toast-surface">已复制链接</div>
-      </div>
-
-    <!--<script is:inline>-->
-    <!--  const drawerLayout = document.getElementById('blog-drawer-layout');-->
-    <!--  const sidebarToggle = document.getElementById('toggle-sidebar');-->
-    <!--  const activeTagPanel = document.getElementById('active-tag-panel');-->
-    <!--  const activeTagName = document.getElementById('active-tag-name');-->
-    <!--  const clearFilterButton = document.getElementById('clear-tag-filter');-->
-    <!--  const postCards = Array.from(document.querySelectorAll('[data-post-card]'));-->
-    <!--  const tagNavButtons = Array.from(document.querySelectorAll('.tag-nav-btn'));-->
-    <!--  const emptyState = document.getElementById('empty-filter-state');-->
-    <!--  const toast = document.getElementById('toast');-->
-    <!--  let toastTimer = null;-->
-    <!--  const actionStoragePrefix = 'blog:action:';-->
-    <!--  const bookmarkKey = 'blog:bookmarks';-->
-    <!--  const canStore = (() => {-->
-    <!--    try {-->
-    <!--      localStorage.setItem(`${actionStoragePrefix}ping`, '1');-->
-    <!--      localStorage.removeItem(`${actionStoragePrefix}ping`);-->
-    <!--      return true;-->
-    <!--    } catch (error) {-->
-    <!--      return false;-->
-    <!--    }-->
-    <!--  })();-->
-
-    <!--  const getStoredNumber = (key, fallback) => {-->
-    <!--    if (!canStore) return fallback;-->
-    <!--    const raw = localStorage.getItem(key);-->
-    <!--    const value = raw === null ? NaN : Number(raw);-->
-    <!--    return Number.isFinite(value) ? value : fallback;-->
-    <!--  };-->
-
-    <!--  const getStoredBool = (key, fallback) => {-->
-    <!--    if (!canStore) return fallback;-->
-    <!--    const raw = localStorage.getItem(key);-->
-    <!--    if (raw === '1') return true;-->
-    <!--    if (raw === '0') return false;-->
-    <!--    return fallback;-->
-    <!--  };-->
-
-    <!--  const setStoredValue = (key, value) => {-->
-    <!--    if (!canStore) return;-->
-    <!--    localStorage.setItem(key, value);-->
-    <!--  };-->
-
-    <!--  const readBookmarks = () => {-->
-    <!--    if (!canStore) return [];-->
-    <!--    try {-->
-    <!--      return JSON.parse(localStorage.getItem(bookmarkKey) || '[]');-->
-    <!--    } catch (error) {-->
-    <!--      return [];-->
-    <!--    }-->
-    <!--  };-->
-
-    <!--  const writeBookmarks = (items) => {-->
-    <!--    if (!canStore) return;-->
-    <!--    localStorage.setItem(bookmarkKey, JSON.stringify(items.slice(-200)));-->
-    <!--  };-->
-
-    <!--  const getInitialCount = (button) => {-->
-    <!--    const raw = button.getAttribute('data-initial-count');-->
-    <!--    const value = raw === null ? NaN : Number(raw);-->
-    <!--    return Number.isFinite(value) ? value : 0;-->
-    <!--  };-->
-
-    <!--  const updateLabel = (button, isActive) => {-->
-    <!--    const labelEl = button.querySelector('.post-action-label');-->
-    <!--    if (!labelEl) return;-->
-    <!--    const activeLabel = button.getAttribute('data-active-label') || labelEl.textContent || '';-->
-    <!--    const inactiveLabel = button.getAttribute('data-inactive-label') || labelEl.textContent || '';-->
-    <!--    labelEl.textContent = isActive ? activeLabel : inactiveLabel;-->
-    <!--  };-->
-
-    <!--  const updateCount = (button, count) => {-->
-    <!--    const countEl = button.querySelector('.post-action-count');-->
-    <!--    if (!countEl) return;-->
-    <!--    countEl.textContent = `${count}`;-->
-    <!--  };-->
-
-    <!--  const showToast = (message) => {-->
-    <!--    if (!toast) return;-->
-    <!--    const surface = toast.querySelector('.toast-surface');-->
-    <!--    if (surface) {-->
-    <!--      surface.textContent = message;-->
-    <!--    }-->
-    <!--    toast.classList.remove('hidden');-->
-    <!--    toast.classList.add('is-visible');-->
-    <!--    if (toastTimer) window.clearTimeout(toastTimer);-->
-    <!--    toastTimer = window.setTimeout(() => {-->
-    <!--      toast.classList.remove('is-visible');-->
-    <!--      toastTimer = window.setTimeout(() => {-->
-    <!--        toast.classList.add('hidden');-->
-    <!--      }, 220);-->
-    <!--    }, 1600);-->
-    <!--  };-->
-
-    <!--  const applyTagFilter = (tag) => {-->
-    <!--    let visibleCount = 0;-->
-    <!--    postCards.forEach((card) => {-->
-    <!--      const tags = (card.getAttribute('data-tags') || '').split('|');-->
-    <!--      const matched = !tag || tags.some((value) => value === tag || value.startsWith(`${tag}/`));-->
-    <!--      card.classList.toggle('hidden', !matched);-->
-    <!--      if (matched) visibleCount += 1;-->
-    <!--    });-->
-
-    <!--    if (tagNavButtons.length > 0) {-->
-    <!--      tagNavButtons.forEach((button) => {-->
-    <!--        const buttonTag = button.getAttribute('data-tag') || '';-->
-    <!--        button.classList.toggle('is-active', Boolean(tag) && buttonTag === tag);-->
-    <!--      });-->
-    <!--    }-->
-
-    <!--    if (activeTagPanel && activeTagName) {-->
-    <!--      activeTagPanel.classList.toggle('hidden', !tag);-->
-    <!--      activeTagName.textContent = tag ? `#${tag}` : '';-->
-    <!--    }-->
-
-    <!--    if (emptyState) {-->
-    <!--      emptyState.classList.toggle('hidden', visibleCount > 0);-->
-    <!--    }-->
-    <!--  };-->
-
-    <!--  document.querySelectorAll('.tag-filter-btn').forEach((button) => {-->
-    <!--    button.addEventListener('click', () => {-->
-    <!--      applyTagFilter(button.getAttribute('data-tag') || '');-->
-    <!--    });-->
-    <!--  });-->
-
-    <!--  if (clearFilterButton) {-->
-    <!--    clearFilterButton.addEventListener('click', () => applyTagFilter(''));-->
-    <!--  }-->
-
-    <!--  document.querySelectorAll('.tag-toggle').forEach((toggleButton) => {-->
-    <!--    toggleButton.addEventListener('click', () => {-->
-    <!--      const listItem = toggleButton.closest('li');-->
-    <!--      const children = listItem?.querySelector(':scope > .tag-children');-->
-    <!--      if (!children) return;-->
-
-    <!--      const expanded = toggleButton.getAttribute('data-expanded') !== 'false';-->
-    <!--      const nextExpanded = !expanded;-->
-    <!--      toggleButton.setAttribute('data-expanded', `${nextExpanded}`);-->
-    <!--      toggleButton.setAttribute('aria-expanded', `${nextExpanded}`);-->
-    <!--      toggleButton.textContent = nextExpanded ? '▾' : '▸';-->
-    <!--      children.classList.toggle('hidden', !nextExpanded);-->
-    <!--    });-->
-    <!--  });-->
-
-    <!--  if (sidebarToggle && drawerLayout) {-->
-    <!--    sidebarToggle.addEventListener('click', () => {-->
-    <!--      const collapsed = drawerLayout.classList.toggle('blog-sidebar-collapsed');-->
-    <!--      sidebarToggle.textContent = collapsed ? '⇤' : '⇥';-->
-    <!--    });-->
-    <!--  }-->
-
-    <!--  postCards.forEach((card) => {-->
-    <!--    const postId = card.getAttribute('data-post-id');-->
-    <!--    if (!postId) return;-->
-
-    <!--    card.querySelectorAll('.post-action-btn').forEach((button) => {-->
-    <!--      const action = button.getAttribute('data-action');-->
-    <!--      if (!action) return;-->
-
-    <!--      const baseCount = getInitialCount(button);-->
-    <!--      const likeKey = `${actionStoragePrefix}like:${postId}`;-->
-    <!--      const shareKey = `${actionStoragePrefix}share:${postId}`;-->
-    <!--      const dockKey = `${actionStoragePrefix}dock:${postId}`;-->
-
-    <!--      if (action === 'like') {-->
-    <!--        let liked = getStoredBool(likeKey, button.classList.contains('is-active'));-->
-    <!--        button.classList.toggle('is-active', liked);-->
-    <!--        updateLabel(button, liked);-->
-    <!--        updateCount(button, baseCount + (liked ? 1 : 0));-->
-
-    <!--        const resolveBookmarkPayload = () => {-->
-    <!--          const title = card.querySelector('h3 a')?.textContent?.trim() || postId;-->
-    <!--          const description = card.querySelector('p.mt-2')?.textContent?.trim() || '';-->
-    <!--          const url = card.getAttribute('data-post-link') || '';-->
-    <!--          return {-->
-    <!--            slug: postId,-->
-    <!--            title,-->
-    <!--            description,-->
-    <!--            url,-->
-    <!--          };-->
-    <!--        };-->
-
-    <!--        if (liked) {-->
-    <!--          const list = readBookmarks();-->
-    <!--          const payload = resolveBookmarkPayload();-->
-    <!--          if (!list.some((item) => item.slug === payload.slug)) {-->
-    <!--            list.push(payload);-->
-    <!--            writeBookmarks(list);-->
-    <!--          }-->
-    <!--        }-->
-
-    <!--        button.addEventListener('click', (event) => {-->
-    <!--          event.stopPropagation();-->
-    <!--          liked = !liked;-->
-    <!--          setStoredValue(likeKey, liked ? '1' : '0');-->
-    <!--          button.classList.toggle('is-active', liked);-->
-    <!--          updateLabel(button, liked);-->
-    <!--          updateCount(button, baseCount + (liked ? 1 : 0));-->
-    <!--          const list = readBookmarks();-->
-    <!--          const payload = resolveBookmarkPayload();-->
-    <!--          if (liked) {-->
-    <!--            if (!list.some((item) => item.slug === payload.slug)) {-->
-    <!--              list.push(payload);-->
-    <!--            }-->
-    <!--            writeBookmarks(list);-->
-    <!--          } else {-->
-    <!--            writeBookmarks(list.filter((item) => item.slug !== payload.slug));-->
-    <!--          }-->
-    <!--        });-->
-    <!--        return;-->
-    <!--      }-->
-
-    <!--      if (action === 'share') {-->
-    <!--        let total = getStoredNumber(shareKey, baseCount);-->
-    <!--        updateCount(button, total);-->
-
-    <!--        const resolveShareUrl = () => {-->
-    <!--          const href = card.getAttribute('data-post-link') || '';-->
-    <!--          if (!href) return window.location.href;-->
-    <!--          try {-->
-    <!--            return new URL(href, window.location.origin).toString();-->
-    <!--          } catch (error) {-->
-    <!--            return window.location.href;-->
-    <!--          }-->
-    <!--        };-->
-
-    <!--        const persistShare = () => {-->
-    <!--          total += 1;-->
-    <!--          setStoredValue(shareKey, `${total}`);-->
-    <!--          updateCount(button, total);-->
-    <!--        };-->
-
-    <!--        button.addEventListener('click', async (event) => {-->
-    <!--          event.stopPropagation();-->
-    <!--          const shareUrl = resolveShareUrl();-->
-
-    <!--          if (navigator.share) {-->
-    <!--            try {-->
-    <!--              await navigator.share({-->
-    <!--                title: document.title,-->
-    <!--                url: shareUrl-->
-    <!--              });-->
-    <!--              persistShare();-->
-    <!--            } catch (error) {-->
-    <!--              // User cancelled or share failed.-->
-    <!--            }-->
-    <!--            return;-->
-    <!--          }-->
-
-    <!--          if (navigator.clipboard?.writeText) {-->
-    <!--            try {-->
-    <!--              await navigator.clipboard.writeText(shareUrl);-->
-    <!--              persistShare();-->
-    <!--              showToast('已复制链接');-->
-    <!--              return;-->
-    <!--            } catch (error) {-->
-    <!--              // fall through-->
-    <!--            }-->
-    <!--          }-->
-
-    <!--          window.prompt('复制链接分享:', shareUrl);-->
-    <!--        });-->
-    <!--        return;-->
-    <!--      }-->
-
-    <!--      if (action === 'dock') {-->
-    <!--        let docked = getStoredBool(dockKey, button.classList.contains('is-active'));-->
-    <!--        button.classList.toggle('is-active', docked);-->
-    <!--        updateLabel(button, docked);-->
-
-    <!--        button.addEventListener('click', (event) => {-->
-    <!--          event.stopPropagation();-->
-    <!--          docked = !docked;-->
-    <!--          setStoredValue(dockKey, docked ? '1' : '0');-->
-    <!--          button.classList.toggle('is-active', docked);-->
-    <!--          updateLabel(button, docked);-->
-    <!--        });-->
-    <!--      }-->
-    <!--    });-->
-    <!--  });-->
-
-    <!--  const shouldIgnoreCardClick = (target) =>-->
-    <!--    Boolean(target.closest('a, button, input, label, textarea, select, [role="button"]'));-->
-
-    <!--  postCards.forEach((card) => {-->
-    <!--    card.addEventListener('click', (event) => {-->
-    <!--      if (shouldIgnoreCardClick(event.target)) return;-->
-    <!--      const href = card.getAttribute('data-post-link');-->
-    <!--      if (!href) return;-->
-    <!--      window.open(href, '_blank', 'noopener');-->
-    <!--    });-->
-
-    <!--    card.addEventListener('keydown', (event) => {-->
-    <!--      if (event.key !== 'Enter' && event.key !== ' ') return;-->
-    <!--      if (shouldIgnoreCardClick(event.target)) return;-->
-    <!--      const href = card.getAttribute('data-post-link');-->
-    <!--      if (!href) return;-->
-    <!--      event.preventDefault();-->
-    <!--      window.open(href, '_blank', 'noopener');-->
-    <!--    });-->
-
-    <!--    card.setAttribute('tabindex', '0');-->
-    <!--    card.setAttribute('role', 'link');-->
-    <!--  });-->
-    <!--</script>-->
     </div>
+
+    <!-- Moment视图 - 朋友圈动态 -->
+    <div id="moment-view" class="view-content hidden">
+      <MomentView />
+    </div>
+
+    <!-- Toast提示框 - 用于显示复制链接等操作反馈 -->
+    <div id="toast" class="toast hidden" role="status" aria-live="polite">
+      <div class="toast-surface">已复制链接</div>
+    </div>
+
+    <script is:inline>
+      // ============================================
+      // 视图切换功能
+      // ============================================
+      // 监听导航按钮点击，切换Article和Moment视图
+      window.addEventListener('view-changed', ((event) => {
+        const { view } = event.detail;
+        
+        const articleView = document.getElementById('article-view');
+        const momentView = document.getElementById('moment-view');
+        
+        if (view === 'moment') {
+          articleView?.classList.add('hidden');
+          momentView?.classList.remove('hidden');
+        } else if (view === 'article') {
+          momentView?.classList.add('hidden');
+          articleView?.classList.remove('hidden');
+        }
+      }));
+      
+      // ============================================
+      // Drawer状态变化处理
+      // ============================================
+      // 监听drawer打开/关闭事件，自动调整主内容区域的左边距
+      window.addEventListener('drawer-state-changed', (event) => {
+        const { isOpen } = event.detail;
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+          // drawer打开时，内容区向右推320px；关闭时恢复
+          mainContent.style.marginLeft = isOpen ? '320px' : '0';
+        }
+      });
+      
+      // ============================================
+      // 标签筛选功能
+      // ============================================
+      const activeTagPanel = document.getElementById('active-tag-panel');
+      const activeTagName = document.getElementById('active-tag-name');
+      const clearFilterButton = document.getElementById('clear-tag-filter');
+      const postCards = Array.from(document.querySelectorAll('[data-post-card]'));
+      const emptyState = document.getElementById('empty-filter-state');
+      
+      /**
+       * 应用标签筛选
+       * @param {string} tag - 要筛选的标签，空字符串表示显示所有文章
+       */
+      const applyTagFilter = (tag) => {
+        let visibleCount = 0;
+        
+        // 遍历所有文章卡片，根据标签显示/隐藏
+        postCards.forEach((card) => {
+          const tags = (card.getAttribute('data-tags') || '').split('|');
+          // 匹配逻辑：无标签时显示全部，或者标签完全匹配，或者是子标签
+          const matched = !tag || tags.some((value) => value === tag || value.startsWith(`${tag}/`));
+          card.classList.toggle('hidden', !matched);
+          if (matched) visibleCount += 1;
+        });
+
+        // 更新当前筛选标签显示面板
+        if (activeTagPanel && activeTagName) {
+          activeTagPanel.classList.toggle('hidden', !tag);
+          activeTagName.textContent = tag ? `#${tag}` : '';
+        }
+
+        // 显示/隐藏空状态提示
+        if (emptyState) {
+          emptyState.classList.toggle('hidden', visibleCount > 0);
+        }
+      };
+
+      // 为文章卡片上的标签按钮绑定点击事件
+      document.querySelectorAll('.tag-filter-btn').forEach((button) => {
+        button.addEventListener('click', () => {
+          applyTagFilter(button.getAttribute('data-tag') || '');
+        });
+      });
+
+      // 清除筛选按钮
+      if (clearFilterButton) {
+        clearFilterButton.addEventListener('click', () => applyTagFilter(''));
+      }
+
+      // 侧边栏标签导航按钮（从TagTreeNode组件生成）
+      document.querySelectorAll('.tag-nav-btn').forEach((button) => {
+        button.addEventListener('click', () => {
+          const tag = button.getAttribute('data-tag') || '';
+          applyTagFilter(tag);
+        });
+      });
+
+      // ============================================
+      // 标签树展开/折叠功能
+      // ============================================
+      document.querySelectorAll('.tag-toggle').forEach((toggleButton) => {
+        toggleButton.addEventListener('click', () => {
+          const listItem = toggleButton.closest('li');
+          const children = listItem?.querySelector(':scope > .tag-children');
+          if (!children) return;
+
+          // 切换展开状态
+          const expanded = toggleButton.getAttribute('data-expanded') !== 'false';
+          const nextExpanded = !expanded;
+          toggleButton.setAttribute('data-expanded', `${nextExpanded}`);
+          toggleButton.setAttribute('aria-expanded', `${nextExpanded}`);
+          toggleButton.textContent = nextExpanded ? '▾' : '▸';
+          children.classList.toggle('hidden', !nextExpanded);
+        });
+      });
+    </script>
+  </div>
 </BaseLayout>

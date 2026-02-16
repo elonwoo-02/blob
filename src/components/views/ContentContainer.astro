@@ -1,0 +1,34 @@
+---
+// ContentContainer.astro - Container that switches between Moment and Article views
+import MomentView from './MomentView.astro';
+import ArticleView from './ArticleView.astro';
+---
+
+<div id="content-container" class="content-container min-h-screen py-8">
+  <!-- Default view: Article -->
+  <div id="article-view" class="view-content">
+    <ArticleView />
+  </div>
+  
+  <div id="moment-view" class="view-content hidden">
+    <MomentView />
+  </div>
+</div>
+
+<script>
+  // Listen for view change events
+  window.addEventListener('view-changed', ((event: CustomEvent) => {
+    const { view } = event.detail;
+    
+    const articleView = document.getElementById('article-view');
+    const momentView = document.getElementById('moment-view');
+    
+    if (view === 'moment') {
+      articleView?.classList.add('hidden');
+      momentView?.classList.remove('hidden');
+    } else if (view === 'article') {
+      momentView?.classList.add('hidden');
+      articleView?.classList.remove('hidden');
+    }
+  }) as EventListener);
+</script>

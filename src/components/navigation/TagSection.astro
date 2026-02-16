@@ -1,0 +1,132 @@
+---
+// TagSection.astro - Multi-level tag filtering system
+interface Tag {
+  id: string;
+  name: string;
+  children?: Tag[];
+}
+
+const tags: Tag[] = [
+  {
+    id: 'tech',
+    name: '技术',
+    children: [
+      { id: 'frontend', name: '前端' },
+      { id: 'backend', name: '后端' },
+      { id: 'devops', name: 'DevOps' },
+    ],
+  },
+  {
+    id: 'life',
+    name: '生活',
+    children: [
+      { id: 'travel', name: '旅行' },
+      { id: 'food', name: '美食' },
+      { id: 'reading', name: '阅读' },
+    ],
+  },
+  {
+    id: 'thoughts',
+    name: '思考',
+    children: [
+      { id: 'philosophy', name: '哲学' },
+      { id: 'productivity', name: '效率' },
+    ],
+  },
+];
+---
+
+<div class="tag-section p-4">
+  <h3 class="text-sm font-semibold mb-3 text-base-content/70">标签</h3>
+  <div class="space-y-2">
+    {tags.map((tag) => (
+      <div class="tag-group">
+        <button
+          data-tag-id={tag.id}
+          class="parent-tag w-full btn btn-sm btn-ghost justify-between hover:bg-primary/10 transition-all"
+        >
+          <span>{tag.name}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 transform transition-transform"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+        {tag.children && tag.children.length > 0 && (
+          <div class="child-tags ml-4 mt-1 space-y-1 hidden">
+            {tag.children.map((child) => (
+              <button
+                data-tag-id={child.id}
+                data-parent-id={tag.id}
+                class="child-tag w-full btn btn-xs btn-ghost justify-start hover:bg-primary/10 transition-all"
+              >
+                <span class="text-xs">{child.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  // Toggle child tags visibility
+  const parentTags = document.querySelectorAll('.parent-tag');
+  
+  parentTags.forEach(button => {
+    button.addEventListener('click', () => {
+      const tagGroup = button.closest('.tag-group');
+      const childTags = tagGroup?.querySelector('.child-tags');
+      const arrow = button.querySelector('svg');
+      
+      if (childTags) {
+        childTags.classList.toggle('hidden');
+        arrow?.classList.toggle('rotate-180');
+      }
+    });
+  });
+  
+  // Handle tag selection
+  const allTags = document.querySelectorAll('.parent-tag, .child-tag');
+  const selectedTags = new Set<string>();
+  
+  allTags.forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      const tagId = button.getAttribute('data-tag-id');
+      if (!tagId) return;
+      
+      // Toggle selection
+      if (selectedTags.has(tagId)) {
+        selectedTags.delete(tagId);
+        button.classList.remove('btn-active');
+      } else {
+        selectedTags.add(tagId);
+        button.classList.add('btn-active');
+      }
+      
+      // Dispatch tag filter event
+      const event = new CustomEvent('tags-changed', {
+        detail: { tags: Array.from(selectedTags) }
+      });
+      window.dispatchEvent(event);
+    });
+  });
+</script>
+
+<style>
+  .rotate-180 {
+    transform: rotate(180deg);
+  }
+</style>

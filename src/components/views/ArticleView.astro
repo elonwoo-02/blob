@@ -1,0 +1,143 @@
+---
+// ArticleView.astro - Article card grid layout
+interface Article {
+  id: string;
+  title: string;
+  excerpt: string;
+  cover?: string;
+  tags: string[];
+  date: string;
+  readTime: string;
+}
+
+const { articles = [], selectedTags = [] } = Astro.props;
+
+// Sample data if none provided
+const defaultArticles: Article[] = [
+  {
+    id: '1',
+    title: 'Astro 与 Tailwind CSS 最佳实践',
+    excerpt: '探索如何在 Astro 项目中高效使用 Tailwind CSS，实现组件化设计...',
+    cover: 'https://picsum.photos/600/400?random=10',
+    tags: ['frontend', 'tech'],
+    date: '2024-02-15',
+    readTime: '5 分钟',
+  },
+  {
+    id: '2',
+    title: '旅行日记：京都之行',
+    excerpt: '记录在京都的美好时光，从清水寺到伏见稻荷大社...',
+    cover: 'https://picsum.photos/600/400?random=11',
+    tags: ['travel', 'life'],
+    date: '2024-02-10',
+    readTime: '8 分钟',
+  },
+  {
+    id: '3',
+    title: '高效工作的秘诀',
+    excerpt: '分享我的时间管理方法和提升效率的工具...',
+    tags: ['productivity', 'thoughts'],
+    date: '2024-02-05',
+    readTime: '6 分钟',
+  },
+  {
+    id: '4',
+    title: 'TypeScript 进阶技巧',
+    excerpt: '深入理解 TypeScript 的高级类型系统...',
+    cover: 'https://picsum.photos/600/400?random=12',
+    tags: ['frontend', 'tech'],
+    date: '2024-02-01',
+    readTime: '10 分钟',
+  },
+];
+
+const displayArticles = articles.length > 0 ? articles : defaultArticles;
+---
+
+<div class="article-view max-w-6xl mx-auto p-4">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {displayArticles.map((article) => (
+      <article
+        class="article-card bg-base-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer"
+        data-tags={JSON.stringify(article.tags)}
+      >
+        {/* Cover Image */}
+        {article.cover && (
+          <div class="aspect-video overflow-hidden">
+            <img
+              src={article.cover}
+              alt={article.title}
+              class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        )}
+        
+        {/* Content */}
+        <div class="p-5">
+          <h3 class="text-xl font-bold text-base-content mb-2 line-clamp-2">
+            {article.title}
+          </h3>
+          <p class="text-base-content/70 text-sm mb-4 line-clamp-3">
+            {article.excerpt}
+          </p>
+          
+          {/* Tags */}
+          <div class="flex flex-wrap gap-2 mb-4">
+            {article.tags.map((tag) => (
+              <span class="badge badge-sm badge-outline">{tag}</span>
+            ))}
+          </div>
+          
+          {/* Meta */}
+          <div class="flex items-center justify-between text-xs text-base-content/50">
+            <span>{article.date}</span>
+            <span>{article.readTime}</span>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+</div>
+
+<script>
+  // Listen for tag filter changes
+  window.addEventListener('tags-changed', ((event: CustomEvent) => {
+    const selectedTags = event.detail.tags;
+    const articleCards = document.querySelectorAll('.article-card');
+    
+    articleCards.forEach(card => {
+      const cardTags = JSON.parse(card.getAttribute('data-tags') || '[]');
+      
+      // Show all if no tags selected
+      if (selectedTags.length === 0) {
+        card.classList.remove('hidden');
+        return;
+      }
+      
+      // Check if card has any of the selected tags
+      const hasMatchingTag = selectedTags.some((tag: string) => cardTags.includes(tag));
+      
+      if (hasMatchingTag) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+  }) as EventListener);
+</script>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

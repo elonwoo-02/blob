@@ -1,0 +1,328 @@
+---
+// MomentPublishModal.astro - 微信朋友圈发布动态模态框
+---
+
+<!-- 模态框遮罩层 -->
+<div id="publish-modal" class="moment-modal-overlay" style="display:none;">
+  <div class="moment-modal-container">
+    <!-- 顶栏 -->
+    <div class="moment-modal-header">
+      <button id="modal-cancel" class="moment-modal-btn-cancel" type="button">取消</button>
+      <span class="moment-modal-title">发表动态</span>
+      <button id="modal-submit" class="moment-modal-btn-submit" type="button">发表</button>
+    </div>
+
+    <!-- 文字输入 -->
+    <textarea
+      id="moment-text"
+      class="moment-modal-textarea"
+      placeholder="这一刻的想法..."
+      rows="5"
+    ></textarea>
+
+    <!-- 图片上传区域 -->
+    <div class="moment-modal-images">
+      <div id="image-preview-grid" class="moment-modal-image-grid"></div>
+      <label id="image-add-btn" class="moment-modal-image-add" title="添加图片">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4" />
+        </svg>
+        <input id="image-input" type="file" accept="image/*" multiple class="hidden" />
+      </label>
+    </div>
+
+    <!-- 底部工具栏 -->
+    <div class="moment-modal-toolbar">
+      <label class="moment-modal-tool-btn" title="添加图片">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
+        </svg>
+        <input type="file" accept="image/*" multiple class="hidden" id="toolbar-image-input" />
+      </label>
+      <button class="moment-modal-tool-btn" id="location-btn" type="button" title="所在位置">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0 1 15 0Z" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- 位置面板 -->
+    <div id="location-panel" class="moment-modal-location-panel" style="display:none;">
+      <input id="location-input" type="text" class="moment-modal-location-input" placeholder="输入位置（如：咖啡馆）" />
+    </div>
+  </div>
+</div>
+
+<style>
+  .moment-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,.55);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 6vh;
+    animation: modalFadeIn .2s ease;
+  }
+  @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .moment-modal-container {
+    width: 100%;
+    max-width: 520px;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    animation: modalSlideUp .25s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes modalSlideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .moment-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .moment-modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  .moment-modal-btn-cancel {
+    font-size: 15px;
+    color: #666;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background .15s;
+  }
+  .moment-modal-btn-cancel:hover { background: #f5f5f5; }
+
+  .moment-modal-btn-submit {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background: #07c160;
+    border: none;
+    cursor: pointer;
+    padding: 6px 18px;
+    border-radius: 6px;
+    transition: opacity .15s;
+  }
+  .moment-modal-btn-submit:hover { opacity: .85; }
+
+  .moment-modal-textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    padding: 16px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #1a1a1a;
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  .moment-modal-textarea::placeholder { color: #bbb; }
+
+  .moment-modal-images {
+    padding: 0 16px 12px;
+  }
+  .moment-modal-image-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .moment-modal-image-grid:empty { margin-bottom: 0; }
+
+  .moment-modal-image-grid .preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f5f5f5;
+  }
+  .moment-modal-image-grid .preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .moment-modal-image-grid .preview-item .remove-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.55);
+    color: #fff;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .moment-modal-image-grid .preview-item:hover .remove-btn { opacity: 1; }
+
+  .moment-modal-image-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 6px;
+    border: 1.5px dashed #d9d9d9;
+    cursor: pointer;
+    transition: border-color .15s;
+  }
+  .moment-modal-image-add:hover { border-color: #aaa; }
+
+  .moment-modal-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 16px;
+    border-top: 1px solid #f0f0f0;
+  }
+  .moment-modal-tool-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    background: none;
+    color: #666;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .moment-modal-tool-btn:hover { background: #f5f5f5; color: #333; }
+
+  .moment-modal-location-panel {
+    padding: 0 16px 14px;
+  }
+  .moment-modal-location-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .moment-modal-location-input:focus { border-color: #07c160; }
+</style>
+
+<script>
+  const modal = document.getElementById('publish-modal') as HTMLElement;
+  const cancelBtn = document.getElementById('modal-cancel') as HTMLElement;
+  const submitBtn = document.getElementById('modal-submit') as HTMLElement;
+  const textArea = document.getElementById('moment-text') as HTMLTextAreaElement;
+  const imageInput = document.getElementById('image-input') as HTMLInputElement;
+  const toolbarImageInput = document.getElementById('toolbar-image-input') as HTMLInputElement;
+  const previewGrid = document.getElementById('image-preview-grid') as HTMLElement;
+  const imageAddBtn = document.getElementById('image-add-btn') as HTMLElement;
+  const locationBtn = document.getElementById('location-btn') as HTMLElement;
+  const locationPanel = document.getElementById('location-panel') as HTMLElement;
+  const locationInput = document.getElementById('location-input') as HTMLInputElement;
+
+  let selectedFiles: File[] = [];
+
+  // 打开模态框
+  window.addEventListener('open-publish-modal', () => {
+    modal.style.display = 'flex';
+    textArea.focus();
+  });
+
+  // 关闭模态框
+  const closeModal = () => {
+    modal.style.display = 'none';
+    textArea.value = '';
+    selectedFiles = [];
+    previewGrid.innerHTML = '';
+    locationInput.value = '';
+    locationPanel.style.display = 'none';
+    updateAddBtnVisibility();
+  };
+
+  cancelBtn?.addEventListener('click', closeModal);
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // 图片处理
+  const handleFiles = (files: FileList | null) => {
+    if (!files) return;
+    const remaining = 9 - selectedFiles.length;
+    const toAdd = Array.from(files).slice(0, remaining);
+    selectedFiles.push(...toAdd);
+    renderPreviews();
+  };
+
+  imageInput?.addEventListener('change', (e) => handleFiles((e.target as HTMLInputElement).files));
+  toolbarImageInput?.addEventListener('change', (e) => handleFiles((e.target as HTMLInputElement).files));
+
+  const updateAddBtnVisibility = () => {
+    if (imageAddBtn) {
+      imageAddBtn.style.display = selectedFiles.length >= 9 ? 'none' : 'inline-flex';
+    }
+  };
+
+  const renderPreviews = () => {
+    previewGrid.innerHTML = '';
+    selectedFiles.forEach((file, index) => {
+      const item = document.createElement('div');
+      item.className = 'preview-item';
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.alt = '预览';
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'remove-btn';
+      removeBtn.textContent = '×';
+      removeBtn.addEventListener('click', () => {
+        selectedFiles.splice(index, 1);
+        renderPreviews();
+      });
+      item.append(img, removeBtn);
+      previewGrid.appendChild(item);
+    });
+    updateAddBtnVisibility();
+  };
+
+  // 位置切换
+  locationBtn?.addEventListener('click', () => {
+    const visible = locationPanel.style.display !== 'none';
+    locationPanel.style.display = visible ? 'none' : 'block';
+    if (!visible) locationInput.focus();
+  });
+
+  // 发表
+  submitBtn?.addEventListener('click', () => {
+    const text = textArea.value.trim();
+    const location = locationInput.value.trim();
+    if (!text && selectedFiles.length === 0) return;
+
+    // 构建新动态数据
+    const imageUrls = selectedFiles.map(f => URL.createObjectURL(f));
+
+    // 派发事件通知页面添加新动态
+    window.dispatchEvent(new CustomEvent('moment-published', {
+      detail: { text, images: imageUrls, location }
+    }));
+
+    closeModal();
+  });
+</script>
