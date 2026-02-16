@@ -1,0 +1,72 @@
+{
+  "color": {
+    "bg": {
+      "app": "#F5F5F3",
+      "card": "#FFFFFF",
+      "hover": "#FAFAF8",
+      "drawer": "#F5F5F3"
+    },
+    "text": {
+      "primary": "#333333",
+      "secondary": "#666666",
+      "tertiary": "#999999",
+      "placeholder": "#B5B5B5"
+    },
+    "tag": {
+      "blue": {
+        "bg": "#EAF2FF",
+        "text": "#4A78FF"
+      }
+    },
+    "accent": {
+      "primary": "#34C759",
+      "shadow": "rgba(52,199,89,0.25)"
+    }
+  },
+  "radius": {
+    "sm": "12px",
+    "md": "18px",
+    "lg": "24px",
+    "xl": "32px"
+  },
+  "shadow": {
+    "card": "0 8px 24px rgba(0,0,0,0.04)",
+    "floating": "0 12px 32px rgba(0,0,0,0.08)"
+  },
+  "space": {
+    "xs": "8px",
+    "sm": "12px",
+    "md": "16px",
+    "lg": "24px",
+    "xl": "32px",
+    "2xl": "48px"
+  },
+  "type": {
+    "title": {
+      "size": "18px",
+      "weight": 600
+    },
+    "body": {
+      "size": "16px",
+      "weight": 400
+    },
+    "meta": {
+      "size": "13px",
+      "weight": 400
+    },
+    "tag": {
+      "size": "12px",
+      "weight": 500
+    }
+  },
+  "motion": {
+    "easing": {
+      "standard": "cubic-bezier(0.4,0,0.2,1)"
+    },
+    "duration": {
+      "fast": "150ms",
+      "base": "250ms",
+      "slow": "400ms"
+    }
+  }
+}

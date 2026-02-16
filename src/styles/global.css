@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  exclude: properties;
+}
 
 /*:root[data-theme="dark"] body {*/
 /*  background: #1d1f21;*/
@@ -31,4 +33,3 @@
 /*  border: none !important;*/
 /*  box-shadow: none !important;*/
 /*}*/
-
