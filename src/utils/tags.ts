@@ -87,5 +87,3 @@ export const buildTagTree = (posts: BlogPost[]): TagNode[] => {
   return roots;
 };
 
-export const flattenTagTree = (nodes: TagNode[]): TagNode[] =>
-  nodes.flatMap((node) => [node, ...flattenTagTree(node.children)]);

@@ -1,0 +1,219 @@
+---
+// ArticleView.astro - Article list layout (Note style)
+import { type CollectionEntry } from 'astro:content';
+import ContentView from '../ContentView.astro';
+
+interface Props {
+  pinnedPosts?: CollectionEntry<'blog'>[];
+  sortedPosts?: CollectionEntry<'blog'>[];
+  hidden?: boolean;
+}
+
+const { pinnedPosts = [], sortedPosts = [], hidden = false } = Astro.props;
+
+// 展开标签路径（保持与其他视图相同的逻辑）
+const expandTagPaths = (tag: string) => {
+  const segments = tag.split('/').map((s) => s.trim()).filter(Boolean);
+  return segments.map((_, i) => segments.slice(0, i + 1).join('/'));
+};
+
+const getPostTagPaths = (tags: string[]) =>
+  [...new Set(tags.flatMap((tag) => expandTagPaths(tag)))].join('|');
+
+const formatTime = (date: Date) => {
+  return date.toLocaleDateString('zh-CN', { 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit' 
+  }) + ' ' + date.toLocaleTimeString('zh-CN', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
+};
+---
+
+<!-- Article视图 - use shared ContentView -->
+<ContentView
+  viewId="article-view"
+  title="ARTICLE"
+  count={sortedPosts.length}
+  hidden={hidden}
+>
+  <Fragment slot="header-right"></Fragment>
+
+  <section id="post-list" class="post-list w-full space-y-4">
+    <!-- 置顶文章 (Pinned) -->
+    {pinnedPosts.length > 0 && pinnedPosts.map((post) => (
+      <article 
+        class="arti-card bg-base-100 rounded-xl p-5 shadow-sm border border-base-200/60"
+        data-post-card
+        data-tags={getPostTagPaths(post.data.tags)}
+      >
+        <!-- Time meta with pinned indicator -->
+        <div class="flex items-center justify-between mb-3 text-xs text-base-content/40 font-mono border-b border-base-100 pb-2">
+           <time datetime={post.data.pubDate.toISOString()}>
+             {formatTime(post.data.pubDate)}
+           </time>
+           <span class="flex items-center gap-1 text-warning bg-warning/10 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+              </svg>
+              Pinned
+           </span>
+        </div>
+
+        <!-- Title -->
+        <div class="mb-3">
+           <h3 class="text-lg font-bold text-base-content/90 mb-2 leading-tight hover:text-[#3A7A8F] transition-colors">
+             <a href={`/posts/${post.id}/`} target="_blank" class="focus:outline-none">
+                {post.data.title}
+             </a>
+           </h3>
+
+        </div>
+
+        <!-- Tags -->
+        <div class="flex flex-wrap gap-2">
+          {post.data.tags.map((tag) => (
+            <button class="article-tag-btn text-xs text-[#3A7A8F]/80 hover:text-[#3A7A8F] hover:bg-[#3A7A8F]/5 px-1.5 py-0.5 rounded transition-colors" data-tag={tag}>
+              #{tag}
+            </button>
+          ))}
+        </div>
+
+    <div>
+     {post.data.description && (
+         <p class="text-sm text-base-content/70 leading-relaxed">
+            {post.data.description}
+         </p>
+       )}
+    </div>
+      </article>
+    ))}
+
+    <!-- 普通文章列表 -->
+    {sortedPosts.map((post) => (
+      !post.data.docked && (
+      <article 
+        class="arti-card bg-base-100 rounded-xl p-5 shadow-sm border border-base-200/60"
+        data-post-card
+        data-tags={getPostTagPaths(post.data.tags)}
+      >
+        <!-- Time meta -->
+        <div class="flex items-center justify-between mb-3 text-xs text-base-content/40 font-mono border-b border-base-100 pb-2">
+           <time datetime={post.data.pubDate.toISOString()}>
+             {formatTime(post.data.pubDate)}
+           </time>
+        </div>
+
+        <!-- Title -->
+        <div class="mb-3">
+           <h3 class="text-lg font-bold text-base-content/90 mb-2 leading-tight hover:text-[#3A7A8F] transition-colors">
+             <a href={`/posts/${post.id}/`} target="_blank" class="focus:outline-none">
+                {post.data.title}
+             </a>
+           </h3>
+           {post.data.description && (
+             <p class="text-sm text-base-content/70 leading-relaxed">
+                {post.data.description}
+             </p>
+           )}
+        </div>
+
+        <!-- Tags -->
+        <div class="flex flex-wrap gap-2">
+          {post.data.tags.map((tag) => (
+            <button class="article-tag-btn text-xs text-[#3A7A8F]/80 hover:text-[#3A7A8F] hover:bg-[#3A7A8F]/5 px-1.5 py-0.5 rounded transition-colors" data-tag={tag}>
+              #{tag}
+            </button>
+          ))}
+        </div>
+      </article>
+      )
+    ))}
+  </section>
+
+  <!-- Empty state -->
+  <div id="article-empty-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
+     <div class="w-16 h-16 rounded-full bg-base-200/50 flex items-center justify-center mb-4 text-base-content/30">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+     </div>
+     <p class="text-base-content/60">No notes found.</p>
+     <button id="article-clear-tag-filter-empty" class="btn btn-link btn-sm mt-2 text-primary">Show all</button>
+  </div>
+</ContentView>
+
+<script>
+  // Filtering logic for ArticleView (same as NoteView)
+  const activeTagPanel = document.getElementById('article-active-tag-panel');
+  const activeTagName = document.getElementById('article-active-tag-name');
+  const clearFilterBtn = document.getElementById('article-clear-tag-filter');
+  const clearFilterBtnEmpty = document.getElementById('article-clear-tag-filter-empty');
+  const postCards = Array.from(document.querySelectorAll('[data-post-card]'));
+  const emptyState = document.getElementById('article-empty-state');
+  
+  const applyArticleTagFilter = (tag: string) => {
+    let visibleCount = 0;
+    
+    postCards.forEach((card) => {
+      const tags = (card.getAttribute('data-tags') || '').split('|');
+      const matched = !tag || tags.some((v) => v === tag || v.startsWith(`${tag}/`));
+      
+      if (matched) {
+         card.classList.remove('hidden');
+         visibleCount++;
+      } else {
+         card.classList.add('hidden');
+      }
+    });
+
+    if (activeTagPanel && activeTagName) {
+      if (tag) {
+         activeTagPanel.classList.remove('hidden');
+         activeTagPanel.classList.add('flex');
+         activeTagName.textContent = `#${tag}`;
+      } else {
+         activeTagPanel.classList.add('hidden');
+         activeTagPanel.classList.remove('flex');
+      }
+    }
+
+    if (emptyState) {
+       emptyState.classList.toggle('hidden', visibleCount > 0);
+       emptyState.classList.toggle('flex', visibleCount === 0);
+    }
+
+    // Update Sidebar Tag Active State
+    document.querySelectorAll('.tag-item').forEach(item => {
+      if (item.getAttribute('data-tag-group') === tag) {
+        item.classList.add('tag-active');
+        item.classList.remove('text-base-content/70', 'hover:bg-base-200/50');
+      } else {
+        item.classList.remove('tag-active');
+        item.classList.add('text-base-content/70', 'hover:bg-base-200/50');
+      }
+    });
+  };
+
+  document.querySelectorAll('.article-tag-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      applyArticleTagFilter(btn.getAttribute('data-tag') || '');
+    });
+  });
+
+  const clearFilter = () => applyArticleTagFilter('');
+  clearFilterBtn?.addEventListener('click', clearFilter);
+  clearFilterBtnEmpty?.addEventListener('click', clearFilter);
+
+  // Global event listener for sidebar
+  document.querySelectorAll('.tag-nav-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tag = btn.getAttribute('data-tag') || '';
+      applyArticleTagFilter(tag);
+    });
+  });
+</script>

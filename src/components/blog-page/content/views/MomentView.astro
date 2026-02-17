@@ -1,0 +1,515 @@
+---
+// ============================================
+// MomentView.astro - Encapsulated WeChat Moments View
+// ============================================
+import MomentPublishModal from '../../modals/MomentPublishModal.astro';
+import ContentView from '../ContentView.astro';
+import { moments } from '../../../../data/moments.ts';
+import PublishIcon from "../../icons/PublishIcon.astro";
+
+// 图片网格样式计算
+const getImageGridClass = (count: number) => {
+  if (count === 1) return 'moment-img-grid moment-img-1';
+  if (count === 2) return 'moment-img-grid moment-img-2';
+  if (count === 3) return 'moment-img-grid moment-img-3';
+  if (count === 4) return 'moment-img-grid moment-img-4';
+  if (count <= 6) return 'moment-img-grid moment-img-6';
+  return 'moment-img-grid moment-img-9';
+};
+---
+
+<!-- 发布模态框，无实际功能 -->
+<MomentPublishModal />
+
+<ContentView viewId="moment-view" title="MOMENT" count={moments.length} hidden={true}>
+  <Fragment slot="header-right">
+    <PublishIcon/>
+  </Fragment>
+
+  <!-- 个人封面区域 -->
+  <section class="moment-cover w-full">
+    <!-- 封面背景 -->
+    <div class="moment-cover-bg">
+      <div class="moment-cover-overlay"></div>
+    </div>
+    <!-- 个人信息 -->
+    <div class="moment-cover-profile">
+      <span class="moment-cover-name">Elon Woo</span>
+      <div class="moment-cover-avatar">EW</div>
+    </div>
+  </section>
+
+  <!-- 朋友圈动态列表 -->
+  <section id="moment-list" class="moment-list w-full">
+    {moments.map((post) => (
+      <article class="moment-card" data-moment-id={post.id}>
+        <!-- 头像 -->
+        <div class="moment-avatar" style={`background:${post.avatarBg}; color:${post.avatarColor};`}>
+          {post.avatar}
+        </div>
+
+        <!-- 内容区 -->
+        <div class="moment-body">
+          <!-- 昵称 -->
+          <h3 class="moment-name">{post.name}</h3>
+
+          <!-- 正文 -->
+          {post.text && <p class="moment-text">{post.text}</p>}
+
+          <!-- 图片网格 -->
+          {post.images.length > 0 && (
+            <div class={getImageGridClass(post.images.length)}>
+              {post.images.map((img) => (
+                <div class="moment-img-item">
+                  {img.startsWith('#') ? (
+                    <div class="moment-img-placeholder" style={`background:${img};`}></div>
+                  ) : (
+                    <img src={img} alt="朋友圈图片" loading="lazy" />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <!-- 底部信息栏：时间 + 位置 + 操作 -->
+          <div class="moment-meta">
+            <div class="moment-meta-left">
+              <span class="moment-time">{post.time}</span>
+              {post.location && (
+                <span class="moment-location">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0 1 15 0Z" />
+                  </svg>
+                  {post.location}
+                </span>
+              )}
+            </div>
+            <!-- 操作按钮 -->
+            <button class="moment-action-trigger" type="button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+              </svg>
+            </button>
+          </div>
+          
+          <!-- 点赞和评论区 -->
+          {(post.likes.length > 0 || post.comments.length > 0) && (
+            <div class="moment-social">
+              <!-- 点赞 -->
+              {post.likes.length > 0 && (
+                <div class="moment-likes">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.765-2.067C4.057 12.626 2.5 10.68 2.5 8.312 2.5 5.946 4.318 4.5 6.25 4.5c1.206 0 2.346.592 3.25 1.608C10.404 5.092 11.544 4.5 12.75 4.5c1.932 0 3.75 1.446 3.75 3.812 0 2.368-1.557 4.314-3.202 5.841a22.045 22.045 0 01-3.927 2.749l-.019.01-.005.003L10 17.25l-.347-.335z" />
+                  </svg>
+                  <span>{post.likes.join('，')}</span>
+                </div>
+              )}
+
+              <!-- 分隔线 -->
+              {post.likes.length > 0 && post.comments.length > 0 && (
+                <div class="moment-social-divider"></div>
+              )}
+
+              <!-- 评论 -->
+              {post.comments.length > 0 && (
+                <div class="moment-comments">
+                  {post.comments.map((c) => (
+                    <p class="moment-comment-item">
+                      <span class="moment-comment-author">{c.name}</span>
+                      {c.replyTo && (
+                        <Fragment>
+                          <span class="moment-comment-reply-arrow">回复</span>
+                          <span class="moment-comment-author">{c.replyTo}</span>
+                        </Fragment>
+                      )}
+                      <span class="moment-comment-colon">：</span>
+                      <span>{c.text}</span>
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </article>
+    ))}
+  </section>
+
+</ContentView>
+
+<style>
+
+
+  .moment-cover {
+    position: relative;
+    height: 280px;
+  }
+  .moment-cover-bg {
+    position: absolute;
+    inset: 0;
+  }
+  .moment-cover-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.25) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(0,0,0,0.15) 0%, transparent 50%);
+  }
+
+  .moment-cover-profile {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .moment-cover-name {
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.35);
+  }
+  .moment-cover-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #555;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+
+  .moment-publish-btn {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .moment-publish-btn:hover {
+    background: rgba(255,255,255,0.35);
+    transform: scale(1.05);
+  }
+
+  /* ============================================
+     动态卡片
+     ============================================ */
+  .moment-list {
+    padding: 0;
+  }
+  .moment-card {
+    display: flex;
+    gap: 12px;
+    padding: 20px;
+    border-bottom: 0.5px solid var(--wechat-divider);
+  }
+
+  .moment-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .moment-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .moment-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--wechat-blue);
+    margin: 0 0 6px 0;
+    line-height: 1;
+  }
+
+  .moment-text {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--wechat-text);
+    margin: 0 0 8px 0;
+    word-break: break-word;
+  }
+
+  /* ============================================
+     图片网格 - 微信朋友圈布局规则
+     ============================================ */
+  .moment-img-grid {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .moment-img-item {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #f5f5f5;
+  }
+  .moment-img-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .moment-img-placeholder {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* 1张图：大图，最宽200px */
+  .moment-img-1 {
+    grid-template-columns: 1fr;
+    max-width: 200px;
+  }
+  .moment-img-1 .moment-img-item { aspect-ratio: 4/3; }
+
+  /* 2张图：横排 */
+  .moment-img-2 {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 260px;
+  }
+
+  /* 3张图：横排 */
+  .moment-img-3 {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 300px;
+  }
+
+  /* 4张图：2×2 */
+  .moment-img-4 {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 260px;
+  }
+
+  /* 5-6张图：3列 */
+  .moment-img-6 {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 300px;
+  }
+
+  /* 7-9张图：3列 */
+  .moment-img-9 {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 300px;
+  }
+
+  /* ============================================
+     底部信息栏
+     ============================================ */
+  .moment-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .moment-meta-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .moment-time {
+    font-size: 12px;
+    color: var(--wechat-gray);
+  }
+  .moment-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    color: var(--wechat-blue);
+  }
+
+  .moment-action-trigger {
+    width: 30px;
+    height: 22px;
+    border-radius: 4px;
+    background: var(--wechat-comment-bg);
+    border: 0.5px solid var(--wechat-divider);
+    color: var(--wechat-blue);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .moment-action-trigger:hover {
+    background: #eaeaea;
+  }
+
+  /* ============================================
+     点赞和评论区
+     ============================================ */
+  .moment-social {
+    background: var(--wechat-comment-bg);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  /* 小三角箭头 */
+  .moment-social::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 12px;
+    width: 10px;
+    height: 10px;
+    background: var(--wechat-comment-bg);
+    transform: rotate(45deg);
+  }
+
+  .moment-likes {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: var(--wechat-blue);
+    line-height: 1.5;
+  }
+  .moment-likes svg {
+    margin-top: 2px;
+    color: #e74c3c;
+  }
+
+  .moment-social-divider {
+    height: 0.5px;
+    background: #e0e0e0;
+    margin: 0 8px;
+  }
+
+  .moment-comments {
+    padding: 6px 10px;
+  }
+  .moment-comment-item {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--wechat-text);
+    margin: 0;
+    padding: 2px 0;
+  }
+  .moment-comment-author {
+    color: var(--wechat-blue);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .moment-comment-reply-arrow {
+    font-size: 12px;
+    color: var(--wechat-gray);
+    margin: 0 3px;
+  }
+  .moment-comment-colon {
+    color: var(--wechat-text);
+  }
+
+  /* ============================================
+     响应式调整
+     ============================================ */
+  @media (max-width: 640px) {
+    .moment-cover { height: 240px; }
+    .moment-cover-avatar { width: 56px; height: 56px; font-size: 16px; }
+    .moment-cover-name { font-size: 15px; }
+    .moment-card { padding: 12px; gap: 10px; }
+    .moment-avatar { width: 38px; height: 38px; font-size: 13px; }
+    .moment-name { font-size: 14px; }
+    .moment-text { font-size: 14px; }
+  }
+</style>
+
+<script>
+  // 发布按钮点击 → 打开模态框
+  document.getElementById('publish-btn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('open-publish-modal'));
+  });
+
+  // 监听新动态发布事件
+  window.addEventListener('moment-published', ((event: CustomEvent) => {
+    const { text, images, location } = event.detail;
+    const list = document.getElementById('moment-list');
+    if (!list) return;
+
+    // 构建图片HTML
+    let imgCount = images.length;
+    let gridClass = 'moment-img-grid';
+    if (imgCount === 1) gridClass += ' moment-img-1';
+    else if (imgCount === 2) gridClass += ' moment-img-2';
+    else if (imgCount === 3) gridClass += ' moment-img-3';
+    else if (imgCount === 4) gridClass += ' moment-img-4';
+    else if (imgCount <= 6) gridClass += ' moment-img-6';
+    else gridClass += ' moment-img-9';
+
+    const imagesHtml = imgCount > 0
+      ? `<div class="${gridClass}">${images.map((url: string) =>
+          `<div class="moment-img-item" style="overflow:hidden;border-radius:4px;">
+            <img src="${url}" alt="图片" style="width:100%;height:100%;object-fit:cover;" />
+          </div>`
+        ).join('')}</div>`
+      : '';
+
+    const locationHtml = location
+      ? `<span class="moment-location">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0 1 15 0Z" />
+          </svg>
+          ${location}
+        </span>`
+      : '';
+
+    const card = document.createElement('article');
+    card.className = 'moment-card';
+    card.innerHTML = `
+      <div class="moment-avatar" style="background:#fef3c7;color:#92400e;">EW</div>
+      <div class="moment-body">
+        <h3 class="moment-name">Elon Woo</h3>
+        ${text ? `<p class="moment-text">${text}</p>` : ''}
+        ${imagesHtml}
+        <div class="moment-meta">
+          <div class="moment-meta-left">
+            <span class="moment-time">刚刚</span>
+            ${locationHtml}
+          </div>
+          <button class="moment-action-trigger" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    `;
+
+    // 插入到列表最前面
+    list.insertBefore(card, list.firstChild);
+
+    // 添加入场动画
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(-10px)';
+    card.style.transition = 'all 0.35s ease';
+    requestAnimationFrame(() => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    });
+  }) as EventListener);
+</script>

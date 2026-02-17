@@ -2,12 +2,35 @@
 import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
 import Dock from "../components/dock/ui/Dock.astro";
-import PlayBot from "../components/bot/PlayBot.astro";
+import PlayBot from "../components/shared/bot/PlayBot.astro";
 import Footer from "../components/shared/Footer.astro";
-import TerminalModal from "../components/terminal/TerminalModal.astro";
+import TerminalModal from "../components/shared/terminal/TerminalModal.astro";
 import Mobile from "../components/mobile/Mobile.astro";
 
-const { pageTitle } = Astro.props;
+interface Props {
+  pageTitle?: string;
+  contentWidth?: "5xl" | "6xl" | "7xl" | "full";
+  contentClass?: string;
+  mainClass?: string;
+  showElonFloat?: boolean;
+}
+
+const {
+  pageTitle = "",
+  contentWidth = "7xl",
+  contentClass = "",
+  mainClass = "",
+  showElonFloat = true,
+} = Astro.props as Props;
+
+const contentWidthClassMap = {
+  "5xl": "max-w-5xl",
+  "6xl": "max-w-6xl",
+  "7xl": "max-w-7xl",
+  full: "max-w-none",
+} as const;
+
+const contentWidthClass = contentWidthClassMap[contentWidth] ?? "max-w-7xl";
 ---
 
 <html lang="zh-CN">
@@ -41,20 +64,24 @@ const { pageTitle } = Astro.props;
     </div>
 
     <!-- Main content -->
-    <main class="w-full">
-      <slot />
+    <main class={`w-full flex-1 ${mainClass}`.trim()}>
+      <div class={`site-content w-full mx-auto px-4 sm:px-6 lg:px-8 ${contentWidthClass} ${contentClass}`.trim()}>
+        <slot />
+      </div>
     </main>
 
     <!--Global footer -->
     <Footer />
 
     <!-- TODO: Add AIbot command to route AI assistant interactions via terminal. -->
-    <div
-      id="elon-bot"
-      class="hidden md:block fixed left-0 bottom-0 z-70 w-50 h-50"
-    >
-      <PlayBot />
-    </div>
+    {showElonFloat && (
+      <div
+        id="elon-bot"
+        class="hidden md:block fixed left-0 bottom-0 z-70 w-50 h-50"
+      >
+        <PlayBot />
+      </div>
+    )}
 
     <script>
       import "../scripts/globalShortcuts.js";
