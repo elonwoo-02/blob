@@ -28,7 +28,7 @@ const displayEntries = entries;
       <h3 class="text-2xl font-semibold">{title}</h3>
       <p class="text-sm">{subtitle}</p>
     </div>
-    <span class="ml-auto rounded-full px-3 py-1 text-xs border border-emerald-500/40 shadow-[inset_0_0_20px_rgba(16,185,129,0.15)]">{tagLabel}</span>
+    <span class="ml-auto rounded-full px-3 py-1 text-xs border border-[#2E9CCA]/40 shadow-[inset_0_0_20px_rgba(46,156,202,0.15)]">{tagLabel}</span>
   </div>
   <!-- 时间轴主体：各条目之间暂时无分割 -->
   <div class="">
@@ -41,14 +41,14 @@ const displayEntries = entries;
           <div class="flex gap-4">
             <!-- 时间轴图标列：点 + 竖线 -->
             <div class="flex flex-col items-center">
-              <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
-              {!isLast && <span class="mt-2 h-full w-px bg-emerald-500/40"></span>}
+              <span class="h-2 w-2 rounded-full bg-[#2E9CCA] shadow-[0_0_8px_rgba(46,156,202,0.6)]"></span>
+              {!isLast && <span class="mt-2 h-full w-px bg-[#2E9CCA]/40"></span>}
             </div>
             <!-- 内容列：日期、标签、标题、摘要、细节 -->
-            <div class="flex-1 space-y-2 border-l border-emerald-500/10 pl-4">
-              <div class="flex flex-wrap items-center justify-between gap-2 text-xs uppercase tracking-[0.3em] text-emerald-300">
+            <div class="flex-1 space-y-2 border-l border-[#2E9CCA]/10 pl-4">
+              <div class="flex flex-wrap items-center justify-between gap-2 text-xs uppercase tracking-[0.3em] text-[#2E9CCA]">
                 <span>{entry.date}</span>
-                <span class="rounded-full border border-emerald-500/40 px-3 py-1 text-[10px]">{entry.tag}</span>
+                <span class="rounded-full border border-[#2E9CCA]/40 px-3 py-1 text-[10px]">{entry.tag}</span>
               </div>
               <h4 class="text-lg font-semibold">{entry.title}</h4>
               <p class="text-sm">{entry.summary}</p>
@@ -56,7 +56,7 @@ const displayEntries = entries;
               <ul class="space-y-1 text-sm">
                 {entry.details.map((detail) => (
                   <li class="flex items-start gap-2">
-                    <span class="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                    <span class="mt-1 h-1.5 w-1.5 rounded-full bg-[#2E9CCA]"></span>
                     <span>{detail}</span>
                   </li>
                 ))}
