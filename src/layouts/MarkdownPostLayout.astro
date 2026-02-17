@@ -1,6 +1,5 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
-import SectionTreeNode from "../components/post/SectionTreeNode.astro";
 
 const {
   frontmatter,
@@ -167,17 +166,6 @@ const sectionTree = buildSectionTree(sectionHeadings);
             ⇤
           </button>
         </div>
-        {
-          sectionTree.length > 0 ? (
-            <ul id="section-tree" class="space-y-2">
-              {sectionTree.map((section) => (
-                <SectionTreeNode node={section} />
-              ))}
-            </ul>
-          ) : (
-            <p class="text-sm text-base-content/60">暂无章节。</p>
-          )
-        }
       </aside>
     </div>
   </div>

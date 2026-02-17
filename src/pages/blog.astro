@@ -17,6 +17,7 @@ import DrawerToggle from "../components/ui/DrawerToggle.astro";
 import BlogDrawerSidebar from "../components/blog/BlogDrawerSidebar.astro";
 import MomentView from "../components/views/MomentView.astro";
 import ArticleView from "../components/views/ArticleView.astro";
+import NoteView from "../components/views/NoteView.astro";
 
 const pageTitle = "";
 
@@ -89,10 +90,10 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-  <!-- Wrapper容器：sidebar + main-content一起居中 -->
+  <!-- Wrapper容器：sidebar + main-content -->
   <div
     id="blog-wrapper"
-    class="flex justify-center h-screen overflow-hidden"
+    class="flex h-screen overflow-hidden justify-center items-center"
     style="transition: all 500ms cubic-bezier(0.4, 0, 0.2, 1);"
   >
     <!-- Blog专用Drawer侧边栏 -->
@@ -105,14 +106,16 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
     <!-- 主内容区域 -->
     <div
       id="main-content"
-      class="blog-page blog-page--index-theme relative min-w-0 h-full overflow-y-auto"
+      class="blog-page blog-page--index-theme relative h-full overflow-y-auto"
       style="transition: background-color 500ms; scroll-behavior: smooth;"
     >
       <!-- Drawer侧边栏切换按钮 -->
       <!-- Article视图 - 默认显示 -->
       <ArticleView pinnedPosts={pinnedPosts} sortedPosts={sortedPosts} />
 
+      <!-- Moment & Note views (hidden by default) -->
       <MomentView />
+      <NoteView hidden={true} />
 
       <!-- Toast提示框 - 用于显示复制链接等操作反馈 -->
       <div id="toast" class="toast hidden" role="status" aria-live="polite">
@@ -123,20 +126,20 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
         // ============================================
         // 视图切换功能
         // ============================================
-        // 监听导航按钮点击，切换Article和Moment视图
+        // 监听导航按钮点击，切换 Article/Moment/Note 视图（显示目标、隐藏其余）
         window.addEventListener("view-changed", (event) => {
           const { view } = event.detail;
 
-          const articleView = document.getElementById("article-view");
-          const momentView = document.getElementById("moment-view");
+          const views = {
+            article: document.getElementById("article-view"),
+            moment: document.getElementById("moment-view"),
+            note: document.getElementById("note-view"),
+          };
 
-          if (view === "moment") {
-            articleView?.classList.add("hidden");
-            momentView?.classList.remove("hidden");
-          } else if (view === "article") {
-            momentView?.classList.add("hidden");
-            articleView?.classList.remove("hidden");
-          }
+          // Hide all views, then show the requested one (if exists)
+          Object.values(views).forEach((el) => el?.classList.add("hidden"));
+          const target = views[view];
+          if (target) target.classList.remove("hidden");
         });
 
         // Drawer状态变化处理

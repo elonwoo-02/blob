@@ -1,18 +1,18 @@
 ---
-// ArticleView.astro - Article list layout (Flomo style)
+// ArticleView.astro - Article list layout (Note style)
 import { type CollectionEntry } from 'astro:content';
 import { tagToSlug } from '../../utils/tags';
-import PostActionBar from '../post/PostActionBar.astro';
-import DrawerToggle from '../ui/DrawerToggle.astro';
+import ContentView from './ContentView.astro';
 
 interface Props {
   pinnedPosts?: CollectionEntry<'blog'>[];
   sortedPosts?: CollectionEntry<'blog'>[];
+  hidden?: boolean;
 }
 
-const { pinnedPosts = [], sortedPosts = [] } = Astro.props;
+const { pinnedPosts = [], sortedPosts = [], hidden = false } = Astro.props;
 
-// 展开标签路径
+// 展开标签路径（保持与其他视图相同的逻辑）
 const expandTagPaths = (tag: string) => {
   const segments = tag.split('/').map((s) => s.trim()).filter(Boolean);
   return segments.map((_, i) => segments.slice(0, i + 1).join('/'));
@@ -20,179 +20,149 @@ const expandTagPaths = (tag: string) => {
 
 const getPostTagPaths = (tags: string[]) =>
   [...new Set(tags.flatMap((tag) => expandTagPaths(tag)))].join('|');
+
+const formatTime = (date: Date) => {
+  return date.toLocaleDateString('zh-CN', { 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit' 
+  }) + ' ' + date.toLocaleTimeString('zh-CN', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  });
+};
 ---
 
-<!-- Article视图 - Flomo风格列表 -->
-<div id="article-view" class="view-content relative z-10 pb-20 w-full">
-  <section class="view-section mt-4 space-y-6 max-w-2xl mx-auto" data-base-width="42rem">
-
-    <!-- 顶部状态栏 - 包含DrawerToggle且标题居中 -->
-    <div class="relative flex items-center justify-center mb-6 px-4 min-h-[4rem]">
-       <div class="absolute left-4 top-1/2 -translate-y-1/2 z-50">
-          <DrawerToggle />
-       </div>
-       <div class="flex items-center gap-2">
-          <h2 class="text-xl font-bold text-base-content/80">ARTICLE</h2>
-          <span class="text-sm font-mono text-base-content/40">{sortedPosts.length}</span>
-       </div>
-       
-       <!-- Search Icon - Symmetrical to DrawerToggle -->
-       <button 
-         class="absolute top-1/2 -translate-y-1/2 right-4 z-50 p-2.5 hover:bg-base-200 text-base-content/40 hover:text-base-content/70 rounded-xl transition-all duration-300"
-         aria-label="Search posts"
-       >
-         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-           <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-         </svg>
-       </button>
-       
-       <!-- 当前标签筛选面板 - 悬浮在搜索按钮左侧 -->
-       <div id="active-tag-panel" class="hidden absolute right-16 items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm animate-in fade-in slide-in-from-top-2">
-          <span class="font-medium">Filter:</span>
-          <span id="active-tag-name" class="font-bold"></span>
-          <button id="clear-tag-filter" type="button" class="ml-2 opacity-60 hover:opacity-100" aria-label="Clear filter">
-             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-               <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-             </svg>
-          </button>
-       </div>
-    </div>
-
-    <!-- 文章列表容器 -->
-    <div id="post-list" class="space-y-4">
-      
-      <!-- 置顶文章 (Pinned) -->
-      {pinnedPosts.length > 0 && pinnedPosts.map((post) => (
-        <article 
-          class="group relative bg-base-100 rounded-xl p-5 shadow-sm border border-base-200/60 hover:shadow-md transition-all duration-300"
-          data-post-card
-          data-tags={getPostTagPaths(post.data.tags)}
-        >
-          <!-- 顶部元数据：时间 -->
-          <div class="flex items-center justify-between mb-3 text-xs text-base-content/40 font-mono">
-             <time datetime={post.data.pubDate.toISOString()}>
-               {post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })} 
-               <span class="mx-1">·</span>
-               {post.data.pubDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
-             </time>
-             <span class="flex items-center gap-1 text-warning bg-warning/10 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                </svg>
-                Pinned
-             </span>
-          </div>
-
-          <!-- 内容主体 -->
-          <div class="mb-4">
-             <h3 class="text-lg font-bold text-base-content/90 mb-2 leading-tight group-hover:text-primary transition-colors">
-               <a href={`/posts/${post.id}/`} target="_blank" class="focus:outline-none">
-                  <span class="absolute inset-0 z-0"></span>
-                  {post.data.title}
-               </a>
-             </h3>
-             <p class="text-sm text-base-content/70 leading-relaxed line-clamp-3">
-                {post.data.description}
-             </p>
-          </div>
-
-          <!-- 底部：标签与操作 -->
-          <div class="flex items-center justify-between relative z-10 pt-2 border-t border-base-100">
-             <div class="flex flex-wrap gap-2">
-                {post.data.tags.map((tag: string) => (
-                   <button class="tag-filter-btn text-xs text-primary/80 hover:bg-primary/10 px-2 py-1 rounded transition-colors" data-tag={tag}>
-                      #{tag}
-                   </button>
-                ))}
-             </div>
-             <!-- 这里的PostActionBar可以简化或隐藏，保持flomo的简洁 -->
-             <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <PostActionBar likeCount={post.data.likeCount} shareCount={post.data.shareCount} />
-             </div>
-          </div>
-        </article>
-      ))}
-
-      <!-- 普通文章列表 -->
-      {sortedPosts.map((post) => (
-        !post.data.docked && (
-        <article 
-          class="group relative bg-base-100 rounded-xl p-5 shadow-sm border border-base-200/60 hover:shadow-md transition-all duration-300"
-          data-post-card
-          data-tags={getPostTagPaths(post.data.tags)}
-        >
-          <!-- 顶部元数据：时间 -->
-          <div class="flex items-center justify-between mb-3 text-xs text-base-content/40 font-mono border-b border-base-100 pb-2">
-             <time datetime={post.data.pubDate.toISOString()}>
-               {post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })} 
-               <span class="mx-1">·</span>
-               {post.data.pubDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
-             </time>
-          </div>
-
-          <!-- 内容主体 -->
-          <div class="mb-3">
-             <h3 class="text-lg font-bold text-base-content/90 mb-2 leading-tight group-hover:text-primary transition-colors">
-               <a href={`/posts/${post.id}/`} target="_blank" class="focus:outline-none">
-                  <span class="absolute inset-0 z-0"></span>
-                  {post.data.title}
-               </a>
-             </h3>
-             <p class="text-sm text-base-content/70 leading-relaxed line-clamp-4">
-                {post.data.description}
-             </p>
-          </div>
-
-          <!-- 底部：标签 -->
-          <div class="flex items-center justify-between relative z-10">
-             <div class="flex flex-wrap gap-2">
-                {post.data.tags.map((tag: string) => (
-                   <button class="tag-filter-btn text-xs text-primary/80 hover:text-primary hover:bg-primary/5 px-1.5 py-0.5 rounded transition-colors" data-tag={tag}>
-                      #{tag}
-                   </button>
-                ))}
-             </div>
-             
-             <!-- Show More / Actions -->
-             <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <button class="btn btn-ghost btn-xs btn-circle" aria-label="More options">
-                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
-                   </svg>
-                </button>
-             </div>
-          </div>
-        </article>
-        )
-      ))}
-      
-    </div>
-    
-    <!-- 空状态提示 -->
-    <div id="empty-filter-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
-       <div class="w-16 h-16 rounded-full bg-base-200/50 flex items-center justify-center mb-4 text-base-content/30">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+<!-- Article视图 - use shared ContentView -->
+<ContentView 
+  viewId="article-view" 
+  title="ARTICLE"
+  count={sortedPosts.length}
+  hidden={hidden}
+>
+  <Fragment slot="header-right">
+    <!-- Active Tag Panel (Sync with NoteView logic) -->
+    <div id="article-active-tag-panel" class="hidden items-center gap-2 px-3 py-1.5 rounded-lg bg-[#3A7A8F]/10 text-[#3A7A8F] text-sm animate-in fade-in slide-in-from-top-2">
+       <span class="font-medium">Filter:</span>
+       <span id="article-active-tag-name" class="font-bold"></span>
+       <button id="article-clear-tag-filter" type="button" class="ml-2 opacity-60 hover:opacity-100" aria-label="Clear filter">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
           </svg>
-       </div>
-       <p class="text-base-content/60">No notes found.</p>
-       <button id="clear-tag-filter-empty" class="btn btn-link btn-sm mt-2 text-primary">Show all</button>
+       </button>
     </div>
-  </section>
-</div>
+  </Fragment>
+
+  <div id="post-list" class="space-y-4 w-[600px]">
+    <!-- 置顶文章 (Pinned) -->
+    {pinnedPosts.length > 0 && pinnedPosts.map((post) => (
+      <article 
+        class="arti-card bg-base-100 rounded-xl p-5 shadow-sm border border-base-200/60"
+        data-post-card
+        data-tags={getPostTagPaths(post.data.tags)}
+      >
+        <!-- Time meta with pinned indicator -->
+        <div class="flex items-center justify-between mb-3 text-xs text-base-content/40 font-mono border-b border-base-100 pb-2">
+           <time datetime={post.data.pubDate.toISOString()}>
+             {formatTime(post.data.pubDate)}
+           </time>
+           <span class="flex items-center gap-1 text-warning bg-warning/10 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+              </svg>
+              Pinned
+           </span>
+        </div>
+
+        <!-- Title -->
+        <div class="mb-3">
+           <h3 class="text-lg font-bold text-base-content/90 mb-2 leading-tight hover:text-[#3A7A8F] transition-colors">
+             <a href={`/posts/${post.id}/`} target="_blank" class="focus:outline-none">
+                {post.data.title}
+             </a>
+           </h3>
+           {post.data.description && (
+             <p class="text-sm text-base-content/70 leading-relaxed">
+                {post.data.description}
+             </p>
+           )}
+        </div>
+
+        <!-- Tags -->
+        <div class="flex flex-wrap gap-2">
+          {post.data.tags.map((tag) => (
+            <button class="article-tag-btn text-xs text-[#3A7A8F]/80 hover:text-[#3A7A8F] hover:bg-[#3A7A8F]/5 px-1.5 py-0.5 rounded transition-colors" data-tag={tag}>
+              #{tag}
+            </button>
+          ))}
+        </div>
+      </article>
+    ))}
+
+    <!-- 普通文章列表 -->
+    {sortedPosts.map((post) => (
+      !post.data.docked && (
+      <article 
+        class="arti-card bg-base-100 rounded-xl p-5 shadow-sm border border-base-200/60"
+        data-post-card
+        data-tags={getPostTagPaths(post.data.tags)}
+      >
+        <!-- Time meta -->
+        <div class="flex items-center justify-between mb-3 text-xs text-base-content/40 font-mono border-b border-base-100 pb-2">
+           <time datetime={post.data.pubDate.toISOString()}>
+             {formatTime(post.data.pubDate)}
+           </time>
+        </div>
+
+        <!-- Title -->
+        <div class="mb-3">
+           <h3 class="text-lg font-bold text-base-content/90 mb-2 leading-tight hover:text-[#3A7A8F] transition-colors">
+             <a href={`/posts/${post.id}/`} target="_blank" class="focus:outline-none">
+                {post.data.title}
+             </a>
+           </h3>
+           {post.data.description && (
+             <p class="text-sm text-base-content/70 leading-relaxed">
+                {post.data.description}
+             </p>
+           )}
+        </div>
+
+        <!-- Tags -->
+        <div class="flex flex-wrap gap-2">
+          {post.data.tags.map((tag) => (
+            <button class="article-tag-btn text-xs text-[#3A7A8F]/80 hover:text-[#3A7A8F] hover:bg-[#3A7A8F]/5 px-1.5 py-0.5 rounded transition-colors" data-tag={tag}>
+              #{tag}
+            </button>
+          ))}
+        </div>
+      </article>
+      )
+    ))}
+  </div>
+
+  <!-- Empty state -->
+  <div id="article-empty-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
+     <div class="w-16 h-16 rounded-full bg-base-200/50 flex items-center justify-center mb-4 text-base-content/30">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+     </div>
+     <p class="text-base-content/60">No notes found.</p>
+     <button id="article-clear-tag-filter-empty" class="btn btn-link btn-sm mt-2 text-primary">Show all</button>
+  </div>
+</ContentView>
 
 <script>
-  // ============================================
-  // Tags Filtering Logic
-  // ============================================
-  const activeTagPanel = document.getElementById('active-tag-panel');
-  const activeTagName = document.getElementById('active-tag-name');
-  const clearFilterBtn = document.getElementById('clear-tag-filter');
-  const clearFilterBtnEmpty = document.getElementById('clear-tag-filter-empty');
+  // Filtering logic for ArticleView (same as NoteView)
+  const activeTagPanel = document.getElementById('article-active-tag-panel');
+  const activeTagName = document.getElementById('article-active-tag-name');
+  const clearFilterBtn = document.getElementById('article-clear-tag-filter');
+  const clearFilterBtnEmpty = document.getElementById('article-clear-tag-filter-empty');
   const postCards = Array.from(document.querySelectorAll('[data-post-card]'));
-  const emptyState = document.getElementById('empty-filter-state');
+  const emptyState = document.getElementById('article-empty-state');
   
-  const applyTagFilter = (tag: string) => {
+  const applyArticleTagFilter = (tag: string) => {
     let visibleCount = 0;
     
     postCards.forEach((card) => {
@@ -235,15 +205,15 @@ const getPostTagPaths = (tags: string[]) =>
     });
   };
 
-  document.querySelectorAll('.tag-filter-btn').forEach((btn) => {
+  document.querySelectorAll('.article-tag-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      applyTagFilter(btn.getAttribute('data-tag') || '');
+      applyArticleTagFilter(btn.getAttribute('data-tag') || '');
     });
   });
 
-  const clearFilter = () => applyTagFilter('');
+  const clearFilter = () => applyArticleTagFilter('');
   clearFilterBtn?.addEventListener('click', clearFilter);
   clearFilterBtnEmpty?.addEventListener('click', clearFilter);
 
@@ -251,7 +221,7 @@ const getPostTagPaths = (tags: string[]) =>
   document.querySelectorAll('.tag-nav-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const tag = btn.getAttribute('data-tag') || '';
-      applyTagFilter(tag);
+      applyArticleTagFilter(tag);
     });
   });
 </script>

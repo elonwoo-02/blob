@@ -99,7 +99,7 @@ const { heatmap, tagTree, stats } = Astro.props;
           </div>
           <div>
             <div class="text-base font-bold text-base-content/90 leading-tight">
-              My Blog
+
             </div>
             <div class="text-xs text-base-content/40 mt-0.5">
               @dimensional-debris
@@ -264,6 +264,9 @@ const { heatmap, tagTree, stats } = Astro.props;
   navItems.forEach((item) => {
     item.addEventListener("click", () => {
       const view = item.getAttribute("data-view");
+
+      // Debug log to trace clicks
+      console.log('[Sidebar] nav click ->', view, item);
 
       // 更新UI状态
       navItems.forEach((n) => {

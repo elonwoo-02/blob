@@ -3,7 +3,7 @@
 // MomentView.astro - Encapsulated WeChat Moments View
 // ============================================
 import MomentPublishModal from '../moment/MomentPublishModal.astro';
-import DrawerToggle from '../ui/DrawerToggle.astro';
+import ContentView from './ContentView.astro';
 import { moments } from '../../data/moments';
 
 // 图片网格样式计算
@@ -20,33 +20,19 @@ const getImageGridClass = (count: number) => {
 <!-- 发布模态框 -->
 <MomentPublishModal />
 
-<div id="moment-view" class="view-content relative z-10 pb-20 w-full hidden">
-  <section class="view-section mt-4 space-y-6 max-w-2xl mx-auto" data-base-width="42rem">
-    <!-- 顶部状态栏 - 对齐 ArticleView -->
-    <div class="relative flex items-center justify-center mb-6 px-4 min-h-[4rem]">
-      <div class="absolute left-4 top-1/2 -translate-y-1/2 z-50">
-        <DrawerToggle />
-      </div>
-      <div class="flex items-center gap-2">
-        <h2 class="text-xl font-bold text-base-content/80 uppercase">MOMENT</h2>
-        <span class="text-sm font-mono text-base-content/40">{moments.length}</span>
-      </div>
-      
-      <!-- Search Icon - Symmetrical to DrawerToggle -->
-      <button 
-        class="absolute top-1/2 -translate-y-1/2 right-4 z-50 p-2.5 hover:bg-base-200 text-base-content/40 hover:text-base-content/70 rounded-xl transition-all duration-300"
-        aria-label="Search moments"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-        </svg>
-      </button>
-    </div>
+<ContentView viewId="moment-view" title="MOMENT" count={moments.length} hidden={true}>
+  <Fragment slot="header-right">
+    <!-- Publish button in header -->
+    <button id="publish-btn" class="p-2.5 hover:bg-base-200 text-base-content/40 hover:text-base-content/70 rounded-xl transition-all duration-300" type="button" title="发布动态">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
+      </svg>
+    </button>
+  </Fragment>
 
-  <!-- ====================== -->
   <!-- 个人封面区域 -->
-  <!-- ====================== -->
-  <section class="moment-cover">
+  <section class="moment-cover w-[600px]">
     <!-- 封面背景 -->
     <div class="moment-cover-bg">
       <div class="moment-cover-overlay"></div>
@@ -56,19 +42,10 @@ const getImageGridClass = (count: number) => {
       <span class="moment-cover-name">Elon Woo</span>
       <div class="moment-cover-avatar">EW</div>
     </div>
-    <!-- 发布按钮（相机图标） -->
-    <button id="publish-btn" class="moment-publish-btn" type="button" title="发布动态">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
-        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
-      </svg>
-    </button>
   </section>
 
-  <!-- ====================== -->
   <!-- 朋友圈动态列表 -->
-  <!-- ====================== -->
-  <section id="moment-list" class="moment-list">
+  <section id="moment-list" class="moment-list w-[600px]">
     {moments.map((post) => (
       <article class="moment-card" data-moment-id={post.id}>
         <!-- 头像 -->
@@ -163,7 +140,7 @@ const getImageGridClass = (count: number) => {
       </article>
     ))}
   </section>
-</div>
+</ContentView>
 
 <style>
   /* ============================================
