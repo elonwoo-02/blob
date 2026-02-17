@@ -1,0 +1,8 @@
+@font-face {
+  font-family: 'VCR OSD NEUE';
+  src: url('/font/VCRosdNEUE.ttf');
+}
+
+.vcr-font {
+  font-family: 'VCR OSD NEUE', monospace;
+}

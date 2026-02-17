@@ -27,10 +27,10 @@ const { pageTitle } = Astro.props;
   </head>
 
   <body
-    class="min-h-screen bg-base-100 text-base-content pb-24 flex justify-center"
+    class="tracking-wide text-base-content flex flex-col"
   >
     <!-- Global navigation -->
-    <MobileDrawer pageTitle={pageTitle} />
+    <MobileDrawer />
     <Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
 
     <!-- Terminal entry shell: mount point only, terminal internals stay in TerminalModal -->
@@ -43,13 +43,12 @@ const { pageTitle } = Astro.props;
     </div>
 
     <!-- Main content -->
-    <main class="container mx-auto px-4 py-8 pt-24 md:pt-8">
-      <h1 class="text-4xl font-bold mb-8">{pageTitle}</h1>
-      <slot />
+    <main class="w-full">
+        <slot />
     </main>
 
-    <!-- Global footer -->
-    <!--<Footer />-->
+     <!--Global footer -->
+    <Footer />
 
     <!-- TODO: Add AIbot command to route AI assistant interactions via terminal. -->
     <div
@@ -58,6 +57,7 @@ const { pageTitle } = Astro.props;
     >
       <PlayBot />
     </div>
+
     <script>
       import "../scripts/globalShortcuts.js";
     </script>

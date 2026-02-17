@@ -81,6 +81,16 @@ export const indexTimeline: TimelineEntry[] = [
       '抽离 TimelineSection.astro 与 developmentTimeline.ts。',
     ],
   },
+  {
+    date: '2026-02-17',
+    title: '设计Hero组件',
+    tag: 'feat',
+    summary: '',
+    details: [
+      '新增Hero组件，展示头像和标签。',
+      'TODO: 后续添加背景（古代建筑，浮动的数字0和1）。',
+    ],
+  },
 ];
 
 export const aboutTimeline: TimelineEntry[] = [

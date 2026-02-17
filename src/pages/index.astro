@@ -1,40 +1,14 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import TimelineSection from '../components/timeline/TimelineSection.astro';
-import { indexTimeline, aboutTimeline, blogTimeline, bookmarksTimeline, baseLayoutTimeline, markdownPostLayoutTimeline, androidTimeline } from "../components/timeline/developmentTimeline.ts";
-import TerminalModal from "../components/terminal/TerminalModal.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/hero/Hero.astro";
+import Timeline from "../components/timeline/Timeline.astro";
 
-const pageTitle = "";
+const pageTitle = "Home";
 ---
+
 <BaseLayout pageTitle={pageTitle}>
-  <section class="relative overflow-hidden rounded-3xl">
-    <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,#10b9811a,transparent_60%)]"></div>
-    <div class="relative grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-      <!--hero左侧的-->
-      <div>
-        <!--角标-->
-        <div class="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1 text-xs font-mono uppercase tracking-[0.25em] border border-emerald-500/40 bg-emerald-500/10 text-emerald-300">
-          <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></span>
-          系统已上线
-        </div>
-        <h2 class="text-3xl font-bold md:text-4xl">Hola, soy!</h2>
-        <p class="mt-4 max-w-xl text-sm leading-relaxed md:text-base">
-          这里是你的主控终端：集中展示数据流、任务进度与关键指令。将内容组织成高对比度的终端面板，让每一次操作都像在执行深夜渗透任务。
-        </p>
-      </div>
-      <!--hero右侧的命令行-->
-      <div class="rounded-2xl p-6 font-mono text-sm">
-
-      </div>
-    </div>
-  </section>
-
-  <!--网页开发时间轴-->
-  <TimelineSection entries={baseLayoutTimeline} title="网页基础布局" subtitle="" tagLabel="baseLayout" />
-  <TimelineSection entries={markdownPostLayoutTimeline} title="文章基础布局" subtitle="" tagLabel="PostLayout" />
-  <TimelineSection entries={indexTimeline} title="首页" subtitle="" tagLabel="index" />
-  <TimelineSection entries={aboutTimeline} title="关于" subtitle="" tagLabel="about" />
-  <TimelineSection entries={blogTimeline} title="博客" subtitle="" tagLabel="blog" />
-  <TimelineSection entries={bookmarksTimeline} title="收藏" subtitle="" tagLabel="bookmarks" />
-  <TimelineSection entries={androidTimeline} title="移动端" subtitle="" tagLabel="android" />
+  <!-- Hero Component -->
+  <Hero />
+  <!-- The Development Timeline -->
+  <Timeline/>
 </BaseLayout>
