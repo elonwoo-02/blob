@@ -92,7 +92,7 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
   <!-- Wrapper容器：sidebar + main-content一起居中 -->
   <div
     id="blog-wrapper"
-    class="flex justify-center"
+    class="flex justify-center h-screen overflow-hidden"
     style="transition: all 500ms cubic-bezier(0.4, 0, 0.2, 1);"
   >
     <!-- Blog专用Drawer侧边栏 -->
@@ -105,16 +105,14 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
     <!-- 主内容区域 -->
     <div
       id="main-content"
-      class="blog-page blog-page--index-theme relative min-w-0"
+      class="blog-page blog-page--index-theme relative min-w-0 h-full overflow-y-auto"
+      style="transition: background-color 500ms; scroll-behavior: smooth;"
     >
       <!-- Drawer侧边栏切换按钮 -->
       <!-- Article视图 - 默认显示 -->
       <ArticleView pinnedPosts={pinnedPosts} sortedPosts={sortedPosts} />
 
-      <!-- Moment视图 - 朋友圈动态 -->
-      <div id="moment-view" class="view-content hidden">
-        <MomentView />
-      </div>
+      <MomentView />
 
       <!-- Toast提示框 - 用于显示复制链接等操作反馈 -->
       <div id="toast" class="toast hidden" role="status" aria-live="polite">
@@ -146,17 +144,17 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
         // 监听drawer打开/关闭事件，调整main-content内部内容的宽度
         window.addEventListener("drawer-state-changed", (event) => {
           const { isOpen } = event.detail;
-          const sections = document.querySelectorAll(
-            "#article-view section, #moment-view section",
-          );
+          const sections = document.querySelectorAll(".view-section");
 
           sections.forEach((section) => {
+            const baseWidth =
+              section.getAttribute("data-base-width") || "42rem";
+            section.style.transition =
+              "max-width 500ms cubic-bezier(0.4, 0, 0.2, 1)";
             if (isOpen) {
-              // sidebar显示时，保持max-w-2xl
-              section.style.maxWidth = "42rem"; // max-w-2xl
+              section.style.maxWidth = baseWidth;
             } else {
-              // sidebar隐藏时，扩展max-width来让main-content扩大
-              section.style.maxWidth = "calc(42rem + 320px)";
+              section.style.maxWidth = `calc(${baseWidth} + 320px)`;
             }
           });
         });
@@ -172,7 +170,13 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
 
         /* Flomo style background */
         .blog-page {
-          min-height: 100vh;
+          height: 100%;
+        }
+
+        #blog-wrapper {
+          height: 100vh;
+          overflow: hidden;
+          align-items: stretch;
         }
 
         /* Hide scrollbar for the blog page */

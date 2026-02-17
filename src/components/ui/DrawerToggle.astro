@@ -3,8 +3,7 @@
 ---
 
 <button
-  id="drawer-toggle"
-  class="absolute top-1/2 -translate-y-1/2 left-0 z-50 p-2.5 hover:bg-base-200 text-base-content/40 hover:text-base-content/70 rounded-xl transition-all duration-300 hidden"
+  class="drawer-toggle-btn absolute top-1/2 -translate-y-1/2 left-0 z-50 p-2.5 hover:bg-base-200 text-base-content/40 hover:text-base-content/70 rounded-xl transition-all duration-300 hidden"
   aria-label="Toggle Sidebar"
 >
   <svg
@@ -25,22 +24,40 @@
 </button>
 
 <script>
-  const toggleButton = document.getElementById("drawer-toggle");
+  // Use a class selector to handle multiple instances of the toggle button
+  const setupToggleButtons = () => {
+    const toggleButtons = document.querySelectorAll(".drawer-toggle-btn");
 
-  toggleButton?.addEventListener("click", () => {
-    const event = new CustomEvent("toggle-drawer");
-    window.dispatchEvent(event);
-  });
+    toggleButtons.forEach((btn) => {
+      // Avoid duplicate listeners if this script runs multiple times
+      if (btn.getAttribute("data-has-listener")) return;
 
-  // Listen for drawer state changes to hide/show the toggle button
+      btn.addEventListener("click", () => {
+        window.dispatchEvent(new CustomEvent("toggle-drawer"));
+      });
+      btn.setAttribute("data-has-listener", "true");
+    });
+  };
+
+  // Listen for drawer state changes to hide/show all toggle buttons
   window.addEventListener("drawer-state-changed", (event: any) => {
     const { isOpen } = event.detail;
-    if (isOpen) {
-      toggleButton?.classList.add("hidden");
-    } else {
-      toggleButton?.classList.remove("hidden");
-    }
+    const toggleButtons = document.querySelectorAll(".drawer-toggle-btn");
+
+    toggleButtons.forEach((btn) => {
+      if (isOpen) {
+        btn.classList.add("hidden");
+      } else {
+        btn.classList.remove("hidden");
+      }
+    });
   });
 
-  // Check initial state (if needed, but usually sidebar starts open in blog.astro)
+  // Run on initial load and handle potential dynamic content
+  setupToggleButtons();
+
+  // Also re-run when content might have changed (e.g. view switching if dynamic)
+  window.addEventListener("view-changed", () => {
+    setTimeout(setupToggleButtons, 0);
+  });
 </script>

@@ -24,19 +24,21 @@ const getPostTagPaths = (tags: string[]) =>
 
 <!-- Article视图 - Flomo风格列表 -->
 <div id="article-view" class="view-content relative z-10 pb-20 w-full">
-  <section class="mt-4 space-y-6 max-w-2xl mx-auto">
+  <section class="view-section mt-4 space-y-6 max-w-2xl mx-auto" data-base-width="42rem">
 
     <!-- 顶部状态栏 - 包含DrawerToggle且标题居中 -->
-    <div class="relative flex items-center justify-center mb-6 px-2 min-h-[3rem]">
-       <DrawerToggle />
+    <div class="relative flex items-center justify-center mb-6 px-4 min-h-[4rem]">
+       <div class="absolute left-4 top-1/2 -translate-y-1/2 z-50">
+          <DrawerToggle />
+       </div>
        <div class="flex items-center gap-2">
-          <h2 class="text-xl font-bold text-base-content/80">MEMO</h2>
+          <h2 class="text-xl font-bold text-base-content/80">ARTICLE</h2>
           <span class="text-sm font-mono text-base-content/40">{sortedPosts.length}</span>
        </div>
        
        <!-- Search Icon - Symmetrical to DrawerToggle -->
        <button 
-         class="absolute top-1/2 -translate-y-1/2 right-0 z-50 p-2.5 hover:bg-base-200 text-base-content/40 hover:text-base-content/70 rounded-xl transition-all duration-300"
+         class="absolute top-1/2 -translate-y-1/2 right-4 z-50 p-2.5 hover:bg-base-200 text-base-content/40 hover:text-base-content/70 rounded-xl transition-all duration-300"
          aria-label="Search posts"
        >
          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -45,7 +47,7 @@ const getPostTagPaths = (tags: string[]) =>
        </button>
        
        <!-- 当前标签筛选面板 - 悬浮在搜索按钮左侧 -->
-       <div id="active-tag-panel" class="hidden absolute right-12 items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm animate-in fade-in slide-in-from-top-2">
+       <div id="active-tag-panel" class="hidden absolute right-16 items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm animate-in fade-in slide-in-from-top-2">
           <span class="font-medium">Filter:</span>
           <span id="active-tag-name" class="font-bold"></span>
           <button id="clear-tag-filter" type="button" class="ml-2 opacity-60 hover:opacity-100" aria-label="Clear filter">

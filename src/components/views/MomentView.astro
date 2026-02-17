@@ -20,22 +20,28 @@ const getImageGridClass = (count: number) => {
 <!-- 发布模态框 -->
 <MomentPublishModal />
 
-<div class="moment-page">
-  <!-- 顶部状态栏 - 与ArticleView对齐 -->
-  <div class="relative flex items-center justify-center py-4 px-4 min-h-[3rem] bg-white border-b border-gray-100">
-    <DrawerToggle />
-    <h2 class="text-xl font-bold text-gray-800">MOMENT</h2>
-    
-    <!-- Search Icon -->
-    <button 
-      class="absolute top-1/2 -translate-y-1/2 right-4 z-50 p-2.5 hover:bg-base-200 text-base-content/40 hover:text-base-content/70 rounded-xl transition-all duration-300"
-      aria-label="Search moments"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-      </svg>
-    </button>
-  </div>
+<div id="moment-view" class="view-content relative z-10 pb-20 w-full hidden">
+  <section class="view-section mt-4 space-y-6 max-w-2xl mx-auto" data-base-width="42rem">
+    <!-- 顶部状态栏 - 对齐 ArticleView -->
+    <div class="relative flex items-center justify-center mb-6 px-4 min-h-[4rem]">
+      <div class="absolute left-4 top-1/2 -translate-y-1/2 z-50">
+        <DrawerToggle />
+      </div>
+      <div class="flex items-center gap-2">
+        <h2 class="text-xl font-bold text-base-content/80 uppercase">MOMENT</h2>
+        <span class="text-sm font-mono text-base-content/40">{moments.length}</span>
+      </div>
+      
+      <!-- Search Icon - Symmetrical to DrawerToggle -->
+      <button 
+        class="absolute top-1/2 -translate-y-1/2 right-4 z-50 p-2.5 hover:bg-base-200 text-base-content/40 hover:text-base-content/70 rounded-xl transition-all duration-300"
+        aria-label="Search moments"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
+      </button>
+    </div>
 
   <!-- ====================== -->
   <!-- 个人封面区域 -->
@@ -163,7 +169,7 @@ const getImageGridClass = (count: number) => {
   /* ============================================
      微信朋友圈主题色
      ============================================ */
-  .moment-page {
+  #moment-view {
     --wechat-blue: #576b95;
     --wechat-bg: #ededed;
     --wechat-card-bg: #ffffff;
@@ -173,8 +179,6 @@ const getImageGridClass = (count: number) => {
     --wechat-divider: #ececec;
     --wechat-green: #07c160;
 
-    max-width: 640px;
-    margin: 0 auto;
     min-height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   }
@@ -201,7 +205,7 @@ const getImageGridClass = (count: number) => {
   .moment-cover-profile {
     position: absolute;
     bottom: 20px;
-    right: 16px;
+    right: 20px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -230,7 +234,7 @@ const getImageGridClass = (count: number) => {
   .moment-publish-btn {
     position: absolute;
     top: 16px;
-    right: 16px;
+    right: 20px;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -258,7 +262,7 @@ const getImageGridClass = (count: number) => {
   .moment-card {
     display: flex;
     gap: 12px;
-    padding: 16px;
+    padding: 20px;
     border-bottom: 0.5px solid var(--wechat-divider);
   }
 
