@@ -18,16 +18,15 @@
       stroke-linecap="round"
       stroke-linejoin="round"
       stroke-width="2"
-      d="M4 6h16M4 12h16M4 18h16"
-    />
+      d="M4 6h16M4 12h16M4 18h16"></path>
   </svg>
 </button>
 
 <script>
-  const toggleButton = document.getElementById('drawer-toggle');
-  
-  toggleButton?.addEventListener('click', () => {
-    const event = new CustomEvent('toggle-drawer');
+  const toggleButton = document.getElementById("drawer-toggle");
+
+  toggleButton?.addEventListener("click", () => {
+    const event = new CustomEvent("toggle-drawer");
     window.dispatchEvent(event);
   });
 </script>

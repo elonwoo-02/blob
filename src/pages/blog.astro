@@ -33,6 +33,21 @@ const pinnedPosts = sortedPosts.filter((post) => post.data.docked);
 // 构建标签树结构（支持多级标签）
 const tagTree = buildTagTree(sortedPosts);
 
+// 统计数据
+const totalPosts = sortedPosts.length;
+const uniqueTags = new Set(sortedPosts.flatMap((post) => post.data.tags));
+const totalTags = uniqueTags.size;
+
+// 计算运行天数 (从第一篇文章发布日期开始)
+const firstPostDate =
+  sortedPosts.length > 0
+    ? new Date(sortedPosts[sortedPosts.length - 1].data.pubDate)
+    : new Date();
+const daysActive =
+  Math.floor(
+    (new Date().getTime() - firstPostDate.getTime()) / (1000 * 60 * 60 * 24),
+  ) + 1;
+
 // ============================================
 // 生成博客更新热力图数据（GitHub风格）
 // ============================================
@@ -49,13 +64,24 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + weekIndex * 7 + dayIndex);
 
-    // 模拟活动强度（实际项目中应从数据库获取）
-    const raw = (weekIndex * 3 + dayIndex * 5 + date.getDate()) % 10;
-    const level = raw < 2 ? 0 : raw < 4 ? 1 : raw < 7 ? 2 : raw < 9 ? 3 : 4;
+    // 模拟活动强度（实际项目中应从数据库获取，这里简单用随机数演示，后续可对接真实数据）
+    // 简单优化：如果当天有文章，则热度高
+    const dateStr = date.toISOString().split("T")[0];
+    const postCount = sortedPosts.filter(
+      (p) => p.data.pubDate.toISOString().split("T")[0] === dateStr,
+    ).length;
+
+    let level = 0;
+    if (postCount > 0) level = 4;
+    else {
+      // 保持原有的随机模拟作为填充，避免热力图太空
+      const raw = (weekIndex * 3 + dayIndex * 5 + date.getDate()) % 15;
+      level = raw < 10 ? 0 : raw < 12 ? 1 : raw < 14 ? 2 : 3;
+    }
 
     return {
       date: formatDate(date),
-      count: level * 2,
+      count: level,
       level,
     };
   }),
@@ -67,7 +93,11 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
   <DrawerToggle />
 
   <!-- Blog专用Drawer侧边栏（包含热力图和标签树） -->
-  <BlogDrawerSidebar heatmap={heatmap} tagTree={tagTree} />
+  <BlogDrawerSidebar
+    heatmap={heatmap}
+    tagTree={tagTree}
+    stats={{ totalPosts, totalTags, daysActive }}
+  />
 
   <!-- 主内容区域 - 当drawer打开时会自动调整margin-left -->
   <div
@@ -123,12 +153,19 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
     </script>
 
     <style is:global>
+      /* Flomo style background */
+      .blog-page {
+        background-color: #f6f8fa; /* Light gray background */
+        min-height: 100vh;
+      }
+
       /* Hide scrollbar for the blog page */
       html:has(.blog-page),
       body:has(.blog-page) {
         scrollbar-width: none !important; /* Firefox */
         -ms-overflow-style: none !important; /* IE and Edge */
         overflow: -moz-scrollbars-none !important;
+        background-color: #f6f8fa !important;
       }
 
       html:has(.blog-page)::-webkit-scrollbar,
