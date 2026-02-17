@@ -1,143 +1,192 @@
 ---
 // ArticleView.astro - Article card grid layout
-interface Article {
-  id: string;
-  title: string;
-  excerpt: string;
-  cover?: string;
-  tags: string[];
-  date: string;
-  readTime: string;
+import { type CollectionEntry } from 'astro:content';
+import { tagToSlug } from '../../utils/tags';
+import PostActionBar from '../post/PostActionBar.astro';
+
+interface Props {
+  pinnedPosts?: CollectionEntry<'blog'>[];
+  sortedPosts?: CollectionEntry<'blog'>[];
 }
 
-const { articles = [], selectedTags = [] } = Astro.props;
+const { pinnedPosts = [], sortedPosts = [] } = Astro.props;
 
-// Sample data if none provided
-const defaultArticles: Article[] = [
-  {
-    id: '1',
-    title: 'Astro 与 Tailwind CSS 最佳实践',
-    excerpt: '探索如何在 Astro 项目中高效使用 Tailwind CSS，实现组件化设计...',
-    cover: 'https://picsum.photos/600/400?random=10',
-    tags: ['frontend', 'tech'],
-    date: '2024-02-15',
-    readTime: '5 分钟',
-  },
-  {
-    id: '2',
-    title: '旅行日记：京都之行',
-    excerpt: '记录在京都的美好时光，从清水寺到伏见稻荷大社...',
-    cover: 'https://picsum.photos/600/400?random=11',
-    tags: ['travel', 'life'],
-    date: '2024-02-10',
-    readTime: '8 分钟',
-  },
-  {
-    id: '3',
-    title: '高效工作的秘诀',
-    excerpt: '分享我的时间管理方法和提升效率的工具...',
-    tags: ['productivity', 'thoughts'],
-    date: '2024-02-05',
-    readTime: '6 分钟',
-  },
-  {
-    id: '4',
-    title: 'TypeScript 进阶技巧',
-    excerpt: '深入理解 TypeScript 的高级类型系统...',
-    cover: 'https://picsum.photos/600/400?random=12',
-    tags: ['frontend', 'tech'],
-    date: '2024-02-01',
-    readTime: '10 分钟',
-  },
-];
+// 展开标签路径：将 "技术/前端/React" 展开为 ["技术", "技术/前端", "技术/前端/React"]
+const expandTagPaths = (tag: string) => {
+  const segments = tag
+    .split('/')
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+  return segments.map((_, index) => segments.slice(0, index + 1).join('/'));
+};
 
-const displayArticles = articles.length > 0 ? articles : defaultArticles;
+const getPostTagPaths = (tags: string[]) =>
+  [...new Set(tags.flatMap((tag) => expandTagPaths(tag)))].join('|');
 ---
 
-<div class="article-view max-w-6xl mx-auto p-4">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {displayArticles.map((article) => (
-      <article
-        class="article-card bg-base-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer"
-        data-tags={JSON.stringify(article.tags)}
-      >
-        {/* Cover Image */}
-        {article.cover && (
-          <div class="aspect-video overflow-hidden">
-            <img
-              src={article.cover}
-              alt={article.title}
-              class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-            />
+<!-- Article视图 - 默认显示 -->
+<div id="article-view" class="view-content">
+  <section class="mt-4 space-y-4">
+    <!-- 当前标签筛选面板 - 选择标签后显示 -->
+    <div id="active-tag-panel" class="hidden rounded-2xl bg-base-200/50 px-4 py-3 text-sm">
+      当前筛选：<span id="active-tag-name" class="font-semibold"></span>
+      <button id="clear-tag-filter" type="button" class="btn btn-ghost btn-xs ml-2">清除</button>
+    </div>
+    
+    <!-- 文章列表 -->
+    <div id="post-list" class="space-y-4">
+      <!-- 置顶文章区域 -->
+      {pinnedPosts.length > 0 && (
+        <section class="rounded-3xl">
+          <div class="mb-3 flex items-center justify-between">
+            <div>
+              <p class="text-sm uppercase tracking-[0.2em] text-base-content/50">置顶文章</p>
+            </div>
+            <span class="badge badge-success badge-outline">Pinned</span>
           </div>
-        )}
-        
-        {/* Content */}
-        <div class="p-5">
-          <h3 class="text-xl font-bold text-base-content mb-2 line-clamp-2">
-            {article.title}
-          </h3>
-          <p class="text-base-content/70 text-sm mb-4 line-clamp-3">
-            {article.excerpt}
-          </p>
-          
-          {/* Tags */}
-          <div class="flex flex-wrap gap-2 mb-4">
-            {article.tags.map((tag) => (
-              <span class="badge badge-sm badge-outline">{tag}</span>
+          <div class="grid gap-3 sm:grid-cols-2">
+            {pinnedPosts.map((post) => (
+              <a
+                class="group rounded-2xl p-4 transition hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(16,185,129,0.2)]"
+                href={`/posts/${post.id}/`}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <div class="flex items-center gap-3 text-xs text-base-content/60">
+                  <span class="inline-flex h-6 w-6 items-center justify-center rounded-full overflow-hidden">
+                    <img src="/avatars/default.png" alt={`${post.data.author} avatar`} width="24" height="24" loading="lazy" />
+                  </span>
+                  <span>{post.data.author}</span>
+                  <span>·</span>
+                  <time datetime={post.data.pubDate.toISOString()}>
+                    {post.data.pubDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
+                  </time>
+                </div>
+                <h3 class="mt-2 text-base font-semibold text-base-content">
+                  {post.data.title}
+                </h3>
+                <p class="mt-2 line-clamp-2 text-sm text-base-content/70">{post.data.description}</p>
+              </a>
             ))}
           </div>
+        </section>
+      )}
+      
+      <!-- 所有文章列表 -->
+      {sortedPosts.map((post) => (
+        <article
+          class="rounded-3xl transition hover:shadow-[0_10px_34px_rgba(16,185,129,0.2)]"
+          data-post-card
+          data-post-link={`/posts/${post.id}/`}
+          data-tags={getPostTagPaths(post.data.tags)}
+          data-post-id={post.id}
+        >
+          <!-- 文章标题 -->
+          <h3 class="text-xl font-semibold">
+            <a href={`/posts/${post.id}/`} target="_blank" rel="noreferrer noopener">{post.data.title}</a>
+          </h3>
           
-          {/* Meta */}
-          <div class="flex items-center justify-between text-xs text-base-content/50">
-            <span>{article.date}</span>
-            <span>{article.readTime}</span>
+          <!-- 作者和日期信息 -->
+          <div class="mt-2 flex items-center gap-3 text-sm text-base-content/70">
+            <div class="avatar">
+              <div class="w-8 rounded-full overflow-hidden">
+                <img src="/avatars/default.png" alt={`${post.data.author} avatar`} width="32" height="32" loading="lazy" />
+              </div>
+            </div>
+            <span class="font-medium text-base-content">{post.data.author}</span>
+            <time datetime={post.data.pubDate.toISOString()}>
+              {post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' })}
+            </time>
           </div>
-        </div>
-      </article>
-    ))}
-  </div>
+
+          <!-- 文章标签 -->
+          <div class="mt-3 flex flex-wrap gap-1">
+            {post.data.tags.map((tag: string) => (
+              <button class="badge tag-filter-btn card-tag" data-tag={tag} data-tag-slug={tagToSlug(tag)} type="button">#{tag}</button>
+            ))}
+          </div>
+
+          <!-- 文章描述 -->
+          <div>
+            <p class="mt-2 text-sm leading-6 text-base-content/80">{post.data.description}</p>
+          </div>
+
+          <!-- 文章操作栏（点赞、分享、收藏） -->
+          <div class="mt-4">
+            <PostActionBar
+              likeCount={post.data.likeCount ?? 0}
+              shareCount={post.data.shareCount ?? 0}
+              docked={post.data.docked ?? false}
+            />
+          </div>
+        </article>
+      ))}
+    </div>
+    
+    <!-- 空状态提示 - 当筛选后没有匹配文章时显示 -->
+    <p id="empty-filter-state" class="mt-6 hidden rounded-2xl bg-base-100 p-6 text-center text-base-content/70">
+      暂无文章匹配该标签。
+    </p>
+  </section>
 </div>
 
 <script>
-  // Listen for tag filter changes
-  window.addEventListener('tags-changed', ((event: CustomEvent) => {
-    const selectedTags = event.detail.tags;
-    const articleCards = document.querySelectorAll('.article-card');
-    
-    articleCards.forEach(card => {
-      const cardTags = JSON.parse(card.getAttribute('data-tags') || '[]');
-      
-      // Show all if no tags selected
-      if (selectedTags.length === 0) {
-        card.classList.remove('hidden');
-        return;
-      }
-      
-      // Check if card has any of the selected tags
-      const hasMatchingTag = selectedTags.some((tag: string) => cardTags.includes(tag));
-      
-      if (hasMatchingTag) {
-        card.classList.remove('hidden');
-      } else {
-        card.classList.add('hidden');
-      }
-    });
-  }) as EventListener);
-</script>
-
-<style>
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
+  // ============================================
+  // 标签筛选功能
+  // ============================================
+  const activeTagPanel = document.getElementById('active-tag-panel');
+  const activeTagName = document.getElementById('active-tag-name');
+  const clearFilterButton = document.getElementById('clear-tag-filter');
+  const postCards = Array.from(document.querySelectorAll('[data-post-card]'));
+  const emptyState = document.getElementById('empty-filter-state');
   
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  /**
+   * 应用标签筛选
+   * @param {string} tag - 要筛选的标签，空字符串表示显示所有文章
+   */
+  const applyTagFilter = (tag: string) => {
+    let visibleCount = 0;
+    
+    // 遍历所有文章卡片，根据标签显示/隐藏
+    postCards.forEach((card) => {
+      const tags = (card.getAttribute('data-tags') || '').split('|');
+      // 匹配逻辑：无标签时显示全部，或者标签完全匹配，或者是子标签
+      const matched = !tag || tags.some((value) => value === tag || value.startsWith(`${tag}/`));
+      card.classList.toggle('hidden', !matched);
+      if (matched) visibleCount += 1;
+    });
+
+    // 更新当前筛选标签显示面板
+    if (activeTagPanel && activeTagName) {
+      activeTagPanel.classList.toggle('hidden', !tag);
+      activeTagName.textContent = tag ? `#${tag}` : '';
+    }
+
+    // 显示/隐藏空状态提示
+    if (emptyState) {
+      emptyState.classList.toggle('hidden', visibleCount > 0);
+    }
+  };
+
+  // 为文章卡片上的标签按钮绑定点击事件
+  document.querySelectorAll('.tag-filter-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      applyTagFilter(button.getAttribute('data-tag') || '');
+    });
+  });
+
+  // 清除筛选按钮
+  if (clearFilterButton) {
+    clearFilterButton.addEventListener('click', () => applyTagFilter(''));
   }
-</style>
+
+  // 侧边栏标签导航按钮（从TagTreeNode组件生成）
+  // 由于Sidebar在ArticleView外部，依然需要全局监听
+  // 或者使用事件委托/自定义事件
+  document.querySelectorAll('.tag-nav-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      const tag = button.getAttribute('data-tag') || '';
+      applyTagFilter(tag);
+    });
+  });
+</script>

@@ -1,56 +1,65 @@
 ---
-import '../styles/global.css';
-import { ClientRouter } from 'astro:transitions';
+import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
 import Dock from "../components/dock/ui/Dock.astro";
 import PlayBot from "../components/bot/PlayBot.astro";
 import MobileDrawer from "../components/navigation/MobileDrawer.astro";
 import Footer from "../components/shared/Footer.astro";
 import TerminalModal from "../components/terminal/TerminalModal.astro";
 
-const {
-  pageTitle,
-} = Astro.props;
+const { pageTitle } = Astro.props;
 ---
 
 <html lang="zh-CN">
-<head>
-  <meta charset="utf-8" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/icon_favicon32x32.png" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <meta name="viewport" content="width=device-width" />
-  <meta name="generator" content={Astro.generator} />
-  <ClientRouter />
-  <title>{pageTitle}</title>
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/icon_favicon32x32.png"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <ClientRouter />
+    <title>{pageTitle}</title>
+  </head>
 
-<body class="min-h-screen bg-base-100 text-base-content flex justify-center">
-  <!-- Global navigation -->
-  <MobileDrawer pageTitle={pageTitle} />
-  <Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
+  <body
+    class="w-auto min-h-screen bg-base-100 text-base-content flex justify-center"
+  >
+    <!-- Global navigation -->
+    <MobileDrawer pageTitle={pageTitle} />
+    <Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
 
-  <!-- Terminal entry shell: mount point only, terminal internals stay in TerminalModal -->
-  <div id="shortcut-overlay" class="shortcut-overlay rounded-xl fixed inset-0 z-40 hidden flex items-center justify-center bg-[rgba(5,8,12,0.55)] backdrop-blur-sm" aria-hidden="true">
-    <TerminalModal />
-  </div>
+    <!-- Terminal entry shell: mount point only, terminal internals stay in TerminalModal -->
+    <div
+      id="shortcut-overlay"
+      class="shortcut-overlay rounded-xl fixed inset-0 z-40 hidden flex items-center justify-center bg-[rgba(5,8,12,0.55)] backdrop-blur-sm"
+      aria-hidden="true"
+    >
+      <TerminalModal />
+    </div>
 
-  <!-- Main content -->
-  <main class={`container`}>
-    <h1 class="text-4xl font-bold mb-8">{pageTitle}</h1>
-    <slot />
-  </main>
+    <!-- Main content -->
+    <main class={`container`}>
+      <h1 class="text-4xl font-bold mb-8">{pageTitle}</h1>
+      <slot />
+    </main>
 
-  <!-- Global footer -->
-  <!--<Footer />-->
+    <!-- Global footer -->
+    <!--<Footer />-->
 
-  <!-- TODO: Add AIbot command to route AI assistant interactions via terminal. -->
-  <div id="elon-bot" class="hidden md:block fixed left-0 bottom-0 z-70 w-50 h-50">
-    <PlayBot />
-  </div>
-  <script>
-    import "../scripts/globalShortcuts.js";
-  </script>
-</body>
+    <!-- TODO: Add AIbot command to route AI assistant interactions via terminal. -->
+    <div
+      id="elon-bot"
+      class="hidden md:block fixed left-0 bottom-0 z-70 w-50 h-50"
+    >
+      <PlayBot />
+    </div>
+    <script>
+      import "../scripts/globalShortcuts.js";
+    </script>
+  </body>
 </html>
-
-
-

@@ -9,22 +9,22 @@
 // 4. 左侧drawer sidebar包含博客更新热力图、视图切换和标签树
 // ============================================
 
-import '../styles/global.css';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-import { buildTagTree, tagToSlug } from '../utils/tags';
-import GithubIcon from "../components/icons/GithubIcon.astro";
-import PostActionBar from '../components/post/PostActionBar.astro';
-import DrawerToggle from '../components/ui/DrawerToggle.astro';
-import BlogDrawerSidebar from '../components/blog/BlogDrawerSidebar.astro';
-import MomentView from '../components/views/MomentView.astro';
+import "../styles/global.css";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { buildTagTree } from "../utils/tags";
+import DrawerToggle from "../components/ui/DrawerToggle.astro";
+import BlogDrawerSidebar from "../components/blog/BlogDrawerSidebar.astro";
+import MomentView from "../components/views/MomentView.astro";
+import ArticleView from "../components/views/ArticleView.astro";
 
-const pageTitle = '';
+const pageTitle = "";
 
 // 获取所有博客文章并按发布日期降序排序
-const allPosts = await getCollection('blog');
+const allPosts = await getCollection("blog");
 const sortedPosts = [...allPosts].sort(
-  (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+  (a, b) =>
+    new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
 );
 
 // 筛选出置顶文章
@@ -32,19 +32,6 @@ const pinnedPosts = sortedPosts.filter((post) => post.data.docked);
 
 // 构建标签树结构（支持多级标签）
 const tagTree = buildTagTree(sortedPosts);
-
-// 展开标签路径：将 "技术/前端/React" 展开为 ["技术", "技术/前端", "技术/前端/React"]
-const expandTagPaths = (tag: string) => {
-  const segments = tag
-    .split('/')
-    .map((segment) => segment.trim())
-    .filter(Boolean);
-  return segments.map((_, index) => segments.slice(0, index + 1).join('/'));
-};
-
-// 获取文章的所有标签路径（包括父级标签）
-const getPostTagPaths = (tags: string[]) =>
-  [...new Set(tags.flatMap((tag) => expandTagPaths(tag)))].join('|');
 
 // ============================================
 // 生成博客更新热力图数据（GitHub风格）
@@ -54,141 +41,42 @@ const startDate = new Date();
 startDate.setDate(startDate.getDate() - 364);
 
 const formatDate = (date: Date) =>
-  `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(2, '0')}-${`${date.getDate()}`.padStart(2, '0')}`;
+  `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(2, "0")}-${`${date.getDate()}`.padStart(2, "0")}`;
 
 // 生成53周 x 7天的热力图数据
 const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
   Array.from({ length: 7 }, (_, dayIndex) => {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + weekIndex * 7 + dayIndex);
-    
+
     // 模拟活动强度（实际项目中应从数据库获取）
     const raw = (weekIndex * 3 + dayIndex * 5 + date.getDate()) % 10;
     const level = raw < 2 ? 0 : raw < 4 ? 1 : raw < 7 ? 2 : raw < 9 ? 3 : 4;
-    
+
     return {
       date: formatDate(date),
       count: level * 2,
-      level
+      level,
     };
-  })
+  }),
 );
 ---
 
 <BaseLayout pageTitle={pageTitle}>
   <!-- Drawer侧边栏切换按钮 -->
   <DrawerToggle />
-  
+
   <!-- Blog专用Drawer侧边栏（包含热力图和标签树） -->
   <BlogDrawerSidebar heatmap={heatmap} tagTree={tagTree} />
-  
+
   <!-- 主内容区域 - 当drawer打开时会自动调整margin-left -->
-  <div id="main-content" class="blog-page blog-page--index-theme" style="transition: margin-left 500ms cubic-bezier(0.4, 0, 0.2, 1);">
+  <div
+    id="main-content"
+    class="blog-page blog-page--index-theme"
+    style="transition: margin-left 500ms cubic-bezier(0.4, 0, 0.2, 1);"
+  >
     <!-- Article视图 - 默认显示 -->
-    <div id="article-view" class="view-content">
-      <section class="mt-4 space-y-4">
-        <!-- 当前标签筛选面板 - 选择标签后显示 -->
-        <div id="active-tag-panel" class="hidden rounded-2xl bg-base-200/50 px-4 py-3 text-sm">
-          当前筛选：<span id="active-tag-name" class="font-semibold"></span>
-          <button id="clear-tag-filter" type="button" class="btn btn-ghost btn-xs ml-2">清除</button>
-        </div>
-        
-        <!-- 文章列表 -->
-      <div id="post-list" class="space-y-4">
-        <!-- 置顶文章区域 -->
-        {pinnedPosts.length > 0 && (
-          <section class="rounded-3xl">
-            <div class="mb-3 flex items-center justify-between">
-              <div>
-                <p class="text-sm uppercase tracking-[0.2em] text-base-content/50">置顶文章</p>
-              </div>
-              <span class="badge badge-success badge-outline">Pinned</span>
-            </div>
-            <div class="grid gap-3 sm:grid-cols-2">
-              {pinnedPosts.map((post) => (
-                <a
-                  class="group rounded-2xl p-4 transition hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(16,185,129,0.2)]"
-                  href={`/posts/${post.id}/`}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  <div class="flex items-center gap-3 text-xs text-base-content/60">
-                    <span class="inline-flex h-6 w-6 items-center justify-center rounded-full overflow-hidden">
-                      <img src="/avatars/default.png" alt={`${post.data.author} avatar`} width="24" height="24" loading="lazy" />
-                    </span>
-                    <span>{post.data.author}</span>
-                    <span>·</span>
-                    <time datetime={post.data.pubDate.toISOString()}>
-                      {post.data.pubDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
-                    </time>
-                  </div>
-                  <h3 class="mt-2 text-base font-semibold text-base-content">
-                    {post.data.title}
-                  </h3>
-                  <p class="mt-2 line-clamp-2 text-sm text-base-content/70">{post.data.description}</p>
-                </a>
-              ))}
-            </div>
-          </section>
-        )}
-        
-        <!-- 所有文章列表 -->
-        {sortedPosts.map((post) => (
-          <article
-            class="rounded-3xl transition hover:shadow-[0_10px_34px_rgba(16,185,129,0.2)]"
-            data-post-card
-            data-post-link={`/posts/${post.id}/`}
-            data-tags={getPostTagPaths(post.data.tags)}
-            data-post-id={post.id}
-          >
-            <!-- 文章标题 -->
-            <h3 class="text-xl font-semibold">
-              <a href={`/posts/${post.id}/`} target="_blank" rel="noreferrer noopener">{post.data.title}</a>
-            </h3>
-            
-            <!-- 作者和日期信息 -->
-            <div class="mt-2 flex items-center gap-3 text-sm text-base-content/70">
-              <div class="avatar">
-                <div class="w-8 rounded-full overflow-hidden">
-                  <img src="/avatars/default.png" alt={`${post.data.author} avatar`} width="32" height="32" loading="lazy" />
-                </div>
-              </div>
-              <span class="font-medium text-base-content">{post.data.author}</span>
-              <time datetime={post.data.pubDate.toISOString()}>
-                {post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' })}
-              </time>
-            </div>
-
-            <!-- 文章标签 -->
-            <div class="mt-3 flex flex-wrap gap-1">
-              {post.data.tags.map((tag: string) => (
-                <button class="badge tag-filter-btn card-tag" data-tag={tag} data-tag-slug={tagToSlug(tag)} type="button">#{tag}</button>
-              ))}
-            </div>
-
-            <!-- 文章描述 -->
-            <div>
-              <p class="mt-2 text-sm leading-6 text-base-content/80">{post.data.description}</p>
-            </div>
-
-            <!-- 文章操作栏（点赞、分享、收藏） -->
-            <div class="mt-4">
-              <PostActionBar
-                likeCount={post.data.likeCount ?? 0}
-                shareCount={post.data.shareCount ?? 0}
-                docked={post.data.docked ?? false}
-              />
-            </div>
-          </article>
-        ))}
-      </div>
-      
-      <!-- 空状态提示 - 当筛选后没有匹配文章时显示 -->
-      <p id="empty-filter-state" class="mt-6 hidden rounded-2xl bg-base-100 p-6 text-center text-base-content/70">
-        暂无文章匹配该标签。
-      </p>
-    </section>
-    </div>
+    <ArticleView pinnedPosts={pinnedPosts} sortedPosts={sortedPosts} />
 
     <!-- Moment视图 - 朋友圈动态 -->
     <div id="moment-view" class="view-content hidden">
@@ -205,108 +93,32 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
       // 视图切换功能
       // ============================================
       // 监听导航按钮点击，切换Article和Moment视图
-      window.addEventListener('view-changed', ((event) => {
+      window.addEventListener("view-changed", (event) => {
         const { view } = event.detail;
-        
-        const articleView = document.getElementById('article-view');
-        const momentView = document.getElementById('moment-view');
-        
-        if (view === 'moment') {
-          articleView?.classList.add('hidden');
-          momentView?.classList.remove('hidden');
-        } else if (view === 'article') {
-          momentView?.classList.add('hidden');
-          articleView?.classList.remove('hidden');
+
+        const articleView = document.getElementById("article-view");
+        const momentView = document.getElementById("moment-view");
+
+        if (view === "moment") {
+          articleView?.classList.add("hidden");
+          momentView?.classList.remove("hidden");
+        } else if (view === "article") {
+          momentView?.classList.add("hidden");
+          articleView?.classList.remove("hidden");
         }
-      }));
-      
+      });
+
       // ============================================
       // Drawer状态变化处理
       // ============================================
       // 监听drawer打开/关闭事件，自动调整主内容区域的左边距
-      window.addEventListener('drawer-state-changed', (event) => {
+      window.addEventListener("drawer-state-changed", (event) => {
         const { isOpen } = event.detail;
-        const mainContent = document.getElementById('main-content');
+        const mainContent = document.getElementById("main-content");
         if (mainContent) {
           // drawer打开时，内容区向右推320px；关闭时恢复
-          mainContent.style.marginLeft = isOpen ? '320px' : '0';
+          mainContent.style.marginLeft = isOpen ? "320px" : "0";
         }
-      });
-      
-      // ============================================
-      // 标签筛选功能
-      // ============================================
-      const activeTagPanel = document.getElementById('active-tag-panel');
-      const activeTagName = document.getElementById('active-tag-name');
-      const clearFilterButton = document.getElementById('clear-tag-filter');
-      const postCards = Array.from(document.querySelectorAll('[data-post-card]'));
-      const emptyState = document.getElementById('empty-filter-state');
-      
-      /**
-       * 应用标签筛选
-       * @param {string} tag - 要筛选的标签，空字符串表示显示所有文章
-       */
-      const applyTagFilter = (tag) => {
-        let visibleCount = 0;
-        
-        // 遍历所有文章卡片，根据标签显示/隐藏
-        postCards.forEach((card) => {
-          const tags = (card.getAttribute('data-tags') || '').split('|');
-          // 匹配逻辑：无标签时显示全部，或者标签完全匹配，或者是子标签
-          const matched = !tag || tags.some((value) => value === tag || value.startsWith(`${tag}/`));
-          card.classList.toggle('hidden', !matched);
-          if (matched) visibleCount += 1;
-        });
-
-        // 更新当前筛选标签显示面板
-        if (activeTagPanel && activeTagName) {
-          activeTagPanel.classList.toggle('hidden', !tag);
-          activeTagName.textContent = tag ? `#${tag}` : '';
-        }
-
-        // 显示/隐藏空状态提示
-        if (emptyState) {
-          emptyState.classList.toggle('hidden', visibleCount > 0);
-        }
-      };
-
-      // 为文章卡片上的标签按钮绑定点击事件
-      document.querySelectorAll('.tag-filter-btn').forEach((button) => {
-        button.addEventListener('click', () => {
-          applyTagFilter(button.getAttribute('data-tag') || '');
-        });
-      });
-
-      // 清除筛选按钮
-      if (clearFilterButton) {
-        clearFilterButton.addEventListener('click', () => applyTagFilter(''));
-      }
-
-      // 侧边栏标签导航按钮（从TagTreeNode组件生成）
-      document.querySelectorAll('.tag-nav-btn').forEach((button) => {
-        button.addEventListener('click', () => {
-          const tag = button.getAttribute('data-tag') || '';
-          applyTagFilter(tag);
-        });
-      });
-
-      // ============================================
-      // 标签树展开/折叠功能
-      // ============================================
-      document.querySelectorAll('.tag-toggle').forEach((toggleButton) => {
-        toggleButton.addEventListener('click', () => {
-          const listItem = toggleButton.closest('li');
-          const children = listItem?.querySelector(':scope > .tag-children');
-          if (!children) return;
-
-          // 切换展开状态
-          const expanded = toggleButton.getAttribute('data-expanded') !== 'false';
-          const nextExpanded = !expanded;
-          toggleButton.setAttribute('data-expanded', `${nextExpanded}`);
-          toggleButton.setAttribute('aria-expanded', `${nextExpanded}`);
-          toggleButton.textContent = nextExpanded ? '▾' : '▸';
-          children.classList.toggle('hidden', !nextExpanded);
-        });
       });
     </script>
   </div>
