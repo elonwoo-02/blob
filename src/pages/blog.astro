@@ -121,5 +121,37 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
         }
       });
     </script>
+
+    <style is:global>
+      /* Hide scrollbar for the blog page */
+      html:has(.blog-page),
+      body:has(.blog-page) {
+        scrollbar-width: none !important; /* Firefox */
+        -ms-overflow-style: none !important; /* IE and Edge */
+        overflow: -moz-scrollbars-none !important;
+      }
+
+      html:has(.blog-page)::-webkit-scrollbar,
+      body:has(.blog-page)::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        background: transparent !important;
+      }
+
+      /* Also ensure main-content containers hide scrollbars if they scroll individually */
+      .blog-page,
+      #main-content {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+      }
+
+      .blog-page::-webkit-scrollbar,
+      #main-content::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+      }
+    </style>
   </div>
 </BaseLayout>
