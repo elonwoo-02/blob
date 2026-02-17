@@ -24,10 +24,10 @@ const levelText = [
                 class:list={[
                   "h-3 w-3 rounded-[3px] hover:ring-2 hover:ring-primary transition-all cursor-pointer",
                   day.level === 0 && "bg-base-300/70",
-                  day.level === 1 && "bg-emerald-200",
-                  day.level === 2 && "bg-emerald-400",
-                  day.level === 3 && "bg-emerald-600",
-                  day.level === 4 && "bg-emerald-800",
+                  day.level === 1 && "bg-level-1",
+                  day.level === 2 && "bg-level-2",
+                  day.level === 3 && "bg-level-3",
+                  day.level === 4 && "bg-level-4",
                 ]}
                 title={`${day.date} · ${day.count} commits`}
                 aria-label={`${day.date} ${levelText[day.level]}`}
@@ -50,10 +50,10 @@ const levelText = [
             class:list={[
               "h-3 w-3 rounded-[3px]",
               level === 0 && "bg-base-300/70",
-              level === 1 && "bg-emerald-200",
-              level === 2 && "bg-emerald-400",
-              level === 3 && "bg-emerald-600",
-              level === 4 && "bg-emerald-800",
+              level === 1 && "bg-level-1",
+              level === 2 && "bg-level-2",
+              level === 3 && "bg-level-3",
+              level === 4 && "bg-level-4",
             ]}
           />
           <span class="hidden sm:inline">{text}</span>
@@ -63,3 +63,17 @@ const levelText = [
     <span>More</span>
   </div>
 </div>
+<style>
+  .bg-level-1 {
+    background-color: #a5cad2;
+  }
+  .bg-level-2 {
+    background-color: #6ba0b3;
+  }
+  .bg-level-3 {
+    background-color: #508fa3;
+  }
+  .bg-level-4 {
+    background-color: #3a7a8f;
+  }
+</style>

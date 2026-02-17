@@ -4,7 +4,12 @@ const { node } = Astro.props as {
     text: string;
     slug: string;
     depth: number;
-    children?: Array<{ text: string; slug: string; depth: number; children?: unknown[] }>;
+    children?: Array<{
+      text: string;
+      slug: string;
+      depth: number;
+      children?: unknown[];
+    }>;
   };
 };
 
@@ -13,25 +18,36 @@ const hasChildren = Boolean(node.children && node.children.length > 0);
 
 <li class="space-y-2">
   <div class="flex items-start gap-2">
-    {hasChildren ? (
-      <button
-        class="section-toggle inline-flex h-5 w-5 items-center justify-center rounded-md text-xs text-base-content/70 transition hover:bg-base-200"
-        type="button"
-        data-expanded="true"
-        aria-expanded="true"
-      >
-        ▾
-      </button>
-    ) : (
-      <span class="inline-flex h-5 w-5 items-center justify-center text-xs text-base-content/30">•</span>
-    )}
-    <a class="section-nav-btn flex-1 text-left font-medium text-base-content/80 hover:text-emerald-700" href={`#${node.slug}`}>
+    {
+      hasChildren ? (
+        <button
+          class="section-toggle inline-flex h-5 w-5 items-center justify-center rounded-md text-xs text-base-content/70 transition hover:bg-base-200"
+          type="button"
+          data-expanded="true"
+          aria-expanded="true"
+        >
+          ▾
+        </button>
+      ) : (
+        <span class="inline-flex h-5 w-5 items-center justify-center text-xs text-base-content/30">
+          •
+        </span>
+      )
+    }
+    <a
+      class="section-nav-btn flex-1 text-left font-medium text-base-content/80 hover:text-[#508FA3]"
+      href={`#${node.slug}`}
+    >
       {node.text}
     </a>
   </div>
-  {hasChildren && (
-    <ul class="section-children mt-2 space-y-2 pl-4">
-      {node.children?.map((child) => <Astro.self node={child} />)}
-    </ul>
-  )}
+  {
+    hasChildren && (
+      <ul class="section-children mt-2 space-y-2 pl-4">
+        {node.children?.map((child) => (
+          <Astro.self node={child} />
+        ))}
+      </ul>
+    )
+  }
 </li>
