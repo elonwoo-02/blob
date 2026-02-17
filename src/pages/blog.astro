@@ -142,17 +142,16 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
           }
         });
 
-        // ============================================
         // Drawer状态变化处理
         // ============================================
         // 监听drawer打开/关闭事件，调整main-content内部内容的宽度
         window.addEventListener("drawer-state-changed", (event) => {
           const { isOpen } = event.detail;
-          const articles = document.querySelectorAll(
+          const sections = document.querySelectorAll(
             "#article-view section, #moment-view section",
           );
 
-          articles.forEach((section) => {
+          sections.forEach((section) => {
             if (isOpen) {
               // sidebar显示时，保持max-w-2xl
               section.style.maxWidth = "42rem"; // max-w-2xl
