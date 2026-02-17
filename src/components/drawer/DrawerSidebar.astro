@@ -1,13 +1,11 @@
 ---
 // DrawerSidebar.astro - Main drawer sidebar container
-import HeatmapSection from '../heatmap/HeatmapSection.astro';
-import NavigationSection from '../navigation/NavigationSection.astro';
-import TagSection from '../navigation/TagSection.astro';
+import HeatmapSection from "../heatmap/HeatmapSection.astro";
 ---
 
 <aside
   id="drawer-sidebar"
-  class="drawer-sidebar fixed top-0 left-0 h-screen w-80 bg-base-100 z-40 overflow-y-auto ml-[-320px]"
+  class="drawer-sidebar fixed top-0 left-0 h-screen w-80 z-40 overflow-y-auto ml-[-320px]"
   style="transition: margin-left 500ms cubic-bezier(0.4, 0, 0.2, 1);"
 >
   <div class="drawer-content flex flex-col h-full">
@@ -30,8 +28,7 @@ import TagSection from '../navigation/TagSection.astro';
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"
-          />
+            d="M6 18L18 6M6 6l12 12"></path>
         </svg>
       </button>
     </div>
@@ -39,39 +36,37 @@ import TagSection from '../navigation/TagSection.astro';
     <!-- Sections -->
     <div class="drawer-body flex-1 overflow-y-auto">
       <HeatmapSection />
-      <NavigationSection />
-      <TagSection />
     </div>
   </div>
 </aside>
 
-
-
 <script>
-  const drawer = document.getElementById('drawer-sidebar');
-  const closeButton = document.getElementById('drawer-close');
-  
+  const drawer = document.getElementById("drawer-sidebar");
+  const closeButton = document.getElementById("drawer-close");
+
   let isOpen = false;
-  
+
   function toggleDrawer() {
     isOpen = !isOpen;
-    
+
     if (isOpen) {
-      drawer?.style.setProperty('margin-left', '0');
+      drawer?.style.setProperty("margin-left", "0");
     } else {
-      drawer?.style.setProperty('margin-left', '-320px');
+      drawer?.style.setProperty("margin-left", "-320px");
     }
-    
+
     // Dispatch event to notify content area to adjust
-    const event = new CustomEvent('drawer-state-changed', { detail: { isOpen } });
+    const event = new CustomEvent("drawer-state-changed", {
+      detail: { isOpen },
+    });
     window.dispatchEvent(event);
   }
-  
+
   // Listen for toggle event from DrawerToggle
-  window.addEventListener('toggle-drawer', toggleDrawer);
-  
+  window.addEventListener("toggle-drawer", toggleDrawer);
+
   // Close drawer when clicking close button
-  closeButton?.addEventListener('click', toggleDrawer);
+  closeButton?.addEventListener("click", toggleDrawer);
 </script>
 
 <style>
@@ -79,20 +74,20 @@ import TagSection from '../navigation/TagSection.astro';
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--bc) / 0.2) transparent;
   }
-  
+
   .drawer-sidebar::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   .drawer-sidebar::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   .drawer-sidebar::-webkit-scrollbar-thumb {
     background-color: hsl(var(--bc) / 0.2);
     border-radius: 3px;
   }
-  
+
   .drawer-sidebar::-webkit-scrollbar-thumb:hover {
     background-color: hsl(var(--bc) / 0.3);
   }

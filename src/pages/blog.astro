@@ -89,112 +89,123 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-  <!-- Blog专用Drawer侧边栏（fixed到屏幕左侧） -->
-  <BlogDrawerSidebar
-    heatmap={heatmap}
-    tagTree={tagTree}
-    stats={{ totalPosts, totalTags, daysActive }}
-  />
-
-  <!-- 主内容区域 - 相对baseLayout居中 -->
+  <!-- Wrapper容器：sidebar + main-content一起居中 -->
   <div
-    id="main-content"
-    class="blog-page blog-page--index-theme"
-    style="transition: margin-left 500ms cubic-bezier(0.4, 0, 0.2, 1);"
+    id="blog-wrapper"
+    class="flex justify-center"
+    style="transition: all 500ms cubic-bezier(0.4, 0, 0.2, 1);"
   >
-    <!-- Drawer侧边栏切换按钮 -->
-    <DrawerToggle />
-    <!-- Article视图 - 默认显示 -->
-    <ArticleView pinnedPosts={pinnedPosts} sortedPosts={sortedPosts} />
+    <!-- Blog专用Drawer侧边栏 -->
+    <BlogDrawerSidebar
+      heatmap={heatmap}
+      tagTree={tagTree}
+      stats={{ totalPosts, totalTags, daysActive }}
+    />
 
-    <!-- Moment视图 - 朋友圈动态 -->
-    <div id="moment-view" class="view-content hidden">
-      <MomentView />
-    </div>
+    <!-- 主内容区域 -->
+    <div
+      id="main-content"
+      class="blog-page blog-page--index-theme relative min-w-0"
+    >
+      <!-- Drawer侧边栏切换按钮 -->
+      <DrawerToggle />
+      <!-- Article视图 - 默认显示 -->
+      <ArticleView pinnedPosts={pinnedPosts} sortedPosts={sortedPosts} />
 
-    <!-- Toast提示框 - 用于显示复制链接等操作反馈 -->
-    <div id="toast" class="toast hidden" role="status" aria-live="polite">
-      <div class="toast-surface">已复制链接</div>
-    </div>
+      <!-- Moment视图 - 朋友圈动态 -->
+      <div id="moment-view" class="view-content hidden">
+        <MomentView />
+      </div>
 
-    <script is:inline>
-      // ============================================
-      // 视图切换功能
-      // ============================================
-      // 监听导航按钮点击，切换Article和Moment视图
-      window.addEventListener("view-changed", (event) => {
-        const { view } = event.detail;
+      <!-- Toast提示框 - 用于显示复制链接等操作反馈 -->
+      <div id="toast" class="toast hidden" role="status" aria-live="polite">
+        <div class="toast-surface">已复制链接</div>
+      </div>
 
-        const articleView = document.getElementById("article-view");
-        const momentView = document.getElementById("moment-view");
+      <script is:inline>
+        // ============================================
+        // 视图切换功能
+        // ============================================
+        // 监听导航按钮点击，切换Article和Moment视图
+        window.addEventListener("view-changed", (event) => {
+          const { view } = event.detail;
 
-        if (view === "moment") {
-          articleView?.classList.add("hidden");
-          momentView?.classList.remove("hidden");
-        } else if (view === "article") {
-          momentView?.classList.add("hidden");
-          articleView?.classList.remove("hidden");
+          const articleView = document.getElementById("article-view");
+          const momentView = document.getElementById("moment-view");
+
+          if (view === "moment") {
+            articleView?.classList.add("hidden");
+            momentView?.classList.remove("hidden");
+          } else if (view === "article") {
+            momentView?.classList.add("hidden");
+            articleView?.classList.remove("hidden");
+          }
+        });
+
+        // ============================================
+        // Drawer状态变化处理
+        // ============================================
+        // 监听drawer打开/关闭事件，调整main-content内部内容的宽度
+        window.addEventListener("drawer-state-changed", (event) => {
+          const { isOpen } = event.detail;
+          const articles = document.querySelectorAll(
+            "#article-view section, #moment-view section",
+          );
+
+          articles.forEach((section) => {
+            if (isOpen) {
+              // sidebar显示时，保持max-w-2xl
+              section.style.maxWidth = "42rem"; // max-w-2xl
+            } else {
+              // sidebar隐藏时，扩展max-width来让main-content扩大
+              section.style.maxWidth = "calc(42rem + 320px)";
+            }
+          });
+        });
+      </script>
+
+      <style is:global>
+        /* Blog container centering */
+        .blog-container {
+          max-width: 100%;
+          margin-left: auto;
+          margin-right: auto;
         }
-      });
 
-      // ============================================
-      // Drawer状态变化处理
-      // ============================================
-      // 监听drawer打开/关闭事件，自动调整主内容区域的左边距
-      window.addEventListener("drawer-state-changed", (event) => {
-        const { isOpen } = event.detail;
-        const mainContent = document.getElementById("main-content");
-        if (mainContent) {
-          // drawer打开时，内容区向右推320px；关闭时恢复
-          mainContent.style.marginLeft = isOpen ? "320px" : "0";
+        /* Flomo style background */
+        .blog-page {
+          min-height: 100vh;
         }
-      });
-    </script>
 
-    <style is:global>
-      /* Blog container centering */
-      .blog-container {
-        max-width: 100%;
-        margin-left: auto;
-        margin-right: auto;
-      }
+        /* Hide scrollbar for the blog page */
+        html:has(.blog-page),
+        body:has(.blog-page) {
+          scrollbar-width: none !important; /* Firefox */
+          -ms-overflow-style: none !important; /* IE and Edge */
+          overflow: -moz-scrollbars-none !important;
+        }
 
-      /* Flomo style background */
-      .blog-page {
-        background-color: #f6f8fa; /* Light gray background */
-        min-height: 100vh;
-      }
+        html:has(.blog-page)::-webkit-scrollbar,
+        body:has(.blog-page)::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
 
-      /* Hide scrollbar for the blog page */
-      html:has(.blog-page),
-      body:has(.blog-page) {
-        scrollbar-width: none !important; /* Firefox */
-        -ms-overflow-style: none !important; /* IE and Edge */
-        overflow: -moz-scrollbars-none !important;
-        background-color: #f6f8fa !important;
-      }
+        /* Also ensure main-content containers hide scrollbars if they scroll individually */
+        .blog-page,
+        #main-content {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
 
-      html:has(.blog-page)::-webkit-scrollbar,
-      body:has(.blog-page)::-webkit-scrollbar {
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
-        background: transparent !important;
-      }
-
-      /* Also ensure main-content containers hide scrollbars if they scroll individually */
-      .blog-page,
-      #main-content {
-        scrollbar-width: none !important;
-        -ms-overflow-style: none !important;
-      }
-
-      .blog-page::-webkit-scrollbar,
-      #main-content::-webkit-scrollbar {
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
-      }
-    </style>
+        .blog-page::-webkit-scrollbar,
+        #main-content::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+      </style>
+    </div>
   </div>
 </BaseLayout>

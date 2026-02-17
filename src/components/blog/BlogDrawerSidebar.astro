@@ -1,7 +1,6 @@
 ---
 // BlogDrawerSidebar.astro - Sidebar for blog page
 import BlogHeatmapSection from "./BlogHeatmapSection.astro";
-import NavigationSection from "../navigation/NavigationSection.astro";
 import BlogTagSection from "./BlogTagSection.astro";
 
 const { heatmap, tagTree } = Astro.props;
@@ -9,10 +8,10 @@ const { heatmap, tagTree } = Astro.props;
 
 <aside
   id="drawer-sidebar"
-  class="drawer-sidebar fixed top-0 left-0 h-screen w-80 bg-base-100 z-40 overflow-y-auto"
-  style="transition: margin-left 500ms cubic-bezier(0.4, 0, 0.2, 1); margin-left: -320px;"
+  class="drawer-sidebar h-screen bg-base-100 flex-shrink-0"
+  style="transition: width 500ms cubic-bezier(0.4, 0, 0.2, 1), margin-right 500ms cubic-bezier(0.4, 0, 0.2, 1); width: 320px; margin-right: 0; overflow: hidden;"
 >
-  <div class="drawer-content flex flex-col h-full">
+  <div class="drawer-content flex flex-col h-full overflow-y-auto">
     <!-- Header -->
     <div
       class="drawer-header p-4 flex justify-between items-center text-gray-400"
@@ -153,7 +152,6 @@ const { heatmap, tagTree } = Astro.props;
       </div>
 
       <BlogHeatmapSection heatmap={heatmap} />
-      <NavigationSection />
       <BlogTagSection tagTree={tagTree} />
     </div>
   </div>
@@ -163,22 +161,30 @@ const { heatmap, tagTree } = Astro.props;
   const drawer = document.getElementById("drawer-sidebar");
   const closeButton = document.getElementById("drawer-close");
 
-  let isOpen = false;
+  let isOpen = true;  // 默认打开
 
   function toggleDrawer() {
     isOpen = !isOpen;
 
     if (isOpen) {
-      drawer?.style.setProperty("margin-left", "0");
+      // 打开：sidebar显示
+      drawer?.style.setProperty("width", "320px");
+      drawer?.style.setProperty("margin-right", "0");
+      // Dispatch event to notify content area to adjust
+      const event = new CustomEvent("drawer-state-changed", {
+        detail: { isOpen: true },
+      });
+      window.dispatchEvent(event);
     } else {
-      drawer?.style.setProperty("margin-left", "-320px");
+      // 关闭：sidebar隐藏
+      drawer?.style.setProperty("width", "0");
+      drawer?.style.setProperty("margin-right", "-320px");
+      // Dispatch event to notify content area to adjust
+      const event = new CustomEvent("drawer-state-changed", {
+        detail: { isOpen: false },
+      });
+      window.dispatchEvent(event);
     }
-
-    // Dispatch event to notify content area to adjust
-    const event = new CustomEvent("drawer-state-changed", {
-      detail: { isOpen },
-    });
-    window.dispatchEvent(event);
   }
 
   // Listen for toggle event from DrawerToggle

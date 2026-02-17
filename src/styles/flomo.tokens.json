@@ -1,10 +1,10 @@
 {
   "color": {
     "bg": {
-      "app": "#F5F5F3",
+      "app": "#F0EEE9",
       "card": "#FFFFFF",
       "hover": "#FAFAF8",
-      "drawer": "#F5F5F3"
+      "drawer": "#F0EEE9"
     },
     "text": {
       "primary": "#333333",

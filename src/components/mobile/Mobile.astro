@@ -1,0 +1,14 @@
+---
+
+import MobileDock from "./component/MobileDock.astro";
+import FabFlower from "./component/FabFlower.astro";
+import MobileDrawer from "./component/MobileDrawer.astro";
+
+---
+
+<!-- Mobile components - only show on mobile devices -->
+<div class="md:hidden">
+  <MobileDrawer/>
+  <MobileDock/>
+  <FabFlower/>
+</div>

@@ -1,8 +1,13 @@
 ---
-import BaseLayout from './BaseLayout.astro';
-import SectionTreeNode from '../components/post/SectionTreeNode.astro';
+import BaseLayout from "./BaseLayout.astro";
+import SectionTreeNode from "../components/post/SectionTreeNode.astro";
 
-const { frontmatter, headings = [], readingTime = 1, postId = '' } = Astro.props as {
+const {
+  frontmatter,
+  headings = [],
+  readingTime = 1,
+  postId = "",
+} = Astro.props as {
   frontmatter: {
     title: string;
     pubDate: Date;
@@ -26,7 +31,9 @@ type SectionNode = {
   children: SectionNode[];
 };
 
-const sectionHeadings = headings.filter((heading) => heading.depth >= 1 && heading.depth <= 4);
+const sectionHeadings = headings.filter(
+  (heading) => heading.depth >= 1 && heading.depth <= 4,
+);
 
 const buildSectionTree = (items: typeof sectionHeadings) => {
   const root: SectionNode[] = [];
@@ -55,16 +62,26 @@ const sectionTree = buildSectionTree(sectionHeadings);
   <div class="post-progress" aria-hidden="true">
     <span id="reading-progress"></span>
   </div>
-  <div class="drawer drawer-end lg:drawer-open post-drawer" id="post-drawer-layout">
+  <div
+    class="drawer drawer-end lg:drawer-open post-drawer"
+    id="post-drawer-layout"
+  >
     <input id="section-drawer" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content">
       <article class="post-layout">
         <main class="post-content">
           <div class="post-header-row">
             <div class="lg:hidden">
-              <label for="section-drawer" class="btn btn-ghost btn-sm px-2" aria-label="打开章节导航">
+              <label
+                for="section-drawer"
+                class="btn btn-ghost btn-sm px-2"
+                aria-label="打开章节导航"
+              >
                 <svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4">
-                  <path fill="currentColor" d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"/>
+                  <path
+                    fill="currentColor"
+                    d="M4 6.75c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 6.75zm0 5.25c0-.41.34-.75.75-.75h9.5c.41 0 .75.34.75.75s-.34.75-.75.75h-9.5A.75.75 0 0 1 4 12zm0 5.25c0-.41.34-.75.75-.75h14.5c.41 0 .75.34.75.75s-.34.75-.75.75H4.75A.75.75 0 0 1 4 17.25z"
+                  ></path>
                 </svg>
               </label>
             </div>
@@ -72,10 +89,18 @@ const sectionTree = buildSectionTree(sectionHeadings);
           <div class="post-meta">
             <div class="post-meta-row">
               <div class="post-avatar">
-                <img src="/avatars/default.png" alt={`${frontmatter.author} avatar`} width="36" height="36" loading="lazy" />
+                <img
+                  src="/avatars/default.png"
+                  alt={`${frontmatter.author} avatar`}
+                  width="36"
+                  height="36"
+                  loading="lazy"
+                />
               </div>
               <p class="author">{frontmatter.author}</p>
-              <p class="publish-date">{frontmatter.pubDate.toLocaleDateString()}</p>
+              <p class="publish-date">
+                {frontmatter.pubDate.toLocaleDateString()}
+              </p>
               <p class="reading-time">{readingTime} min read</p>
               <button
                 id="post-like-btn"
@@ -94,14 +119,25 @@ const sectionTree = buildSectionTree(sectionHeadings);
             </div>
             <p class="description"><em>{frontmatter.description}</em></p>
           </div>
-          {frontmatter.image?.url && (
-            <img class="hero-image" src={frontmatter.image.url} width="300" alt={frontmatter.image.alt || ''} />
-          )}
+          {
+            frontmatter.image?.url && (
+              <img
+                class="hero-image"
+                src={frontmatter.image.url}
+                width="300"
+                alt={frontmatter.image.alt || ""}
+              />
+            )
+          }
 
           <div class="tags">
-            {(frontmatter.tags ?? []).map((tag: string) => (
-              <p class="tag"><a href={`/tags/${tag}`}>#{tag}</a></p>
-            ))}
+            {
+              (frontmatter.tags ?? []).map((tag: string) => (
+                <p class="tag">
+                  <a href={`/tags/${tag}`}>#{tag}</a>
+                </p>
+              ))
+            }
           </div>
 
           <div class="markdown-body">
@@ -111,53 +147,69 @@ const sectionTree = buildSectionTree(sectionHeadings);
       </article>
     </div>
     <div class="drawer-side z-20 post-drawer-side">
-      <label for="section-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-      <aside class="min-h-full w-80 rounded-l-3xl border-l border-base-300 bg-base-100 p-5 shadow-sm lg:rounded-3xl lg:border lg:shadow-sm">
-        <br>
-        <br>
+      <label
+        for="section-drawer"
+        aria-label="close sidebar"
+        class="drawer-overlay"></label>
+      <aside
+        class="min-h-full w-80 rounded-l-3xl border-l border-base-300 bg-base-100 p-5 shadow-sm lg:rounded-3xl lg:border lg:shadow-sm"
+      >
+        <br />
+        <br />
         <div class="mb-4 flex items-center justify-between">
           <h2 class="text-lg font-semibold">Menu</h2>
-          <button id="toggle-section-sidebar" class="btn btn-ghost btn-xs hidden lg:inline-flex" type="button" aria-label="收起章节导航">
+          <button
+            id="toggle-section-sidebar"
+            class="btn btn-ghost btn-xs hidden lg:inline-flex"
+            type="button"
+            aria-label="收起章节导航"
+          >
             ⇤
           </button>
         </div>
-        {sectionTree.length > 0 ? (
-          <ul id="section-tree" class="space-y-2">
-            {sectionTree.map((section) => <SectionTreeNode node={section} />)}
-          </ul>
-        ) : (
-          <p class="text-sm text-base-content/60">暂无章节。</p>
-        )}
+        {
+          sectionTree.length > 0 ? (
+            <ul id="section-tree" class="space-y-2">
+              {sectionTree.map((section) => (
+                <SectionTreeNode node={section} />
+              ))}
+            </ul>
+          ) : (
+            <p class="text-sm text-base-content/60">暂无章节。</p>
+          )
+        }
       </aside>
     </div>
   </div>
 
   <script is:inline>
-    const drawerLayout = document.getElementById('post-drawer-layout');
-    const sidebarToggle = document.getElementById('toggle-section-sidebar');
+    const drawerLayout = document.getElementById("post-drawer-layout");
+    const sidebarToggle = document.getElementById("toggle-section-sidebar");
 
-    document.querySelectorAll('.section-toggle').forEach((toggleButton) => {
-      toggleButton.addEventListener('click', () => {
-        const listItem = toggleButton.closest('li');
-        const children = listItem?.querySelector(':scope > .section-children');
+    document.querySelectorAll(".section-toggle").forEach((toggleButton) => {
+      toggleButton.addEventListener("click", () => {
+        const listItem = toggleButton.closest("li");
+        const children = listItem?.querySelector(":scope > .section-children");
         if (!children) return;
 
-        const expanded = toggleButton.getAttribute('data-expanded') !== 'false';
+        const expanded = toggleButton.getAttribute("data-expanded") !== "false";
         const nextExpanded = !expanded;
-        toggleButton.setAttribute('data-expanded', `${nextExpanded}`);
-        toggleButton.setAttribute('aria-expanded', `${nextExpanded}`);
-        toggleButton.textContent = nextExpanded ? '▾' : '▸';
-        children.classList.toggle('hidden', !nextExpanded);
+        toggleButton.setAttribute("data-expanded", `${nextExpanded}`);
+        toggleButton.setAttribute("aria-expanded", `${nextExpanded}`);
+        toggleButton.textContent = nextExpanded ? "▾" : "▸";
+        children.classList.toggle("hidden", !nextExpanded);
       });
     });
 
     if (sidebarToggle && drawerLayout) {
-      sidebarToggle.addEventListener('click', () => {
-        const collapsed = drawerLayout.classList.toggle('post-sidebar-collapsed');
-        sidebarToggle.textContent = collapsed ? '⇥' : '⇤';
+      sidebarToggle.addEventListener("click", () => {
+        const collapsed = drawerLayout.classList.toggle(
+          "post-sidebar-collapsed",
+        );
+        sidebarToggle.textContent = collapsed ? "⇥" : "⇤";
       });
     }
-    const progressBar = document.getElementById('reading-progress');
+    const progressBar = document.getElementById("reading-progress");
     const updateProgress = () => {
       if (!progressBar) return;
       const total = document.documentElement.scrollHeight - window.innerHeight;
@@ -165,31 +217,34 @@ const sectionTree = buildSectionTree(sectionHeadings);
       progressBar.style.width = `${percent * 100}%`;
     };
     updateProgress();
-    window.addEventListener('scroll', updateProgress, { passive: true });
-    window.addEventListener('resize', updateProgress);
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
 
-    const likeButton = document.getElementById('post-like-btn');
+    const likeButton = document.getElementById("post-like-btn");
     if (likeButton) {
-      const postId = likeButton.getAttribute('data-post-id') || '';
+      const postId = likeButton.getAttribute("data-post-id") || "";
       const likeKey = `blog:action:like:${postId}`;
-      const bookmarkKey = 'blog:bookmarks';
-      const readBookmarks = () => JSON.parse(localStorage.getItem(bookmarkKey) || '[]');
+      const bookmarkKey = "blog:bookmarks";
+      const readBookmarks = () =>
+        JSON.parse(localStorage.getItem(bookmarkKey) || "[]");
       const writeBookmarks = (items) =>
         localStorage.setItem(bookmarkKey, JSON.stringify(items.slice(-200)));
 
       const getPayload = () => ({
         slug: postId,
-        title: likeButton.getAttribute('data-post-title') || '',
-        url: likeButton.getAttribute('data-post-url') || '',
-        description: likeButton.getAttribute('data-post-desc') || '',
-        date: likeButton.getAttribute('data-post-date') || '',
+        title: likeButton.getAttribute("data-post-title") || "",
+        url: likeButton.getAttribute("data-post-url") || "",
+        description: likeButton.getAttribute("data-post-desc") || "",
+        date: likeButton.getAttribute("data-post-date") || "",
       });
 
       const syncState = () => {
-        const liked = localStorage.getItem(likeKey) === '1';
-        likeButton.classList.toggle('is-active', liked);
-        likeButton.setAttribute('aria-pressed', `${liked}`);
-        likeButton.querySelector('.post-action-label').textContent = liked ? 'Liked' : 'Like';
+        const liked = localStorage.getItem(likeKey) === "1";
+        likeButton.classList.toggle("is-active", liked);
+        likeButton.setAttribute("aria-pressed", `${liked}`);
+        likeButton.querySelector(".post-action-label").textContent = liked
+          ? "Liked"
+          : "Like";
         if (liked) {
           const list = readBookmarks();
           const payload = getPayload();
@@ -200,11 +255,11 @@ const sectionTree = buildSectionTree(sectionHeadings);
         }
       };
 
-      likeButton.addEventListener('click', () => {
+      likeButton.addEventListener("click", () => {
         if (!postId) return;
-        const liked = localStorage.getItem(likeKey) === '1';
+        const liked = localStorage.getItem(likeKey) === "1";
         const next = !liked;
-        localStorage.setItem(likeKey, next ? '1' : '0');
+        localStorage.setItem(likeKey, next ? "1" : "0");
         const list = readBookmarks();
         const payload = getPayload();
         if (next) {
@@ -232,7 +287,6 @@ const sectionTree = buildSectionTree(sectionHeadings);
     right: 0;
     z-index: 90;
     height: 3px;
-    background: color-mix(in oklab, var(--color-base-content) 12%, transparent);
   }
 
   #reading-progress {
@@ -289,7 +343,11 @@ const sectionTree = buildSectionTree(sectionHeadings);
     font-weight: 600;
     gap: 0.35rem;
     padding: 0.35rem 0.6rem;
-    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease,
+      background 0.2s ease,
+      color 0.2s ease;
   }
 
   .post-action-btn:hover {
@@ -350,7 +408,6 @@ const sectionTree = buildSectionTree(sectionHeadings);
     height: auto;
   }
 
-
   .markdown-body :global(h1),
   .markdown-body :global(h2),
   .markdown-body :global(h3),
@@ -393,7 +450,6 @@ const sectionTree = buildSectionTree(sectionHeadings);
   }
 
   .markdown-body :global(code) {
-    background: color-mix(in oklab, var(--color-base-content) 12%, transparent);
     border-radius: 0.35rem;
     padding: 0.1rem 0.35rem;
     font-size: 0.92em;
@@ -403,7 +459,6 @@ const sectionTree = buildSectionTree(sectionHeadings);
     padding: 1rem;
     border-radius: 0.75rem;
     overflow-x: auto;
-    background: color-mix(in oklab, var(--color-base-content) 8%, transparent);
   }
 
   .markdown-body :global(pre code) {
@@ -415,7 +470,6 @@ const sectionTree = buildSectionTree(sectionHeadings);
     margin: 1rem 0;
     padding: 0.75rem 1rem;
     border-left: 4px solid color-mix(in oklab, var(--color-primary) 65%, white);
-    background: color-mix(in oklab, var(--color-primary) 12%, transparent);
     border-radius: 0 0.5rem 0.5rem 0;
   }
 

@@ -74,11 +74,11 @@ const sidebarByLang = {
     { title: 'profile []string', items: ['Curious', 'Rigorous', 'Collaborative'] },
   ],
   zh: [
-    { title: '平台', items: ['Windows', 'Linux', '移动端'] },
+    { title: '平台', items: ['Windows', 'Linux', '移动�?] },
     { title: '技术栈', items: ['Python', 'Go', 'TypeScript', 'JavaScript', 'C#', 'HTML/CSS'] },
     { title: '工具', items: ['Unity3D', 'Unreal', 'Godot', 'JetBrains', 'VSCode', 'Photoshop', 'Blender'] },
     { title: '媒体链接', items: ['itch.io/elon', 'linkedin.com/in/elon', 'github.com/elon'] },
-    { title: '语言能力', items: ['法语: C1', '英语: B2', '波兰语: B2'] },
+    { title: '语言能力', items: ['法语: C1', '英语: B2', '波兰�? B2'] },
     { title: '个人特质', items: ['好奇', '严谨', '协作'] },
   ],
 };
@@ -112,7 +112,7 @@ const sidebarByLang = {
         </div>
       ))}
     </aside>
-    <!--简历主体-->
+    <!--简历主�?->
     <article class="resume-editor">
       <div class="editor-top">
         <span class="dot red"></span>
@@ -298,8 +298,8 @@ const sidebarByLang = {
         </div>
 
         <div class="code-lang-panel" data-lang-code="zh">
-          <p class="code-line comment"># 目标：寻找 Unity3D / Unreal Engine 相关岗位</p>
-          <p class="code-line comment"># 工作安排：每周 4 天企业 + 1 天学校，可立即到岗</p>
+          <p class="code-line comment"># 目标：寻�?Unity3D / Unreal Engine 相关岗位</p>
+          <p class="code-line comment"># 工作安排：每�?4 天企�?+ 1 天学校，可立即到�?/p>
 
           <section class="code-section">
             <h2 class="section-title">
@@ -312,7 +312,7 @@ const sidebarByLang = {
             <p class="code-line indent"><span class="str">"电话"</span>: <span class="str">"{profile.phone}"</span>,</p>
             <p class="code-line indent"><span class="str">"地点"</span>: <span class="str">"{profile.location}"</span>,</p>
             <p class="code-line indent">
-              <span class="str">"可入职"</span>: <span class="num">{profile.availableNow ? '是' : '否'}</span>,
+              <span class="str">"可入�?</span>: <span class="num">{profile.availableNow ? '�? : '�?}</span>,
             </p>
             <p class="code-line indent"><span class="str">"年龄"</span>: <span class="num">{profile.age}</span>,</p>
             <p class="code-line indent brace">{'}'}</p>
@@ -325,7 +325,7 @@ const sidebarByLang = {
             {education.map((item) => (
               <div class="method-block">
                 <p class="code-line indent brace">{'{'}</p>
-                <p class="code-line indent2"><span class="str">"函数名"</span>: <span class="str">"{item.method}()"</span>,</p>
+                <p class="code-line indent2"><span class="str">"函数�?</span>: <span class="str">"{item.method}()"</span>,</p>
                 <p class="code-line indent2"><span class="str">"学历"</span>: <span class="str">"{item.level}"</span>,</p>
                 <p class="code-line indent2"><span class="str">"时间"</span>: <span class="str">"{item.range}"</span>,</p>
                 <p class="code-line indent2"><span class="str">"方向"</span>: <span class="str">"{item.type}"</span>,</p>
@@ -337,12 +337,12 @@ const sidebarByLang = {
 
           <section class="code-section">
             <h2 class="section-title">
-              <span class="id">项目与经历</span> <span class="id">= [</span>
+              <span class="id">项目与经�?/span> <span class="id">= [</span>
             </h2>
             {experiences.map((item) => (
               <div class="method-block">
                 <p class="code-line indent brace">{'{'}</p>
-                <p class="code-line indent2"><span class="str">"方法名"</span>: <span class="str">"{item.method}()"</span>,</p>
+                <p class="code-line indent2"><span class="str">"方法�?</span>: <span class="str">"{item.method}()"</span>,</p>
                 <p class="code-line indent2"><span class="str">"角色"</span>: <span class="str">"{item.role}"</span>,</p>
                 <p class="code-line indent2"><span class="str">"周期"</span>: <span class="str">"{item.range}"</span>,</p>
                 <p class="code-line indent2"><span class="str">"链接"</span>: <span class="str">"{item.site}"</span>,</p>
@@ -413,7 +413,7 @@ const sidebarByLang = {
 
   :global(main.container) {
     max-width: 1200px;
-    background: transparent !important;
+
     border: none !important;
     box-shadow: none !important;
   }
@@ -425,13 +425,13 @@ const sidebarByLang = {
     border-radius: 0.9rem;
     overflow: hidden;
     overflow-x: hidden;
-    background: #08100d;
+
     box-shadow: 0 18px 50px rgba(16, 185, 129, 0.18);
     min-height: 72vh;
   }
 
   .resume-sidebar {
-    background: linear-gradient(180deg, #09120e 0%, #070d0a 100%);
+
     border-right: 1px solid rgba(16, 185, 129, 0.3);
     padding: 1rem 0.9rem;
     overflow: auto;
@@ -449,7 +449,7 @@ const sidebarByLang = {
   .avatar-panel {
     border: 1px solid rgba(16, 185, 129, 0.35);
     border-radius: 0.35rem;
-    background: rgba(0, 0, 0, 0.35);
+
     padding: 0.35rem;
     margin-bottom: 1rem;
   }
@@ -499,7 +499,7 @@ const sidebarByLang = {
   }
 
   .resume-editor {
-    background: linear-gradient(180deg, #0c1512 0%, #090f0c 100%);
+
     overflow: auto;
     min-width: 0;
   }
@@ -513,7 +513,7 @@ const sidebarByLang = {
     align-items: center;
     gap: 0.45rem;
     border-bottom: 1px solid rgba(16, 185, 129, 0.3);
-    background: #0e1814;
+
     padding: 0.65rem 0.85rem;
   }
 
@@ -525,15 +525,15 @@ const sidebarByLang = {
   }
 
   .dot.red {
-    background: #f16d75;
+
   }
 
   .dot.yellow {
-    background: #f3cf5a;
+
   }
 
   .dot.green {
-    background: #6edb8c;
+
   }
 
   .tab-name {
@@ -556,7 +556,7 @@ const sidebarByLang = {
 
   .lang-switcher select {
     border: 1px solid rgba(16, 185, 129, 0.45);
-    background: #08120e;
+
     color: #d1fae5;
     border-radius: 0.35rem;
     padding: 0.3rem 0.45rem;

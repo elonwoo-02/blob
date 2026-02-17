@@ -1,17 +1,17 @@
 ﻿---
-import DockActivityLayer from './DockActivityLayer.astro';
-import DockHomeItem from './items/DockHomeItem.astro';
-import DockBlogItem from './items/DockBlogItem.astro';
-import DockAboutItem from './items/DockAboutItem.astro';
-import DockBookmarksItem from './items/DockBookmarksItem.astro';
-import DockTerminalItem from './items/DockTerminalItem.astro';
-import DockGitHubItem from './items/DockGitHubItem.astro';
-import DockBotItem from './items/DockBotItem.astro';
-import DockBackToTop from './items/DockBackToTopItem.astro';
-import DockThemeToggle from './items/DockThemeToggleItem.astro';
-import DockRssLink from './items/DockRssLinkItem.astro';
+import DockActivityLayer from "./DockActivityLayer.astro";
+import DockHomeItem from "./items/DockHomeItem.astro";
+import DockBlogItem from "./items/DockBlogItem.astro";
+import DockAboutItem from "./items/DockAboutItem.astro";
+import DockBookmarksItem from "./items/DockBookmarksItem.astro";
+import DockTerminalItem from "./items/DockTerminalItem.astro";
+import DockGitHubItem from "./items/DockGitHubItem.astro";
+import DockBotItem from "./items/DockBotItem.astro";
+import DockBackToTop from "./items/DockBackToTopItem.astro";
+import DockThemeToggle from "./items/DockThemeToggleItem.astro";
+import DockRssLink from "./items/DockRssLinkItem.astro";
 
-const { pageTitle = '页面', currentPath = '/' } = Astro.props;
+const { pageTitle = "页面", currentPath = "/" } = Astro.props;
 
 const dockPayload = {
   pageTitle,
@@ -28,11 +28,7 @@ const dockItems = [
   DockBotItem,
 ];
 
-const actionItems = [
-  DockBackToTop,
-  DockThemeToggle,
-  DockRssLink,
-];
+const actionItems = [DockBackToTop, DockThemeToggle, DockRssLink];
 
 const externalDockItems: any[] = [];
 
@@ -62,7 +58,7 @@ const leftItems = [...dockItems, ...actionItems];
 <DockActivityLayer />
 
 <script type="module">
-  import { initDock } from '/src/components/dock/index.ts';
+  import { initDock } from "/src/components/dock/index.ts";
 
   initDock();
 </script>
@@ -107,7 +103,6 @@ const leftItems = [...dockItems, ...actionItems];
     position: absolute;
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.55);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(232, 232, 232, 0.92));
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.28);
     overflow: hidden;
     pointer-events: auto;
@@ -115,7 +110,10 @@ const leftItems = [...dockItems, ...actionItems];
     flex-direction: column;
     transform-origin: center;
     animation: dock-window-open 200ms ease-out;
-    transition: transform 220ms ease, opacity 220ms ease, border-radius 220ms ease;
+    transition:
+      transform 220ms ease,
+      opacity 220ms ease,
+      border-radius 220ms ease;
     will-change: transform;
     contain: layout paint;
   }
@@ -194,67 +192,67 @@ const leftItems = [...dockItems, ...actionItems];
     pointer-events: auto;
   }
 
-  .dock-activity-resize-handle[data-resize='n'],
-  .dock-activity-resize-handle[data-resize='s'] {
+  .dock-activity-resize-handle[data-resize="n"],
+  .dock-activity-resize-handle[data-resize="s"] {
     left: 10px;
     right: 10px;
     height: 10px;
   }
 
-  .dock-activity-resize-handle[data-resize='n'] {
+  .dock-activity-resize-handle[data-resize="n"] {
     top: -4px;
     cursor: ns-resize;
   }
 
-  .dock-activity-resize-handle[data-resize='s'] {
+  .dock-activity-resize-handle[data-resize="s"] {
     bottom: -4px;
     cursor: ns-resize;
   }
 
-  .dock-activity-resize-handle[data-resize='e'],
-  .dock-activity-resize-handle[data-resize='w'] {
+  .dock-activity-resize-handle[data-resize="e"],
+  .dock-activity-resize-handle[data-resize="w"] {
     top: 10px;
     bottom: 10px;
     width: 10px;
   }
 
-  .dock-activity-resize-handle[data-resize='e'] {
+  .dock-activity-resize-handle[data-resize="e"] {
     right: -4px;
     cursor: ew-resize;
   }
 
-  .dock-activity-resize-handle[data-resize='w'] {
+  .dock-activity-resize-handle[data-resize="w"] {
     left: -4px;
     cursor: ew-resize;
   }
 
-  .dock-activity-resize-handle[data-resize='ne'],
-  .dock-activity-resize-handle[data-resize='nw'],
-  .dock-activity-resize-handle[data-resize='se'],
-  .dock-activity-resize-handle[data-resize='sw'] {
+  .dock-activity-resize-handle[data-resize="ne"],
+  .dock-activity-resize-handle[data-resize="nw"],
+  .dock-activity-resize-handle[data-resize="se"],
+  .dock-activity-resize-handle[data-resize="sw"] {
     width: 16px;
     height: 16px;
   }
 
-  .dock-activity-resize-handle[data-resize='ne'] {
+  .dock-activity-resize-handle[data-resize="ne"] {
     top: -6px;
     right: -6px;
     cursor: nesw-resize;
   }
 
-  .dock-activity-resize-handle[data-resize='nw'] {
+  .dock-activity-resize-handle[data-resize="nw"] {
     top: -6px;
     left: -6px;
     cursor: nwse-resize;
   }
 
-  .dock-activity-resize-handle[data-resize='se'] {
+  .dock-activity-resize-handle[data-resize="se"] {
     bottom: -6px;
     right: -6px;
     cursor: nwse-resize;
   }
 
-  .dock-activity-resize-handle[data-resize='sw'] {
+  .dock-activity-resize-handle[data-resize="sw"] {
     bottom: -6px;
     left: -6px;
     cursor: nesw-resize;
@@ -263,14 +261,15 @@ const leftItems = [...dockItems, ...actionItems];
   .dock-activity-window.dock-activity-minimized {
     transform: scale(0.86) translateY(120px);
     opacity: 0;
-    transition: transform 180ms ease-in, opacity 180ms ease-in;
+    transition:
+      transform 180ms ease-in,
+      opacity 180ms ease-in;
   }
 
   .dock-activity-window.dock-activity-fullscreen {
     transform: scale(1.04);
     transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
-
 
   @keyframes dock-window-open {
     from {
@@ -283,5 +282,3 @@ const leftItems = [...dockItems, ...actionItems];
     }
   }
 </style>
-
-

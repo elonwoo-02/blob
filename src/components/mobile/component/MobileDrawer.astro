@@ -1,6 +1,6 @@
 ---
-import MenuIcon from '../icons/MenuIcon.astro';
-import ThemeToggle from '../shared/ThemeToggle.astro';
+import MenuIcon from '../../icons/MenuIcon.astro';
+import ThemeToggle from '../../shared/ThemeToggle.astro';
 
 const { pageTitle = 'Dimensional Debris' } = Astro.props;
 const currentPath = Astro.url.pathname;
@@ -21,12 +21,12 @@ const navItems = [
   <input id="mobile-nav-drawer" type="checkbox" class="drawer-toggle" />
 
   <div class="drawer-content">
-    <div class="navbar fixed top-0 left-0 z-50 w-full border-b border-base-200 bg-base-100/90 backdrop-blur-md">
+    <div class="navbar fixed top-0 left-0 z-50 w-full border-base-200">
       <div class="navbar-start flex items-center gap-2">
-        <label for="mobile-nav-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost">
-          <MenuIcon />
-        </label>
-        <a href="/" class="font-bold truncate max-w-[42vw]">{pageTitle}</a>
+        <!--<label for="mobile-nav-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost">-->
+        <!--  <MenuIcon />-->
+        <!--</label>-->
+        <!--<a href="/public" class="font-bold truncate max-w-[42vw]">{pageTitle}</a>-->
       </div>
 
       <div class="navbar-end">
@@ -37,7 +37,7 @@ const navItems = [
 
   <div class="drawer-side z-[60]">
     <label for="mobile-nav-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-    <ul class="menu min-h-full w-64 bg-base-200 p-4">
+    <ul class="menu min-h-full w-48 bg-base-200 p-4">
       <li class="menu-title">Navbar</li>
   {navItems.map((item) => (
     <li>
@@ -50,23 +50,6 @@ const navItems = [
       <li><button onclick="exitApp()" class="w-full text-left px-4 py-2 hover:bg-base-300 transition-colors">Exit App</button></li>
     </ul>
   </div>
-</div>
-
-<div class="dock dock-sm md:hidden">
-  <a href="/" data-nav-path="/" data-mobile-dock-link class={isDockActive('/') ? 'dock-active' : ''} aria-label="Home">
-     <svg class="size-[1.2em]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V10.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-  </a>
-
-  <a href="/blog/" data-nav-path="/blog/" data-mobile-dock-link class={isDockActive('/blog/') ? 'dock-active' : ''} aria-label="Blog">
-    <svg class="size-[1.2em]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 7h8M8 11h8M8 15h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-  </a>
-
-  <a href="/about/" data-nav-path="/about/" data-mobile-dock-link class={isDockActive('/about/') ? 'dock-active' : ''} aria-label="About">
-    <svg class="size-[1.2em]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 21a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-  </a>
-  <a href="/moment/" data-nav-path="/moment/" data-mobile-dock-link class={isDockActive('/moment/') ? 'dock-active' : ''} aria-label="Moment">
-    <svg class="size-[1.2em]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M8 10h8M8 14h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-  </a>
 </div>
 
 <script>

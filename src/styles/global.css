@@ -2,3 +2,9 @@
 @plugin "daisyui" {
   exclude: properties;
 }
+
+@layer base {
+  body {
+    background-color: #F2F1EE;
+  }
+}

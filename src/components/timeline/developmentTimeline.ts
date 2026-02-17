@@ -8,11 +8,11 @@
 
 export const androidTimeline: TimelineEntry[] = [
   {
-    date: '2026-02-12',
-    title: '',
+    date: '2026-02-17',
+    title: '添加一些导航组件',
     tag: 'Android',
     summary: '',
-    details: [''],
+    details: ['新增Dock、Drawer和FabFlower组件'],
   },
 ];
 
@@ -58,19 +58,18 @@ export const baseLayoutTimeline: TimelineEntry[] = [
       '将快捷键重构为可配置映射，便于后续调整。',
     ],
   },
+  {
+    date: '2026-02-17',
+    title: '添加背景色',
+    tag: 'BaseLayout',
+    summary: '',
+    details: [
+      '参考潘通2026年度色云舞白设置背景色。',
+    ],
+  },
 ];
 
 export const indexTimeline: TimelineEntry[] = [
-  {
-    date: '2026-02-08',
-    title: '首页 Hero 初版',
-    tag: 'style',
-    summary: '在首页搭建带终端输出风格的信息区块。',
-    details: [
-      '使用高对比视觉风格与模拟终端日志。',
-      '确保在桌面端和移动端都保持稳定布局。',
-    ],
-  },
   {
     date: '2026-02-12',
     title: '搭建网页开发时间轴',

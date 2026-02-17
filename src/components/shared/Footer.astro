@@ -20,19 +20,72 @@ const {
 };
 ---
 
-<footer class="footer footer-horizontal footer-center bg-base-200 text-base-content rounded p-10">
-  <nav class="grid grid-flow-col gap-4">
-    {primaryLinks.map((item) => (
-      <a class="link link-hover" href={item.href}>{item.label}</a>
-    ))}
-  </nav>
-  <nav class="grid grid-flow-col gap-4">
-    <a class="link link-hover" href={projectLink.href}>{projectLink.label}</a>
-  </nav>
+<footer class="w-full bg-base-100 border-t border-[#2E9CCA]/10 mt-16">
+  <div class="timeline-container max-w-4xl mx-auto px-4 py-12">
+    <div class="text-center space-y-8">
+      <!-- Name with dot indicator -->
+      <div class="flex items-center justify-center gap-3">
+        <span class="h-2 w-2 rounded-full bg-[#2E9CCA] shadow-[0_0_8px_rgba(46,156,202,0.6)]"></span>
+        <h2 class="vcr-font text-2xl font-bold">Elon Woo</h2>
+        <span class="h-2 w-2 rounded-full bg-[#2E9CCA] shadow-[0_0_8px_rgba(46,156,202,0.6)]"></span>
+      </div>
+      
+      <!-- Tagline -->
+      <p class="text-sm text-base-content/60 animate-fade-in-up">
+        Programmer, Editor and Student
+      </p>
 
-  <Social links={socialLinks} />
+      <!-- Navigation links -->
+      <nav class="flex flex-wrap justify-center gap-6 text-sm">
+        {primaryLinks.map((item) => (
+          <a 
+            class="text-base-content/70 hover:text-[#2E9CCA] transition-colors duration-300" 
+            href={item.href}
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
 
-  <aside>
-    <p>Copyright © {new Date().getFullYear()} - All right reserved by Elon Woo</p>
-  </aside>
+      <!-- Project button -->
+      <div class="flex justify-center">
+        <a 
+          class="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-[#2E9CCA]/40 text-sm text-[#2E9CCA] hover:bg-[#2E9CCA] hover:text-white transition-all duration-300 shadow-[inset_0_0_20px_rgba(46,156,202,0.15)]" 
+          href={projectLink.href}
+        >
+          <span class="h-1.5 w-1.5 rounded-full bg-[#2E9CCA]"></span>
+          {projectLink.label}
+        </a>
+      </div>
+
+      <!-- Social links -->
+      <div class="flex justify-center">
+        <Social links={socialLinks} />
+      </div>
+
+      <!-- Copyright -->
+      <div class="pt-6 border-t border-[#2E9CCA]/10">
+        <p class="text-xs text-base-content/50 vcr-font">
+          © {new Date().getFullYear()} Elon Woo
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes fade-in-up {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .animate-fade-in-up {
+      animation: fade-in-up 0.8s ease-out forwards;
+    }
+  </style>
 </footer>
