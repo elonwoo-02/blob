@@ -3,6 +3,7 @@
 // MomentView.astro - Encapsulated WeChat Moments View
 // ============================================
 import MomentPublishModal from '../moment/MomentPublishModal.astro';
+import DrawerToggle from '../ui/DrawerToggle.astro';
 import { moments } from '../../data/moments';
 
 // 图片网格样式计算
@@ -20,6 +21,12 @@ const getImageGridClass = (count: number) => {
 <MomentPublishModal />
 
 <div class="moment-page">
+  <!-- 顶部状态栏 - 与ArticleView对齐 -->
+  <div class="relative flex items-center justify-center py-4 px-4 min-h-[3rem] bg-white border-b border-gray-100">
+    <DrawerToggle />
+    <h2 class="text-xl font-bold text-gray-800">MOMENT</h2>
+  </div>
+
   <!-- ====================== -->
   <!-- 个人封面区域 -->
   <!-- ====================== -->
