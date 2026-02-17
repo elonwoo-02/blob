@@ -37,7 +37,7 @@ const displayEntries = entries;
       const padding = index === 0 ? 'pt-0' : 'pt-6';
       return (
         <!-- 每个 article 代表一条开发事件 -->
-        <article class={padding}>
+        <article class={`reveal-entry ${padding} opacity-0 translate-y-8 transition-all duration-1000 ease-out`}>
           <div class="flex gap-4">
             <!-- 时间轴图标列：点 + 竖线 -->
             <div class="flex flex-col items-center">
@@ -68,3 +68,41 @@ const displayEntries = entries;
     })}
   </div>
 </section>
+
+<script>
+  /**
+   * 使用 Intersection Observer 实现滚动揭示效果
+   */
+  function initRevealObserver() {
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.15 // 当 15% 的元素进入视口时触发
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // 添加激活类并移除初始偏移
+          entry.target.classList.remove('opacity-0', 'translate-y-8');
+          entry.target.classList.add('opacity-100', 'translate-y-0');
+          // 一旦显示就不再观察，除非需要重复动画
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    const targets = document.querySelectorAll('.reveal-entry');
+    targets.forEach((target) => observer.observe(target));
+  }
+
+  // 支持 Astro 的视图转换 (View Transitions)
+  document.addEventListener('astro:page-load', initRevealObserver);
+  
+  // 初始加载处理 (如果当前页面没有 View Transitions 或者是在非 View Transitions 页面)
+  if (document.readyState === 'complete') {
+    initRevealObserver();
+  } else {
+    window.addEventListener('load', initRevealObserver);
+  }
+</script>
