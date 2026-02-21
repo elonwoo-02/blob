@@ -5,53 +5,60 @@ import {
   aboutTimeline,
   blogTimeline,
   bookmarksTimeline,
+  experienceTimeline,
   baseLayoutTimeline,
   markdownPostLayoutTimeline,
   androidTimeline,
 } from "../../../data/development.ts";
 ---
 
-      <div class="timeline-container max-w-5xl mx-auto px-4 -mt-4 pt-4">
-        <TimelineSection
-          entries={baseLayoutTimeline}
-          title="网页基础布局"
-          subtitle=""
-          tagLabel="baseLayout"
-        />
-        <TimelineSection
-          entries={markdownPostLayoutTimeline}
-          title="文章基础布局"
-          subtitle=""
-          tagLabel="PostLayout"
-        />
-        <TimelineSection
-          entries={indexTimeline}
-          title="首页"
-          subtitle=""
-          tagLabel="index"
-        />
-        <TimelineSection
-          entries={aboutTimeline}
-          title="关于"
-          subtitle=""
-          tagLabel="about"
-        />
-        <TimelineSection
-          entries={blogTimeline}
-          title="博客"
-          subtitle=""
-          tagLabel="blog"
-        />
-        <TimelineSection
-          entries={bookmarksTimeline}
-          title="收藏"
-          subtitle=""
-          tagLabel="bookmarks"
-        />
-        <TimelineSection
-          entries={androidTimeline}
-          title="移动端"
-          subtitle=""
-          tagLabel="android"
-        />
-      </div>
+<div class="timeline-container -mt-4 pt-4">
+  <TimelineSection
+    entries={baseLayoutTimeline}
+    title="基础布局"
+    subtitle=""
+    tagLabel="baseLayout"
+  />
+  <TimelineSection
+    entries={markdownPostLayoutTimeline}
+    title="文章布局"
+    subtitle=""
+    tagLabel="PostLayout"
+  />
+  <TimelineSection
+    entries={indexTimeline}
+    title="首页"
+    subtitle=""
+    tagLabel="index"
+  />
+  <TimelineSection
+    entries={aboutTimeline}
+    title="关于"
+    subtitle=""
+    tagLabel="about"
+  />
+  <TimelineSection
+    entries={blogTimeline}
+    title="博客"
+    subtitle=""
+    tagLabel="blog"
+  />
+  <TimelineSection
+    entries={bookmarksTimeline}
+    title="收藏"
+    subtitle=""
+    tagLabel="bookmarks"
+  />
+  <TimelineSection
+    entries={experienceTimeline}
+    title="Experience"
+    subtitle=""
+    tagLabel="experience"
+  />
+  <TimelineSection
+    entries={androidTimeline}
+    title="移动端"
+    subtitle=""
+    tagLabel="android"
+  />
+</div>

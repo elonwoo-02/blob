@@ -17,7 +17,7 @@ interface Props {
 
 const {
   pageTitle = "",
-  contentWidth = "7xl",
+  contentWidth = "6xl",
   contentClass = "",
   mainClass = "",
   showElonFloat = true,
@@ -30,7 +30,7 @@ const contentWidthClassMap = {
   full: "max-w-none",
 } as const;
 
-const contentWidthClass = contentWidthClassMap[contentWidth] ?? "max-w-7xl";
+const contentWidthClass = contentWidthClassMap[contentWidth] ?? "max-w-6xl";
 ---
 
 <html lang="zh-CN">
