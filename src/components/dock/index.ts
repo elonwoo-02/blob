@@ -1,2 +1,3 @@
-// Public entry for dock behavior.
-export { initDock } from './logic/dockController.js';
+// Compatibility re-export for legacy imports.
+export { initDock } from "../shared/dock/index";
+
