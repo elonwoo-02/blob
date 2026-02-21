@@ -6,6 +6,7 @@ import PlayBot from "../components/shared/bot/PlayBot.astro";
 import Footer from "../components/shared/Footer.astro";
 import TerminalModal from "../components/shared/terminal/TerminalModal.astro";
 import Mobile from "../components/mobile/Mobile.astro";
+import DynamicIslandShell from "../components/shared/dynamic-island/DynamicIslandShell.astro";
 
 interface Props {
   pageTitle?: string;
@@ -43,6 +44,7 @@ const contentWidthClass = contentWidthClassMap[contentWidth] ?? "max-w-6xl";
       href="/icon_favicon32x32.png"
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <ClientRouter />
@@ -53,6 +55,7 @@ const contentWidthClass = contentWidthClassMap[contentWidth] ?? "max-w-6xl";
     <!-- Global navigation -->
     <Mobile />
     <Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />
+    <DynamicIslandShell />
 
     <!-- Terminal entry shell: mount point only, terminal internals stay in TerminalModal -->
     <div
@@ -85,6 +88,9 @@ const contentWidthClass = contentWidthClassMap[contentWidth] ?? "max-w-6xl";
 
     <script>
       import "../scripts/globalShortcuts.js";
+      import { registerAppServiceWorker } from "../scripts/registerSw";
+
+      registerAppServiceWorker();
     </script>
   </body>
 </html>

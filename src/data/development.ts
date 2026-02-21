@@ -106,6 +106,28 @@ export const baseLayoutTimeline: TimelineEntry[] = [
   },
   {
     date: '2026-02-21',
+    title: '新增灵动岛消息组件',
+    tag: 'UI',
+    summary: '仿 iPhone 灵动岛形态实现全站消息入口。',
+    details: [
+      '新增顶部固定胶囊组件，支持收起与展开交互。',
+      '使用 Astro 群岛架构挂载为独立交互岛屿。',
+      '抽离消息总线，支持后续扩展系统消息与更新提醒。',
+    ],
+  },
+  {
+    date: '2026-02-21',
+    title: '接入安装提示链路',
+    tag: 'PWA',
+    summary: '首次访问提示将网页安装为应用并支持安装状态感知。',
+    details: [
+      '接入 beforeinstallprompt 与 appinstalled 事件。',
+      '首次访问提示一次，关闭后记忆不重复打扰。',
+      'iOS 场景降级为“添加到主屏幕”引导。',
+    ],
+  },
+  {
+    date: '2026-02-21',
     title: 'AI 聊天终端接入（LangGraph）',
     tag: 'AI',
     summary: '在终端中接入 AI 聊天命令与服务端图编排。',

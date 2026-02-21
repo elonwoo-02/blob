@@ -1,5 +1,5 @@
 self.addEventListener('install', (event) => {
-  const cacheName = 'pwa-cache-v2';
+  const cacheName = 'pwa-cache-v3';
   event.waitUntil(
     caches.open(cacheName).then((cache) =>
       cache.addAll([
@@ -7,7 +7,8 @@ self.addEventListener('install', (event) => {
         '/manifest.webmanifest',
         '/icon_favicon32x32.png',
         '/favicon.svg',
-        '/icons/icon.svg'
+        '/icons/icon-192.webp',
+        '/icons/icon-512.webp'
       ])
     )
   );
@@ -15,7 +16,7 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  const keep = 'pwa-cache-v2';
+  const keep = 'pwa-cache-v3';
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.filter((key) => key !== keep).map((key) => caches.delete(key)))
