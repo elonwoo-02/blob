@@ -12,10 +12,10 @@
 
 ## 2. 组件结构
 
-- `src/components/Dock.astro`
+- `src/components/shared/dock/ui/Dock.astro`
   - Dock 主容器
   - 负责左右分区布局、自动隐藏逻辑、动态打开项管理
-- `src/components/DockItem.astro`
+- `src/components/shared/dock/ui/DockItem.astro`
   - 单个图标项封装
   - 负责 tooltip、图标显示、放大动画、关闭按钮
 
@@ -49,7 +49,7 @@
 
 在 `src/layouts/BaseLayout.astro` 中插入：
 
-- `import Dock from '../components/Dock.astro';`
+- `import Dock from '../components/shared/dock/ui/Dock.astro';`
 - `<Dock pageTitle={pageTitle} currentPath={Astro.url.pathname} />`
 
 这样所有页面共享同一套 Dock 行为。
