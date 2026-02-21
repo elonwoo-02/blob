@@ -1,0 +1,41 @@
+---
+import type { PublicationItem } from "../../data/experience";
+
+interface Props {
+  items: PublicationItem[];
+}
+
+const { items } = Astro.props as Props;
+---
+
+{
+  items.length > 0 ? (
+    <div class="space-y-4">
+      {items.map((publication) => (
+        <article class="border border-slate-300/95 bg-slate-50/45 p-5">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h3 class="text-lg font-semibold tracking-tight text-slate-900">{publication.title}</h3>
+            <p class="text-sm text-slate-600">{publication.year}</p>
+          </div>
+          <p class="mt-2.5 text-slate-700">
+            <span class="font-semibold text-slate-800">{publication.venue}</span> - {publication.status}
+          </p>
+          {publication.url && (
+            <a
+              href={publication.url}
+              target="_blank"
+              rel="noreferrer noopener"
+              class="mt-3 inline-flex text-sm text-slate-700 underline decoration-slate-400 underline-offset-4 transition hover:text-slate-900 hover:decoration-slate-700"
+            >
+              Read Publication
+            </a>
+          )}
+        </article>
+      ))}
+    </div>
+  ) : (
+    <p class="border border-dashed border-slate-300/90 bg-slate-50/30 p-5 leading-7 text-slate-700">
+      Publications available upon request.
+    </p>
+  )
+}

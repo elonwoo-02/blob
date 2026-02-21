@@ -1,0 +1,27 @@
+---
+import type { ExperienceSectionRef } from "../../data/experience";
+
+interface Props {
+  sections: ExperienceSectionRef[];
+}
+
+const { sections } = Astro.props as Props;
+---
+
+<nav aria-label="Experience sections" class="border border-slate-300/90 bg-slate-50/35 p-4 lg:sticky lg:top-24">
+  <p class="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">On This Page</p>
+  <ul class="space-y-1.5">
+    {sections.map((section) => (
+      <li>
+        <a
+          href={`#${section.id}`}
+          data-toc-link
+          data-target-id={section.id}
+          class="inline-flex w-full border-l-2 border-transparent py-1.5 pl-3 text-sm text-slate-500 transition hover:border-slate-500 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+        >
+          {section.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

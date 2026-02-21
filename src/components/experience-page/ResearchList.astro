@@ -1,0 +1,25 @@
+---
+import type { ResearchItem } from "../../data/experience";
+
+interface Props {
+  items: ResearchItem[];
+}
+
+const { items } = Astro.props as Props;
+---
+
+<div class="space-y-4">
+  {items.map((item) => (
+    <article class="border border-slate-300/95 bg-slate-50/45 p-5">
+      <h3 class="text-lg font-semibold tracking-tight text-slate-900">{item.title}</h3>
+      <p class="mt-2.5 leading-7 text-slate-700">{item.summary}</p>
+      <ul class="mt-4 flex flex-wrap gap-2">
+        {item.keywords.map((keyword) => (
+          <li class="border border-slate-300 bg-white/60 px-2 py-1 text-xs tracking-wide text-slate-600">
+            {keyword}
+          </li>
+        ))}
+      </ul>
+    </article>
+  ))}
+</div>
