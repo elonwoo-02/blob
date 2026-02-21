@@ -1,5 +1,6 @@
 import { initTerminalInteraction } from './terminalInteraction.js';
 import { initTerminalCommands } from './terminalCommands.js';
+import { initTheme, setThemePreference } from '../../../scripts/theme/themeManager.ts';
 
 const overlay = document.getElementById('shortcut-overlay');
 const terminalPanel = document.getElementById('terminal-panel');
@@ -61,21 +62,7 @@ const pushClickable = (label, command) => {
   terminalOutput.scrollTop = terminalOutput.scrollHeight;
 };
 
-const getPreferredTheme = () =>
-  window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-
-const setThemeMode = (mode) => {
-  const resolved = mode === 'auto' ? getPreferredTheme() : mode;
-  document.documentElement.setAttribute('data-theme', resolved);
-  window.localStorage.setItem('theme', mode);
-};
-
-const themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
-themeMedia.addEventListener('change', () => {
-  if (window.localStorage.getItem('theme') === 'auto') {
-    setThemeMode('auto');
-  }
-});
+initTheme();
 
 updateClock();
 window.setInterval(updateClock, 30000);
@@ -90,7 +77,7 @@ const commandRuntime = initTerminalCommands({
   dock,
   closeOverlay,
   navigateTo,
-  setThemeMode,
+  setThemePreference,
   pushLine,
 });
 

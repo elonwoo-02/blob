@@ -3,9 +3,51 @@
   exclude: properties;
 }
 
+:root,
+html[data-theme="light"] {
+  --app-bg: #f2f1ee;
+  --app-surface: #ffffff;
+  --app-surface-2: #f3f4f6;
+  --app-text: #111827;
+  --app-text-muted: #4b5563;
+  --app-border: #d1d5db;
+  --app-accent: #2e9cca;
+  --app-accent-contrast: #f8fbff;
+
+  --color-base-100: var(--app-surface);
+  --color-base-200: var(--app-surface-2);
+  --color-base-300: #e5e7eb;
+  --color-base-content: var(--app-text);
+  --color-primary: var(--app-accent);
+  --color-primary-content: var(--app-accent-contrast);
+}
+
+html[data-theme="dark"] {
+  --app-bg: #0f141a;
+  --app-surface: #161d24;
+  --app-surface-2: #1b2430;
+  --app-text: #e6edf5;
+  --app-text-muted: #aeb8c5;
+  --app-border: #2d3a4b;
+  --app-accent: #67b6d8;
+  --app-accent-contrast: #07131b;
+
+  --color-base-100: var(--app-surface);
+  --color-base-200: var(--app-surface-2);
+  --color-base-300: #253346;
+  --color-base-content: var(--app-text);
+  --color-primary: var(--app-accent);
+  --color-primary-content: var(--app-accent-contrast);
+}
+
 @layer base {
+  html,
   body {
-    background-color: #F2F1EE;
+    background-color: var(--app-bg);
+    color: var(--app-text);
+    transition:
+      background-color 180ms ease,
+      color 180ms ease;
   }
 
   /* Hide vertical scrollbar globally but keep scrolling functional */

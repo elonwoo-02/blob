@@ -4,7 +4,7 @@ export const initTerminalCommands = ({
   dock,
   closeOverlay,
   navigateTo,
-  setThemeMode,
+  setThemePreference,
   pushLine,
 }) => {
   if (!terminalInput) {
@@ -538,12 +538,12 @@ export const initTerminalCommands = ({
         break;
       case 'theme':
         if (argument === 'dark' || argument === 'light' || argument === 'auto') {
-          setThemeMode(argument);
+          setThemePreference(argument);
           pushLine(`Theme set to ${argument}.`, 'dim');
         } else if (argument === 'toggle') {
           const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
           const next = currentTheme === 'dark' ? 'light' : 'dark';
-          setThemeMode(next);
+          setThemePreference(next);
           pushLine(`Theme set to ${next}.`, 'dim');
         } else {
           pushLine('Usage: theme dark|light|auto|toggle', 'error');

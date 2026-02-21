@@ -36,6 +36,28 @@ const contentWidthClass = contentWidthClassMap[contentWidth] ?? "max-w-6xl";
 
 <html lang="zh-CN">
   <head>
+    <script is:inline>
+      (() => {
+        try {
+          const key = "theme";
+          const stored = window.localStorage.getItem(key);
+          const preference =
+            stored === "light" || stored === "dark" || stored === "auto"
+              ? stored
+              : "auto";
+          const system = window.matchMedia("(prefers-color-scheme: dark)")
+            .matches
+            ? "dark"
+            : "light";
+          const resolved = preference === "auto" ? system : preference;
+          document.documentElement.setAttribute("data-theme", resolved);
+          document.documentElement.style.colorScheme = resolved;
+        } catch {
+          document.documentElement.setAttribute("data-theme", "light");
+          document.documentElement.style.colorScheme = "light";
+        }
+      })();
+    </script>
     <meta charset="utf-8" />
     <link
       rel="icon"
@@ -88,8 +110,10 @@ const contentWidthClass = contentWidthClassMap[contentWidth] ?? "max-w-6xl";
 
     <script>
       import "../scripts/globalShortcuts.js";
+      import { initTheme } from "../scripts/theme/themeManager.ts";
       import { registerAppServiceWorker } from "../scripts/registerSw";
 
+      initTheme();
       registerAppServiceWorker();
     </script>
   </body>

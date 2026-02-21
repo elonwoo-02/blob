@@ -163,6 +163,17 @@ export const baseLayoutTimeline: TimelineEntry[] = [
   },
   {
     date: '2026-02-21',
+    title: '重写全站主题切换系统',
+    tag: 'Theme',
+    summary: '统一 light/dark/auto 主题入口并提升主题切换后文本可读性。',
+    details: [
+      '新增 themeManager，统一 Dock/快捷键/Terminal 的主题切换逻辑。',
+      'BaseLayout 在首屏渲染前注入主题初始化，减少主题闪烁。',
+      'global.css 引入主题语义色变量，统一背景与文字对比度策略。',
+    ],
+  },
+  {
+    date: '2026-02-21',
     title: '新增灵动岛消息组件',
     tag: 'UI',
     summary: '仿 iPhone 灵动岛形态实现全站消息入口。',
