@@ -30,7 +30,6 @@ export const initTerminalCommands = ({
     pushLine('  home                 Go to Home', 'dim');
     pushLine('  blog                 Go to Blog', 'dim');
     pushLine('  about                Go to About', 'dim');
-    pushLine('  bookmarks            Go to Bookmarks', 'dim');
     pushLine('  theme dark|light|auto Switch theme', 'dim');
     pushLine('  theme toggle          Toggle theme', 'dim');
     pushLine('  open <url>            Open a URL', 'dim');
@@ -72,9 +71,6 @@ export const initTerminalCommands = ({
         break;
       case 'about':
         pushLine('about - go to About', 'dim');
-        break;
-      case 'bookmarks':
-        pushLine('bookmarks - go to Bookmarks', 'dim');
         break;
       case 'theme':
         pushLine('theme dark|light|auto|toggle - switch theme', 'dim');
@@ -540,9 +536,6 @@ export const initTerminalCommands = ({
       case 'about':
         navigateTo('/about/');
         break;
-      case 'bookmarks':
-        navigateTo('/bookmarks/');
-        break;
       case 'theme':
         if (argument === 'dark' || argument === 'light' || argument === 'auto') {
           setThemeMode(argument);
@@ -686,7 +679,6 @@ export const initTerminalCommands = ({
     'home',
     'blog',
     'about',
-    'bookmarks',
     'theme',
     'open',
     'search',
