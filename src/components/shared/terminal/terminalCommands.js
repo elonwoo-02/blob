@@ -16,6 +16,9 @@ export const initTerminalCommands = ({
   let lastSearchResults = [];
   const notesKey = 'terminal-notes';
   const historyKey = 'terminal-history';
+  const aiHistoryKey = 'terminal-ai-history';
+  const aiThreadKey = 'terminal-ai-thread-id';
+  const aiMaxMessages = 20;
   // Shared command history used by arrow navigation and "Last session" preview.
   const history = JSON.parse(window.localStorage.getItem(historyKey) || '[]');
   let historyIndex = -1;
@@ -45,6 +48,10 @@ export const initTerminalCommands = ({
     pushLine('  version              Show app version', 'dim');
     pushLine('  clear                Clear terminal output', 'dim');
     pushLine('  clear-history        Clear all command history', 'dim');
+    pushLine('  ai ask <question>    Ask AI assistant', 'dim');
+    pushLine('  ai history           Show AI chat history', 'dim');
+    pushLine('  ai reset             Clear AI chat context', 'dim');
+    pushLine('  ai help              Show AI command usage', 'dim');
     pushLine('  !<n>                 Re-run history item', 'dim');
     pushLine('  reset-layout         Clear saved window layout', 'dim');
     pushLine('  reload               Reload current page', 'dim');
@@ -107,6 +114,12 @@ export const initTerminalCommands = ({
         break;
       case 'clear':
         pushLine('clear - clear terminal output', 'dim');
+        break;
+      case 'ai':
+        pushLine('ai ask <question> - ask AI assistant with context', 'dim');
+        pushLine('ai history - show recent AI chat history', 'dim');
+        pushLine('ai reset - clear AI chat context', 'dim');
+        pushLine('ai help - show AI usage', 'dim');
         break;
       case 'reset-layout':
         pushLine('reset-layout - clear saved window layout', 'dim');
@@ -177,6 +190,225 @@ export const initTerminalCommands = ({
   };
 
   const readNotes = () => JSON.parse(window.localStorage.getItem(notesKey) || '[]');
+  const readAiHistory = () => JSON.parse(window.localStorage.getItem(aiHistoryKey) || '[]');
+  const writeAiHistory = (messages) => {
+    window.localStorage.setItem(aiHistoryKey, JSON.stringify(messages.slice(-aiMaxMessages)));
+  };
+  const getAiThreadId = () => {
+    const current = window.localStorage.getItem(aiThreadKey);
+    if (current) return current;
+    const generated = `thread-${window.crypto?.randomUUID?.() || Date.now()}`;
+    window.localStorage.setItem(aiThreadKey, generated);
+    return generated;
+  };
+  const resetAiSession = () => {
+    window.localStorage.removeItem(aiHistoryKey);
+    window.localStorage.removeItem(aiThreadKey);
+  };
+
+  const createStreamingLine = () => {
+    if (!terminalOutput) return null;
+    const li = document.createElement('li');
+    li.classList.add('output');
+    li.textContent = 'AI: ';
+    terminalOutput.append(li);
+    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    return li;
+  };
+
+  const parseSseChunk = (raw) => {
+    const lines = raw.split('\n');
+    let eventType = 'message';
+    const dataLines = [];
+
+    lines.forEach((line) => {
+      if (line.startsWith('event:')) {
+        eventType = line.slice(6).trim();
+        return;
+      }
+      if (line.startsWith('data:')) {
+        dataLines.push(line.slice(5).trim());
+      }
+    });
+
+    let payload = {};
+    try {
+      payload = JSON.parse(dataLines.join('\n') || '{}');
+    } catch {
+      payload = {};
+    }
+
+    return { eventType, payload };
+  };
+
+  const runAiAsk = async (question) => {
+    if (!question) {
+      pushLine('Usage: ai ask <question>', 'error');
+      return;
+    }
+
+    const historyMessages = readAiHistory();
+    const nextMessages = [...historyMessages, { role: 'user', content: question }].slice(-aiMaxMessages);
+    const streamLine = createStreamingLine();
+    let fullAnswer = '';
+
+    try {
+      const compactHistory = nextMessages.slice(-6).map((message) => ({
+        role: message.role,
+        content: String(message.content || '').slice(0, 240),
+      }));
+      const params = new URLSearchParams({
+        q: question,
+        h: JSON.stringify(compactHistory),
+      });
+
+      // Astro static dev does not support POST endpoints; use GET in dev.
+      const preferGet = Boolean(import.meta?.env?.DEV);
+      let response;
+
+      if (preferGet) {
+        response = await fetch(`/api/ai/chat?${params.toString()}`, {
+          method: 'GET',
+          headers: { accept: 'application/json' },
+        });
+      } else {
+        const payload = {
+          messages: nextMessages,
+          threadId: getAiThreadId(),
+          stream: true,
+        };
+        response = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      if (response.status === 400) {
+        let errorPayload = null;
+        try {
+          errorPayload = await response.json();
+        } catch {
+          errorPayload = null;
+        }
+
+        if (errorPayload?.error === 'Request body is empty.') {
+          response = await fetch(`/api/ai/chat?${params.toString()}`, {
+            method: 'GET',
+            headers: { accept: 'application/json' },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const fallbackText = typeof data?.text === 'string' ? data.text : '';
+            if (!fallbackText) {
+              pushLine('AI returned an empty response.', 'error');
+              return;
+            }
+            fullAnswer = fallbackText;
+            if (streamLine) {
+              streamLine.textContent = `AI: ${fullAnswer}`;
+            } else {
+              pushLine(`AI: ${fullAnswer}`);
+            }
+            writeAiHistory([...nextMessages, { role: 'assistant', content: fullAnswer }]);
+            return;
+          }
+        }
+      }
+
+      if (!response.ok) {
+        let errorMessage = `AI request failed (${response.status})`;
+        try {
+          const errorPayload = await response.json();
+          if (errorPayload?.error) {
+            errorMessage = errorPayload.error;
+          }
+        } catch {
+          // ignore parse failure and use fallback message
+        }
+        pushLine(errorMessage, 'error');
+        return;
+      }
+
+      if (!response.body) {
+        pushLine('AI stream is not available in this environment.', 'error');
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let done = false;
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          buffer += decoder.decode(value, { stream: true });
+        }
+
+        let markerIndex = buffer.indexOf('\n\n');
+        while (markerIndex !== -1) {
+          const rawEvent = buffer.slice(0, markerIndex);
+          buffer = buffer.slice(markerIndex + 2);
+          const { eventType, payload } = parseSseChunk(rawEvent);
+
+          if (eventType === 'token') {
+            const token = typeof payload?.text === 'string' ? payload.text : '';
+            if (!token) {
+              markerIndex = buffer.indexOf('\n\n');
+              continue;
+            }
+            fullAnswer += token;
+            if (streamLine) {
+              streamLine.textContent = `AI: ${fullAnswer}`;
+              terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+          } else if (eventType === 'error') {
+            const message = typeof payload?.message === 'string' ? payload.message : 'AI stream failed.';
+            throw new Error(message);
+          }
+
+          markerIndex = buffer.indexOf('\n\n');
+        }
+      }
+
+      if (!fullAnswer) {
+        pushLine('AI returned an empty response.', 'error');
+        return;
+      }
+
+      writeAiHistory([...nextMessages, { role: 'assistant', content: fullAnswer }]);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'AI request failed.';
+      pushLine(message, 'error');
+    }
+  };
+
+  const runAiHistory = () => {
+    const historyMessages = readAiHistory();
+    if (!historyMessages.length) {
+      pushLine('No AI history yet. Try: ai ask <question>', 'dim');
+      return;
+    }
+    pushLine('AI history:', 'dim');
+    historyMessages.slice(-10).forEach((message, index) => {
+      const role = message.role || 'unknown';
+      const content = (message.content || '').replace(/\s+/g, ' ').trim();
+      const preview = content.length > 96 ? `${content.slice(0, 96)}...` : content;
+      pushLine(`${index + 1}. [${role}] ${preview}`, 'dim');
+    });
+  };
+
+  const runAiHelp = () => {
+    pushLine('AI commands:', 'dim');
+    pushLine('  ai ask <question>  Ask assistant with session memory', 'dim');
+    pushLine('  ai history         Show recent chat context', 'dim');
+    pushLine('  ai reset           Clear chat context', 'dim');
+    pushLine('  ai help            Show this help', 'dim');
+  };
+
   const renderSearchMatches = (matches) => {
     lastSearchResults = matches;
     if (!matches.length) {
@@ -412,6 +644,33 @@ export const initTerminalCommands = ({
         window.localStorage.removeItem(historyKey);
         pushLine('History cleared.', 'dim');
         break;
+      case 'ai': {
+        const [sub, ...rest] = argument.split(' ').filter(Boolean);
+        if (!sub) {
+          runAiHelp();
+          break;
+        }
+        if (sub === 'ask') {
+          void runAiAsk(rest.join(' ').trim());
+          break;
+        }
+        if (sub === 'history') {
+          runAiHistory();
+          break;
+        }
+        if (sub === 'reset') {
+          resetAiSession();
+          pushLine('AI chat context cleared.', 'dim');
+          break;
+        }
+        if (sub === 'help') {
+          runAiHelp();
+          break;
+        }
+        pushLine(`Unknown ai subcommand: ${sub}`, 'error');
+        runAiHelp();
+        break;
+      }
       case 'exit':
         closeOverlay();
         break;
@@ -445,6 +704,7 @@ export const initTerminalCommands = ({
     'status',
     'exit',
     'clear-history',
+    'ai',
   ];
 
   const completeInput = () => {
