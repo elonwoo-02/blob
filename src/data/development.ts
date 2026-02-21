@@ -18,11 +18,26 @@ export const androidTimeline: TimelineEntry[] = [
 
 export const markdownPostLayoutTimeline: TimelineEntry[] = [
   {
-    date: '2026-02-12',
-    title: '',
+    date: '2026-02-21',
+    title: '优化文章基础布局与宽度对齐',
     tag: 'Post',
-    summary: '',
-    details: [''],
+    summary: '文章页主内容宽度与 BaseLayout 保持一致，修复展示混乱。',
+    details: [
+      '文章页面容器统一继承站点主容器宽度策略。',
+      '修复文章布局错位与构建失败相关问题。',
+      '优化内容阅读节奏与版面稳定性。',
+    ],
+  },
+  {
+    date: '2026-02-21',
+    title: '加入章节导航与阅读辅助',
+    tag: 'Post',
+    summary: '文章页支持章节目录导航与阅读进度反馈。',
+    details: [
+      '桌面端展示右侧 TOC，移动端提供折叠目录。',
+      '目录高亮与滚动定位联动。',
+      '长文场景下阅读进度条可用。',
+    ],
   },
 ];
 
@@ -65,6 +80,69 @@ export const baseLayoutTimeline: TimelineEntry[] = [
     summary: '',
     details: [
       '参考潘通2026年度色云舞白设置背景色。',
+    ],
+  },
+  {
+    date: '2026-02-21',
+    title: '统一页面宽度控制入口',
+    tag: 'Layout',
+    summary: '移除页面内部宽度覆盖，统一由 BaseLayout 控制。',
+    details: [
+      'About 页面移除 .site-content 的 max-width 覆盖。',
+      'Experience/Test/Timeline 移除局部 max-w 约束。',
+      '各页面内容宽度策略一致化。',
+    ],
+  },
+  {
+    date: '2026-02-21',
+    title: '全站默认宽度收窄至 6xl',
+    tag: 'BaseLayout',
+    summary: '默认内容宽度由 7xl 调整为 6xl，并同步 Footer 对齐。',
+    details: [
+      'BaseLayout 默认 contentWidth: 7xl -> 6xl。',
+      'fallback 宽度同步改为 max-w-6xl。',
+      'Footer 容器宽度与主容器一致。',
+    ],
+  },
+  {
+    date: '2026-02-21',
+    title: 'AI 聊天终端接入（LangGraph）',
+    tag: 'AI',
+    summary: '在终端中接入 AI 聊天命令与服务端图编排。',
+    details: [
+      '新增 /api/ai/chat 路由并接入 LangGraph。',
+      '支持 ai ask / ai history / ai reset / ai help 命令。',
+      '会话历史持久化到 localStorage。',
+    ],
+  },
+  {
+    date: '2026-02-21',
+    title: '开发环境兼容修复',
+    tag: 'AI',
+    summary: '解决 static 开发模式下 API 请求兼容问题。',
+    details: [
+      '为 Astro API 路由配置 prerender = false。',
+      '开发环境优先走 GET 兜底请求，避免 POST 限制。',
+    ],
+  },
+  {
+    date: '2026-02-21',
+    title: '模型参数兼容修复',
+    tag: 'AI',
+    summary: '适配 gpt-4o-mini-search-preview 的参数约束。',
+    details: [
+      '移除不兼容的 temperature 参数。',
+      '继续读取 .env 中 OPENAI_MODEL 配置。',
+    ],
+  },
+  {
+    date: '2026-02-21',
+    title: '流式稳定性修复',
+    tag: 'AI',
+    summary: '提高流式输出在不同运行时下的可用性。',
+    details: [
+      '流式失败时自动降级为 invoke 返回完整结果。',
+      '本地与 Cloudflare Functions 路由保持一致逻辑。',
     ],
   },
 ];
@@ -126,6 +204,48 @@ export const bookmarksTimeline: TimelineEntry[] = [
     details: [
       '卡片网格布局配合空状态提示。',
       '保留收藏记录，便于后续管理。',
+    ],
+  },
+];
+
+export const experienceTimeline: TimelineEntry[] = [
+  {
+    date: '2026-02-21',
+    title: '重构 Experience 页面结构',
+    tag: 'Experience',
+    summary: '将页面整理为 Hero + 分区内容 + 右侧目录的学术化版式。',
+    details: [
+      '统一 Research / Projects / Publications 的区块节奏。',
+      '优化页面主栏与 TOC 栅格比例。',
+    ],
+  },
+  {
+    date: '2026-02-21',
+    title: '移除头像并改造 Hero',
+    tag: 'Hero',
+    summary: 'Experience Hero 由双栏改为单栏文本，去除照片。',
+    details: [
+      '强化姓名与身份信息层级。',
+      '保留研究兴趣卡片与操作按钮组。',
+    ],
+  },
+  {
+    date: '2026-02-21',
+    title: '首屏占满 Hero',
+    tag: 'Layout',
+    summary: '未滚动时 Hero 占据主要可视区，增强首屏展示。',
+    details: [
+      '移动端采用 svh 最小高度策略。',
+      '通过纵向分布让信息块更均衡。',
+    ],
+  },
+  {
+    date: '2026-02-21',
+    title: '补充研究兴趣条目',
+    tag: 'Content',
+    summary: 'Research Interests 新增方向条目。',
+    details: [
+      '新增：Model Compression and Inference Optimization。',
     ],
   },
 ];
