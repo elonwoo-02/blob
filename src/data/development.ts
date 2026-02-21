@@ -59,7 +59,7 @@ export const markdownPostLayoutTimeline: TimelineEntry[] = [
     ],
   },
   {
-    date: '2026-02-22',
+    date: '2026-02-21',
     title: '加入章节导航与阅读辅助',
     tag: 'Post',
     summary: '文章页支持章节目录导航与阅读进度反馈。',
@@ -162,7 +162,7 @@ export const baseLayoutTimeline: TimelineEntry[] = [
     ],
   },
   {
-    date: '2026-02-22',
+    date: '2026-02-21',
     title: '新增灵动岛消息组件',
     tag: 'UI',
     summary: '仿 iPhone 灵动岛形态实现全站消息入口。',
@@ -173,7 +173,7 @@ export const baseLayoutTimeline: TimelineEntry[] = [
     ],
   },
   {
-    date: '2026-02-22',
+    date: '2026-02-21',
     title: '接入安装提示链路',
     tag: 'PWA',
     summary: '首次访问提示将网页安装为应用并支持安装状态感知。',
@@ -184,7 +184,7 @@ export const baseLayoutTimeline: TimelineEntry[] = [
     ],
   },
   {
-    date: '2026-02-23',
+    date: '2026-02-21',
     title: '迁移 Dock 与 Icon 到 shared',
     tag: 'Refactor',
     summary: '统一共享组件目录并降低跨页面耦合。',
@@ -195,7 +195,7 @@ export const baseLayoutTimeline: TimelineEntry[] = [
     ],
   },
   {
-    date: '2026-02-24',
+    date: '2026-02-21',
     title: '增加兼容层保障升级无感',
     tag: 'Refactor',
     summary: '为历史路径补充 re-export，避免重构引发功能回退。',
@@ -219,7 +219,7 @@ export const indexTimeline: TimelineEntry[] = [
     details: ['新增 Hero 组件展示头像与标签。', '统一首页首屏信息层级。'],
   },
   {
-    date: '2026-02-22',
+    date: '2026-02-21',
     title: '首页可见全站消息入口',
     tag: 'UI',
     summary: '首页接入灵动岛消息能力，展示安装与系统提示。',
@@ -261,10 +261,17 @@ export const blogTimeline: TimelineEntry[] = [
   },
   {
     date: '2026-02-14',
-    title: '实现双视图内容系统',
+    title: '实现三视图内容系统',
     tag: 'Blog',
-    summary: '博客支持 Article 与 Moment 双视图切换。',
-    details: ['抽离 ArticleView 与 MomentView。', '接入视图切换岛屿组件。'],
+    summary: '博客支持 Article / Moment / Note 三视图切换。',
+    details: ['抽离 ArticleView、MomentView 与 NoteView。', '接入视图切换岛屿组件。'],
+  },
+  {
+    date: '2026-02-16',
+    title: '补充 Note 视图筛选能力',
+    tag: 'Blog',
+    summary: 'Note 视图支持标签筛选与空状态反馈。',
+    details: ['支持标签路径匹配与一键清除过滤。', '补充无结果空状态提示。'],
   },
   {
     date: '2026-02-15',
@@ -312,7 +319,7 @@ export const experienceTimeline: TimelineEntry[] = [
     details: ['移动端采用 svh 最小高度策略。', '通过纵向分布让信息块更均衡。'],
   },
   {
-    date: '2026-02-22',
+    date: '2026-02-21',
     title: '补充研究兴趣条目',
     tag: 'Content',
     summary: 'Research Interests 新增方向条目。',
