@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { buildTagTree } from '../../utils/tags';
-import TagTreeNode from '../../components/post/TagTreeNode.astro';
+import TagTreeNode from '../../components/blog-page/post/TagTreeNode.astro';
 
 const allPosts = await getCollection('blog');
 const tagTree = buildTagTree(allPosts);

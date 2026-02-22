@@ -1,14 +1,12 @@
 ---
-interface SectionItem {
-  title: string;
-  items: string[];
-}
+import type { AboutLanguage, AboutSidebarSection } from "../../../data/about";
 
 interface Props {
-  sidebarByLang: Record<string, SectionItem[]>;
+  sidebarByLang: Record<AboutLanguage, AboutSidebarSection[]>;
+  defaultLanguage?: AboutLanguage;
 }
 
-const { sidebarByLang } = Astro.props as Props;
+const { sidebarByLang, defaultLanguage = "go" } = Astro.props as Props;
 ---
 
 {
@@ -16,7 +14,7 @@ const { sidebarByLang } = Astro.props as Props;
     <div
       class:list={[
         "sidebar-lang-panel",
-        lang === "python" && "is-active",
+        lang === defaultLanguage && "is-active",
       ]}
       data-lang-sidebar={lang}
     >
@@ -39,3 +37,53 @@ const { sidebarByLang } = Astro.props as Props;
     </div>
   ))
 }
+
+<style>
+  .sidebar-lang-panel {
+    display: none;
+  }
+
+  .sidebar-lang-panel.is-active {
+    display: block;
+  }
+
+  .side-section {
+    border: 1px solid color-mix(in srgb, var(--color-base-content) 9%, transparent);
+    background: color-mix(in srgb, var(--color-base-100) 82%, transparent);
+    border-radius: 0.65rem;
+    padding: 0.65rem 0.7rem;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-base-100) 60%, transparent);
+  }
+
+  .side-section + .side-section {
+    margin-top: 0.5rem;
+  }
+
+  .side-title,
+  .side-tail,
+  .side-section li {
+    font-family: "Cascadia Code", "JetBrains Mono", "Consolas", monospace;
+    font-size: 0.74rem;
+    line-height: 1.45;
+  }
+
+  .side-section ul {
+    margin-top: 0.2rem;
+    padding-left: 0.7rem;
+    list-style: none;
+    border-left: 1px solid color-mix(in srgb, var(--color-base-content) 15%, transparent);
+  }
+
+  .kw {
+    color: color-mix(in srgb, var(--color-primary) 88%, var(--color-base-content));
+  }
+
+  .id {
+    color: color-mix(in srgb, var(--color-base-content) 68%, transparent);
+  }
+
+  .str {
+    color: color-mix(in srgb, var(--color-success) 82%, var(--color-base-content));
+    word-break: break-word;
+  }
+</style>

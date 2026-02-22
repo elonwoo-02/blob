@@ -8,6 +8,7 @@ const TAB_NAME_BY_LANG: Record<ResumeLanguage, string> = {
   go: "resume.go",
   zh: "resume.zh-CN",
 };
+const DEFAULT_LANGUAGE: ResumeLanguage = "go";
 
 const isResumeLanguage = (value: string): value is ResumeLanguage =>
   value === "python" || value === "go" || value === "zh";
@@ -26,7 +27,9 @@ const ResumeLanguageIsland = () => {
     );
 
     const applyLanguage = (rawLang: string) => {
-      const lang: ResumeLanguage = isResumeLanguage(rawLang) ? rawLang : "python";
+      const lang: ResumeLanguage = isResumeLanguage(rawLang)
+        ? rawLang
+        : DEFAULT_LANGUAGE;
       sidebarPanels.forEach((panel) => {
         const panelLang = panel.getAttribute("data-lang-sidebar");
         panel.classList.toggle("is-active", panelLang === lang);
@@ -44,7 +47,7 @@ const ResumeLanguageIsland = () => {
       }
     };
 
-    let initialLanguage: ResumeLanguage = "python";
+    let initialLanguage: ResumeLanguage = DEFAULT_LANGUAGE;
     try {
       const savedLanguage = window.localStorage.getItem(STORAGE_KEY);
       if (savedLanguage && isResumeLanguage(savedLanguage)) {

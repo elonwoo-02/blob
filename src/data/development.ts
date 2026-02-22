@@ -263,6 +263,17 @@ export const aboutTimeline: TimelineEntry[] = [
     summary: '强化编辑器风格排版与响应式表现。',
     details: ['完善左右栏网格与移动端断点。', '提升履历信息层级与可读性。'],
   },
+  {
+    date: '2026-02-22',
+    title: '重构 About 为 JetBrains 风工作区',
+    tag: 'About',
+    summary: '完成窄侧栏+主代码区布局，并升级为 token 级代码高亮。',
+    details: [
+      '左侧栏收窄并固定头像模块，主阅读区聚焦代码内容。',
+      '代码块支持关键字/类型/字符串/注释等 token 级着色。',
+      '补充分词与数据契约测试，确保语言切换与显示稳定。',
+    ],
+  },
 ];
 
 export const blogTimeline: TimelineEntry[] = [
