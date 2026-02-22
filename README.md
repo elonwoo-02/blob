@@ -116,12 +116,17 @@ elon-kernel/
 ### Install
 
 ```bash
+# Clone the repository
+git clone --depth 1 https://github.com/elonwoo-02/elon-kernel.git my-new-blog && cd my-new-blog
+
+# Install dependencies
 npm install
 ```
 
 ### Start local dev server
 
 ```bash
+# Run the development server
 npm run dev
 ```
 
