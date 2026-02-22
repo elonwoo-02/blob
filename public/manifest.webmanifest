@@ -1,11 +1,11 @@
 {
-  "name": "Dimensional Debris",
-  "short_name": "Debris",
+  "name": "Elon Kernel",
+  "short_name": "Kernel",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1D1F21",
   "theme_color": "#1D1F21",
-  "description": "Dimensional Debris blog",
+  "description": "Elon Kernel blog",
   "icons": [
     {
       "src": "/icons/icon-192.webp",
