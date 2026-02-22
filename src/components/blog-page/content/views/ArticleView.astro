@@ -3,6 +3,7 @@
 import { type CollectionEntry } from 'astro:content';
 import ContentView from '../ContentView.astro';
 import TagFilterIsland from "../TagFilterIsland";
+import ArticleCardNavigationIsland from "../ArticleCardNavigationIsland";
 
 interface Props {
   pinnedPosts?: CollectionEntry<'blog'>[];
@@ -46,8 +47,10 @@ const formatTime = (date: Date) => {
     <!-- 置顶文章 (Pinned) -->
     {pinnedPosts.length > 0 && pinnedPosts.map((post) => (
       <article 
-        class="arti-card bg-base-100 rounded-xl p-5 shadow-sm border border-base-200/60"
+        class="arti-card bg-base-100 rounded-xl p-5 shadow-sm border border-base-200/60 cursor-pointer"
         data-post-card
+        data-post-url={`/posts/${post.id}/`}
+        data-post-title={post.data.title}
         data-tags={getPostTagPaths(post.data.tags)}
       >
         <!-- Time meta with pinned indicator -->
@@ -66,7 +69,7 @@ const formatTime = (date: Date) => {
         <!-- Title -->
         <div class="mb-3">
            <h3 class="text-lg font-bold text-base-content/90 mb-2 leading-tight hover:text-[var(--app-accent-hover)] transition-colors">
-             <a href={`/posts/${post.id}/`} target="_blank" class="focus:outline-none">
+             <a href={`/posts/${post.id}/`} class="focus:outline-none">
                 {post.data.title}
              </a>
            </h3>
@@ -96,8 +99,10 @@ const formatTime = (date: Date) => {
     {sortedPosts.map((post) => (
       !post.data.docked && (
       <article 
-        class="arti-card bg-base-100 rounded-xl p-5 shadow-sm border border-base-200/60"
+        class="arti-card bg-base-100 rounded-xl p-5 shadow-sm border border-base-200/60 cursor-pointer"
         data-post-card
+        data-post-url={`/posts/${post.id}/`}
+        data-post-title={post.data.title}
         data-tags={getPostTagPaths(post.data.tags)}
       >
         <!-- Time meta -->
@@ -110,7 +115,7 @@ const formatTime = (date: Date) => {
         <!-- Title -->
         <div class="mb-3">
            <h3 class="text-lg font-bold text-base-content/90 mb-2 leading-tight hover:text-[var(--app-accent-hover)] transition-colors">
-             <a href={`/posts/${post.id}/`} target="_blank" class="focus:outline-none">
+             <a href={`/posts/${post.id}/`} class="focus:outline-none">
                 {post.data.title}
              </a>
            </h3>
@@ -154,4 +159,10 @@ const formatTime = (date: Date) => {
   activeTagPanelId="article-active-tag-panel"
   activeTagNameId="article-active-tag-name"
   includeSidebarTagState={true}
+  tagClickMode="modifier"
+/>
+<ArticleCardNavigationIsland
+  client:load
+  cardSelector="[data-post-card]"
+  tagButtonSelector=".article-tag-btn"
 />

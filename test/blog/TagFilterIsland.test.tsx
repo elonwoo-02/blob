@@ -46,4 +46,60 @@ describe("TagFilterIsland", () => {
     expect(firstCard.classList.contains("hidden")).toBe(false);
     expect(secondCard.classList.contains("hidden")).toBe(false);
   });
+
+  it("does not filter on plain click in modifier mode", () => {
+    document.body.innerHTML = `
+      <button class="article-tag-btn" data-tag="tech">tech</button>
+      <article data-post-card data-tags="tech"></article>
+      <article data-post-card data-tags="life"></article>
+      <div id="article-empty-state" class="hidden"></div>
+    `;
+
+    render(
+      <TagFilterIsland
+        tagButtonSelector=".article-tag-btn"
+        cardSelector="[data-post-card]"
+        emptyStateId="article-empty-state"
+        clearButtonIds={[]}
+        tagClickMode="modifier"
+      />,
+    );
+
+    const [firstCard, secondCard] = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-post-card]"),
+    );
+    const tagButton = document.querySelector(".article-tag-btn") as HTMLElement;
+
+    fireEvent.click(tagButton);
+    expect(firstCard.classList.contains("hidden")).toBe(false);
+    expect(secondCard.classList.contains("hidden")).toBe(false);
+  });
+
+  it("filters on ctrl/meta click in modifier mode", () => {
+    document.body.innerHTML = `
+      <button class="article-tag-btn" data-tag="tech">tech</button>
+      <article data-post-card data-tags="tech"></article>
+      <article data-post-card data-tags="life"></article>
+      <div id="article-empty-state" class="hidden"></div>
+    `;
+
+    render(
+      <TagFilterIsland
+        tagButtonSelector=".article-tag-btn"
+        cardSelector="[data-post-card]"
+        emptyStateId="article-empty-state"
+        clearButtonIds={[]}
+        tagClickMode="modifier"
+      />,
+    );
+
+    const [firstCard, secondCard] = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-post-card]"),
+    );
+    const tagButton = document.querySelector(".article-tag-btn") as HTMLElement;
+
+    fireEvent.click(tagButton, { ctrlKey: true });
+    expect(firstCard.classList.contains("hidden")).toBe(false);
+    expect(secondCard.classList.contains("hidden")).toBe(true);
+  });
 });

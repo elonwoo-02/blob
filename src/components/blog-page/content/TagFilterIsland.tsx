@@ -8,6 +8,7 @@ interface Props {
   activeTagPanelId?: string;
   activeTagNameId?: string;
   includeSidebarTagState?: boolean;
+  tagClickMode?: "click" | "modifier";
 }
 
 export const matchesTagFilter = (rawTags: string, tag: string) => {
@@ -24,6 +25,7 @@ const TagFilterIsland = ({
   activeTagPanelId,
   activeTagNameId,
   includeSidebarTagState = false,
+  tagClickMode = "click",
 }: Props) => {
   useEffect(() => {
     const cards = Array.from(document.querySelectorAll<HTMLElement>(cardSelector));
@@ -69,6 +71,12 @@ const TagFilterIsland = ({
     };
 
     const onTagButtonClick = (event: Event) => {
+      const mouseEvent = event as MouseEvent;
+      const shouldFilter =
+        tagClickMode === "click" ||
+        (tagClickMode === "modifier" &&
+          (mouseEvent.ctrlKey || mouseEvent.metaKey));
+      if (!shouldFilter) return;
       event.preventDefault();
       event.stopPropagation();
       const target = event.currentTarget as HTMLElement;
@@ -119,6 +127,7 @@ const TagFilterIsland = ({
     activeTagPanelId,
     activeTagNameId,
     includeSidebarTagState,
+    tagClickMode,
   ]);
 
   return null;
