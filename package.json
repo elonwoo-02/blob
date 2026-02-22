@@ -9,8 +9,9 @@
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest",
+    "check:test-layout": "node tools/check-test-layout.mjs",
     "check:colors": "node tools/check-colors.mjs",
-    "check": "npm run check:colors && npm run build"
+    "check": "npm run check:test-layout && npm run check:colors && npm run build"
   },
   "dependencies": {
     "@astrojs/preact": "^4.1.3",

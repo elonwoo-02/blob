@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@testing-library/preact";
 import TagFilterIsland, {
   matchesTagFilter,
-} from "../../components/blog-page/content/TagFilterIsland";
+} from "../../src/components/blog-page/content/TagFilterIsland";
 
 describe("matchesTagFilter", () => {
   it("supports exact and nested tag matching", () => {

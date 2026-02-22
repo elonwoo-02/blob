@@ -1,5 +1,5 @@
 import { render } from "@testing-library/preact";
-import TimelineRevealIsland from "../../components/index-page/timeline/TimelineRevealIsland";
+import TimelineRevealIsland from "../../src/components/index-page/timeline/TimelineRevealIsland";
 
 describe("TimelineRevealIsland", () => {
   it("reveals intersected timeline entries", () => {

@@ -1,6 +1,6 @@
 import { fireEvent, render } from "@testing-library/preact";
-import MomentPublishModalIsland from "../../components/blog-page/modals/MomentPublishModalIsland";
-import { BLOG_EVENTS } from "../../components/blog-page/events";
+import MomentPublishModalIsland from "../../src/components/blog-page/modals/MomentPublishModalIsland";
+import { BLOG_EVENTS } from "../../src/components/blog-page/events";
 
 describe("MomentPublishModalIsland", () => {
   it("opens from event and dispatches publish payload", () => {

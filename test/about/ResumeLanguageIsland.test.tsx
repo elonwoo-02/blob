@@ -1,5 +1,5 @@
 import { fireEvent, render } from "@testing-library/preact";
-import ResumeLanguageIsland from "../../components/about-page/resume/ResumeLanguageIsland";
+import ResumeLanguageIsland from "../../src/components/about-page/resume/ResumeLanguageIsland";
 
 describe("ResumeLanguageIsland", () => {
   it("loads language from localStorage and updates view on change", () => {
