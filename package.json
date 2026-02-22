@@ -1,7 +1,7 @@
 {
   "name": "elon-kernel",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -33,4 +33,3 @@
     "vitest": "^3.2.4"
   }
 }
-
