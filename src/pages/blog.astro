@@ -1,14 +1,4 @@
----
-// ============================================
-// 博客页面 - Blog Page
-// ============================================
-// 功能说明：
-// 1. 支持Article和Moment两种视图切换
-// 2. Article视图：展示所有博客文章列表，支持按标签筛选
-// 3. Moment视图：展示朋友圈动态（类似微信朋友圈）
-// 4. 左侧drawer sidebar包含博客更新热力图、视图切换和标签树
-// ============================================
-
+﻿---
 import "../styles/global.css";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
@@ -17,23 +7,26 @@ import MomentView from "../components/blog-page/content/views/MomentView.astro";
 import ArticleView from "../components/blog-page/content/views/ArticleView.astro";
 import NoteView from "../components/blog-page/content/views/NoteView.astro";
 import ContentViewSwitcherIsland from "../components/blog-page/content/ContentViewSwitcherIsland";
+import { notes } from "../data/notes";
+import { moments } from "../data/moments";
+import {
+  buildHeatmapMatrix,
+  collectActivityRecords,
+  DEFAULT_HEATMAP_WEEKS,
+} from "../components/blog-page/sidebar/heatmap/buildHeatmapData";
 
-// 获取所有博客文章并按发布日期降序排序
 const allPosts = await getCollection("blog");
 const sortedPosts = [...allPosts].sort(
   (a, b) =>
     new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
 );
 
-// 筛选出置顶文章
 const pinnedPosts = sortedPosts.filter((post) => post.data.docked);
 
-// 统计数据
 const totalPosts = sortedPosts.length;
 const uniqueTags = new Set(sortedPosts.flatMap((post) => post.data.tags));
 const totalTags = uniqueTags.size;
 
-// 计算运行天数 (从第一篇文章发布日期开始)
 const firstPostDate =
   sortedPosts.length > 0
     ? new Date(sortedPosts[sortedPosts.length - 1].data.pubDate)
@@ -43,56 +36,27 @@ const daysActive =
     (new Date().getTime() - firstPostDate.getTime()) / (1000 * 60 * 60 * 24),
   ) + 1;
 
-// ============================================
-// 生成博客更新热力图数据（GitHub风格）
-// ============================================
-// 显示过去364天（52周）的活动数据
-const startDate = new Date();
-startDate.setDate(startDate.getDate() - 364);
-
-const formatDate = (date: Date) =>
-  `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(2, "0")}-${`${date.getDate()}`.padStart(2, "0")}`;
-
-// 生成53周 x 7天的热力图数据
-const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
-  Array.from({ length: 7 }, (_, dayIndex) => {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + weekIndex * 7 + dayIndex);
-
-    // 模拟活动强度（实际项目中应从数据库获取，这里简单用随机数演示，后续可对接真实数据）
-    // 简单优化：如果当天有文章，则热度高
-    const dateStr = date.toISOString().split("T")[0];
-    const postCount = sortedPosts.filter(
-      (p) => p.data.pubDate.toISOString().split("T")[0] === dateStr,
-    ).length;
-
-    let level: number;
-    if (postCount > 0) level = 4;
-    else {
-      // 保持原有的随机模拟作为填充，避免热力图太空
-      const raw = (weekIndex * 3 + dayIndex * 5 + date.getDate()) % 15;
-      level = raw < 10 ? 0 : raw < 12 ? 1 : raw < 14 ? 2 : 3;
-    }
-
-    return {
-      date: formatDate(date),
-      count: level,
-      level,
-    };
-  }),
-);
+const activityRecords = collectActivityRecords({
+  posts: sortedPosts,
+  notes,
+  moments,
+});
+const heatmap = buildHeatmapMatrix(activityRecords, new Date(), DEFAULT_HEATMAP_WEEKS);
+const flattenedHeatmap = heatmap.flat();
+const initialSelectedDate =
+  flattenedHeatmap[flattenedHeatmap.length - 1]?.date ??
+  new Date().toISOString().slice(0, 10);
 ---
 
 <BaseLayout pageTitle="">
-  <!-- Wrapper容器：sidebar + main-content -->
   <div
     id="blog-wrapper"
     class="p-2 flex h-screen overflow-hidden"
     style="transition: all 500ms cubic-bezier(0.4, 0, 0.2, 1);"
-
   >
     <BlogDrawerSidebar
       heatmap={heatmap}
+      initialSelectedDate={initialSelectedDate}
       stats={{ totalPosts, totalTags, daysActive }}
     />
 
@@ -101,21 +65,16 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
       class="blog-page blog-page--index-theme relative flex-1 min-w-0 h-full overflow-y-scroll"
       style="transition: background-color 500ms; scroll-behavior: smooth;"
     >
-      <!-- Drawer侧边栏切换按钮 -->
-      <!-- Article视图 - 默认显示 -->
       <ArticleView pinnedPosts={pinnedPosts} sortedPosts={sortedPosts} />
-      <!-- Moment & Note views (hidden by default) -->
       <MomentView />
       <NoteView hidden={true} />
       <ContentViewSwitcherIsland client:load defaultView="article" />
 
-      <!-- Toast提示框 - 用于显示复制链接等操作反馈 -->
       <div id="toast" class="toast hidden" role="status" aria-live="polite">
-        <div class="toast-surface">已复制链接</div>
+        <div class="toast-surface">Copied link</div>
       </div>
 
       <style is:global>
-        /* Flomo style background */
         .blog-page {
           height: 100%;
         }
@@ -136,11 +95,10 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
           }
         }
 
-        /* Hide scrollbar for the blog page */
         html:has(.blog-page),
         body:has(.blog-page) {
-          scrollbar-width: none !important; /* Firefox */
-          -ms-overflow-style: none !important; /* IE and Edge */
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
         }
 
         html:has(.blog-page)::-webkit-scrollbar,
@@ -150,7 +108,6 @@ const heatmap = Array.from({ length: 53 }, (_, weekIndex) =>
           height: 0 !important;
         }
 
-        /* Also ensure main-content containers hide scrollbars if they scroll individually */
         .blog-page,
         #main-content {
           scrollbar-width: none !important;

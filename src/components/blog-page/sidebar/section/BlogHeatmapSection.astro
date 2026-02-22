@@ -30,19 +30,19 @@ const { heatmap, initialSelectedDate } = Astro.props as Props;
 </div>
 
 <style>
-  .hm-level-0 {
-    background-color: #ffffff;
+  :global(.hm-level-0) {
+    background-color: #d2d2d2;
   }
-  .hm-level-1 {
+  :global(.hm-level-1) {
     background-color: var(--app-accent-soft);
   }
-  .hm-level-2 {
+  :global(.hm-level-2) {
     background-color: var(--app-focus);
   }
-  .hm-level-3 {
+  :global(.hm-level-3) {
     background-color: var(--app-accent-hover);
   }
-  .hm-level-4 {
+  :global(.hm-level-4) {
     background-color: var(--app-accent);
   }
 </style>

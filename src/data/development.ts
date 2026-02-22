@@ -301,6 +301,17 @@ export const blogTimeline: TimelineEntry[] = [
     summary: '解决小屏场景下的抽屉和内容区错位问题。',
     details: ['优化移动端 Drawer 显隐行为。', '调整内容区宽度与滚动表现。'],
   },
+  {
+    date: '2026-02-22',
+    title: '重构博客热力图为真实活动追踪',
+    tag: 'Blog',
+    summary: '热力图改为 12x7 真实数据聚合，并修复颜色层级与样式生效问题。',
+    details: [
+      '活动数据从伪随机改为 Article/Note/Moment 按日聚合。',
+      '热力图布局调整为 12x7，点击日期可查看当天明细。',
+      '修复 Astro 样式作用域导致的颜色失效，0 级改为中性灰块。',
+    ],
+  },
 ];
 
 export const experienceTimeline: TimelineEntry[] = [
