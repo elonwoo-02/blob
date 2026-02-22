@@ -22,7 +22,9 @@ export const initDock = (selector = '#mac-dock', options: DockInitOptions = {}) 
   }
 
   const dock = document.querySelector(selector) as HTMLElement | null;
-  if (!dock) return;
+  if (!dock) return () => {};
+  if (dock.dataset.dockInitialized === '1') return () => {};
+  dock.dataset.dockInitialized = '1';
 
   const payload = JSON.parse(dock.dataset.dock || '{}') as DockPayload;
   const rightList = dock.querySelector('.dock-right') as HTMLElement | null;
@@ -48,15 +50,15 @@ export const initDock = (selector = '#mac-dock', options: DockInitOptions = {}) 
     },
   });
 
-  createDockVisibility(dock);
-  bindDockActions(dock);
+  const cleanupVisibility = createDockVisibility(dock);
+  const cleanupActions = bindDockActions(dock);
 
   const isSystemPath = ['/', '/blog/', '/about/'].includes(payload.currentPath);
   const isBlogPostPath = /^\/posts\/.+/.test(payload.currentPath);
 
   if (!isSystemPath && isBlogPostPath && payload.currentPath) {
     store.addItem({
-      label: payload.pageTitle || document.title || '文章',
+      label: payload.pageTitle || document.title || 'Article',
       href: payload.currentPath,
       icon: articleIcon,
     });
@@ -64,7 +66,7 @@ export const initDock = (selector = '#mac-dock', options: DockInitOptions = {}) 
 
   store.renderItems(store.getItems());
 
-  dock.addEventListener('click', (event) => {
+  const onDockClick = (event: Event) => {
     const anchor = (event.target as HTMLElement | null)?.closest('.dock-item a') as HTMLAnchorElement | null;
     if (!anchor) return;
     const listItem = anchor.closest('.dock-item') as HTMLElement | null;
@@ -72,7 +74,17 @@ export const initDock = (selector = '#mac-dock', options: DockInitOptions = {}) 
     event.preventDefault();
     activity.open({
       href: normalizeHref(anchor.getAttribute('href') || ''),
-      label: listItem.dataset.label || '文章',
+      label: listItem.dataset.label || 'Article',
     });
-  });
+  };
+
+  dock.addEventListener('click', onDockClick);
+
+  return () => {
+    dock.removeEventListener('click', onDockClick);
+    cleanupActions?.();
+    cleanupVisibility?.();
+    activity.destroy?.();
+    delete dock.dataset.dockInitialized;
+  };
 };

@@ -55,33 +55,52 @@ export const createDockVisibility = (dock: HTMLElement) => {
     scheduleHide();
   };
 
-  dock.addEventListener('pointerenter', () => {
+  const onPointerEnter = () => {
     isHoveringDock = true;
     evaluate();
-  });
+  };
 
-  dock.addEventListener('pointerleave', () => {
+  const onPointerLeave = () => {
     isHoveringDock = false;
     evaluate();
-  });
+  };
 
-  document.addEventListener('pointermove', (event) => {
+  const onPointerMove = (event: PointerEvent) => {
     pendingPointerY = event.clientY;
     if (pointerRafId !== null) return;
     pointerRafId = requestAnimationFrame(() => {
       evaluate();
       pointerRafId = null;
     });
-  });
+  };
 
-  window.addEventListener('scroll', () => {
+  const onScroll = () => {
     isScrolling = true;
     window.clearTimeout(scrollTimer);
     scrollTimer = window.setTimeout(() => {
       isScrolling = false;
       evaluate();
     }, 180);
-  }, { passive: true });
+  };
+
+  dock.addEventListener('pointerenter', onPointerEnter);
+  dock.addEventListener('pointerleave', onPointerLeave);
+  document.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('scroll', onScroll, { passive: true });
 
   scheduleHide();
+
+  return () => {
+    dock.removeEventListener('pointerenter', onPointerEnter);
+    dock.removeEventListener('pointerleave', onPointerLeave);
+    document.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('scroll', onScroll);
+    if (pointerRafId !== null) {
+      cancelAnimationFrame(pointerRafId);
+      pointerRafId = null;
+    }
+    clearHideTimer();
+    window.clearTimeout(scrollTimer);
+    scrollTimer = undefined;
+  };
 };

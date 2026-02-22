@@ -1,5 +1,5 @@
 export const initTerminalInteraction = (terminalModal, terminalTitlebar) => {
-  if (!terminalModal) return;
+  if (!terminalModal) return () => {};
 
   const handles = terminalModal.querySelectorAll('.terminal-resize-handle');
   const minWidth = 420;
@@ -127,15 +127,41 @@ export const initTerminalInteraction = (terminalModal, terminalTitlebar) => {
     window.addEventListener('pointercancel', onPointerUp);
   };
 
+  const resizeHandlers = new Map();
+  handles.forEach((handle) => {
+    const onPointerDown = (event) => {
+      beginInteraction(event, 'resize', handle.dataset.resize || '');
+    };
+    resizeHandlers.set(handle, onPointerDown);
+    handle.addEventListener('pointerdown', onPointerDown);
+  });
+
+  const onTitlebarPointerDown = (event) => {
+    beginInteraction(event, 'drag');
+  };
+
   if (terminalTitlebar) {
-    terminalTitlebar.addEventListener('pointerdown', (event) => {
-      beginInteraction(event, 'drag');
-    });
+    terminalTitlebar.removeEventListener('pointerdown', onTitlebarPointerDown);
+    terminalTitlebar.addEventListener('pointerdown', onTitlebarPointerDown);
   }
 
-  handles.forEach((handle) => {
-    handle.addEventListener('pointerdown', (event) => {
-      beginInteraction(event, 'resize', handle.dataset.resize || '');
+  return () => {
+    if (rafId) {
+      window.cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+    if (interaction) {
+      terminalModal.releasePointerCapture?.(interaction.pointerId);
+      interaction = null;
+    }
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+    window.removeEventListener('pointercancel', onPointerUp);
+    if (terminalTitlebar) {
+      terminalTitlebar.removeEventListener('pointerdown', onTitlebarPointerDown);
+    }
+    resizeHandlers.forEach((handler, handle) => {
+      handle.removeEventListener('pointerdown', handler);
     });
-  });
+  };
 };

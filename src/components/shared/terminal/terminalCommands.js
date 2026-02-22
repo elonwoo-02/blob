@@ -10,6 +10,7 @@ export const initTerminalCommands = ({
   if (!terminalInput) {
     return {
       getHistory: () => [],
+      cleanup: () => {},
     };
   }
 
@@ -257,28 +258,27 @@ export const initTerminalCommands = ({
         q: question,
         h: JSON.stringify(compactHistory),
       });
-
-      // Astro static dev does not support POST endpoints; use GET in dev.
-      const preferGet = Boolean(import.meta?.env?.DEV);
-      let response;
-
-      if (preferGet) {
-        response = await fetch(`/api/ai/chat?${params.toString()}`, {
+      const fallbackGetRequest = async () =>
+        fetch(`/api/ai/chat?${params.toString()}`, {
           method: 'GET',
-          headers: { accept: 'application/json' },
+          headers: {
+            accept: 'application/json',
+            'x-ai-question': question,
+            'x-ai-history': JSON.stringify(compactHistory),
+          },
         });
-      } else {
-        const payload = {
-          messages: nextMessages,
-          threadId: getAiThreadId(),
-          stream: true,
-        };
-        response = await fetch('/api/ai/chat', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-      }
+
+      const payload = {
+        messages: nextMessages,
+        threadId: getAiThreadId(),
+        stream: true,
+      };
+
+      let response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
       if (response.status === 400) {
         let errorPayload = null;
@@ -289,10 +289,7 @@ export const initTerminalCommands = ({
         }
 
         if (errorPayload?.error === 'Request body is empty.') {
-          response = await fetch(`/api/ai/chat?${params.toString()}`, {
-            method: 'GET',
-            headers: { accept: 'application/json' },
-          });
+          response = await fallbackGetRequest();
 
           if (response.ok) {
             const data = await response.json();
@@ -311,6 +308,10 @@ export const initTerminalCommands = ({
             return;
           }
         }
+      }
+
+      if ([404, 405, 415, 501].includes(response.status)) {
+        response = await fallbackGetRequest();
       }
 
       if (!response.ok) {
@@ -715,7 +716,7 @@ export const initTerminalCommands = ({
   };
 
   // Single input handler: completion, history navigation, and command execution.
-  terminalInput.addEventListener('keydown', (event) => {
+  const onInputKeydown = (event) => {
     if (event.key === 'Tab') {
       event.preventDefault();
       completeInput();
@@ -768,9 +769,14 @@ export const initTerminalCommands = ({
     const [cmd, ...rest] = raw.split(' ');
     const arg = rest.join(' ').trim();
     executeCommand(cmd, arg);
-  });
+  };
+
+  terminalInput.addEventListener('keydown', onInputKeydown);
 
   return {
     getHistory: () => history,
+    cleanup: () => {
+      terminalInput.removeEventListener('keydown', onInputKeydown);
+    },
   };
 };

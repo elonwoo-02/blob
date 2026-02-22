@@ -20,6 +20,9 @@ export const createActivityManager = (
   let topZIndex = baseZIndex;
   const storage = createDockStorage(options.storagePrefix);
   const callbacks = options.callbacks;
+  let onLayerDblClick: ((event: MouseEvent) => void) | null = null;
+  let onLayerClick: ((event: MouseEvent) => void) | null = null;
+  let onCloseTopActivity: (() => void) | null = null;
 
   const setLayerVisibility = () => {
     if (!activityLayer) return;
@@ -319,26 +322,53 @@ export const createActivityManager = (
   };
 
   const bindLayerEvents = () => {
-    activityLayer?.addEventListener('dblclick', (event) => {
+    onLayerDblClick = (event: MouseEvent) => {
       const panel = (event.target as HTMLElement | null)?.closest('.dock-activity-window') as HTMLElement | null;
       if (!panel?.dataset.href) return;
       window.location.assign(panel.dataset.href);
-    });
+    };
 
-    activityLayer?.addEventListener('click', (event) => {
+    onLayerClick = (event: MouseEvent) => {
       if ((event.target as HTMLElement | null)?.closest('.dock-activity-window')) return;
       if ((event.target as HTMLElement | null)?.closest('#mac-dock')) return;
       closeAll();
-    });
+    };
 
-    window.addEventListener('dock:close-top-activity', () => {
+    onCloseTopActivity = () => {
       closeTopVisiblePanel();
-    });
+    };
+
+    if (activityLayer && onLayerDblClick) {
+      activityLayer.addEventListener('dblclick', onLayerDblClick);
+    }
+    if (activityLayer && onLayerClick) {
+      activityLayer.addEventListener('click', onLayerClick);
+    }
+    if (onCloseTopActivity) {
+      window.addEventListener('dock:close-top-activity', onCloseTopActivity);
+    }
   };
 
   bindLayerEvents();
 
+  const destroy = () => {
+    if (activityLayer && onLayerDblClick) {
+      activityLayer.removeEventListener('dblclick', onLayerDblClick);
+    }
+    if (activityLayer && onLayerClick) {
+      activityLayer.removeEventListener('click', onLayerClick);
+    }
+    if (onCloseTopActivity) {
+      window.removeEventListener('dock:close-top-activity', onCloseTopActivity);
+    }
+    onLayerDblClick = null;
+    onLayerClick = null;
+    onCloseTopActivity = null;
+    closeAll();
+  };
+
   return {
     open,
+    destroy,
   };
 };
