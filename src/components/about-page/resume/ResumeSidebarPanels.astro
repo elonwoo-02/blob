@@ -86,4 +86,23 @@ const { sidebarByLang, defaultLanguage = "go" } = Astro.props as Props;
     color: color-mix(in srgb, var(--color-success) 82%, var(--color-base-content));
     word-break: break-word;
   }
+
+  @media (max-width: 640px) {
+    .side-section {
+      padding: 0.42rem 0.44rem;
+      border-radius: 0.5rem;
+    }
+
+    .side-title,
+    .side-tail,
+    .side-section li {
+      font-size: 0.61rem;
+      line-height: 1.25;
+    }
+
+    .side-section ul {
+      margin-top: 0.15rem;
+      padding-left: 0.45rem;
+    }
+  }
 </style>

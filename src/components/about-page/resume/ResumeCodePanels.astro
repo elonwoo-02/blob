@@ -115,4 +115,22 @@ const { codeByLang, defaultLanguage = "go" } = Astro.props as Props;
   .code-line code [data-token="plain"] {
     color: color-mix(in srgb, var(--color-base-content) 84%, transparent);
   }
+
+  @media (max-width: 640px) {
+    .code-block-head {
+      padding: 0.4rem 0.55rem;
+      font-size: 0.66rem;
+    }
+
+    .code-lines {
+      padding: 0.35rem 0.45rem;
+    }
+
+    .code-line {
+      grid-template-columns: 1.7rem minmax(0, 1fr);
+      gap: 0.45rem;
+      font-size: 0.68rem;
+      line-height: 1.35;
+    }
+  }
 </style>

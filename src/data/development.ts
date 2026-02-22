@@ -274,6 +274,17 @@ export const aboutTimeline: TimelineEntry[] = [
       '补充分词与数据契约测试，确保语言切换与显示稳定。',
     ],
   },
+  {
+    date: '2026-02-22',
+    title: '修复 About 双栏滚动与刷新缓存异常',
+    tag: 'About',
+    summary: '左右栏改为同步滚动，移动端维持双栏，并修复普通刷新样式回退问题。',
+    details: [
+      '移除侧栏独立滚动容器，页面改为统一文档流滚动。',
+      '手机端保持双栏结构，仅缩小字体与间距提升可读性。',
+      'Service Worker 升级为 v5，HTML 与 _astro 资源采用 network-first。',
+    ],
+  },
 ];
 
 export const blogTimeline: TimelineEntry[] = [
