@@ -9,7 +9,7 @@
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check:colors": "node scripts/check-colors.mjs",
+    "check:colors": "node tools/check-colors.mjs",
     "check": "npm run check:colors && npm run build"
   },
   "dependencies": {
@@ -32,3 +32,4 @@
     "vitest": "^3.2.4"
   }
 }
+

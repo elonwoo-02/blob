@@ -1,5 +1,6 @@
 import { useMemo, useState } from "preact/hooks";
 import type { HeatmapMatrix } from "./heatmap/types";
+import { BLOG_EVENTS } from "../events";
 
 interface Props {
   heatmap: HeatmapMatrix;
@@ -18,7 +19,9 @@ const BlogHeatmapGridIsland = ({ heatmap, initialSelectedDate }: Props) => {
   const onSelectDate = (date: string) => {
     if (!validDates.has(date)) return;
     setSelectedDate(date);
-    window.dispatchEvent(new CustomEvent("heatmap-day-selected", { detail: { date } }));
+    window.dispatchEvent(
+      new CustomEvent(BLOG_EVENTS.heatmapDaySelected, { detail: { date } }),
+    );
   };
 
   return (

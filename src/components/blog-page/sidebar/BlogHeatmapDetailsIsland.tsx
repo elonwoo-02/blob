@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
 import type { ActivityType, HeatmapMatrix } from "./heatmap/types";
+import { BLOG_EVENTS, type HeatmapDaySelectedDetail } from "../events";
 
 interface Props {
   heatmap: HeatmapMatrix;
@@ -28,13 +29,14 @@ const BlogHeatmapDetailsIsland = ({ heatmap, initialSelectedDate }: Props) => {
 
   useEffect(() => {
     const onSelected = (event: Event) => {
-      const detail = (event as CustomEvent<{ date?: string }>).detail;
+      const detail = (event as CustomEvent<HeatmapDaySelectedDetail>).detail;
       if (!detail?.date || !dayMap.has(detail.date)) return;
       setSelectedDate(detail.date);
     };
 
-    window.addEventListener("heatmap-day-selected", onSelected);
-    return () => window.removeEventListener("heatmap-day-selected", onSelected);
+    window.addEventListener(BLOG_EVENTS.heatmapDaySelected, onSelected);
+    return () =>
+      window.removeEventListener(BLOG_EVENTS.heatmapDaySelected, onSelected);
   }, [dayMap]);
 
   const selected = dayMap.get(selectedDate);

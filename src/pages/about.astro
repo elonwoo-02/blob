@@ -1,6 +1,9 @@
----
+﻿---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Avatar3D from "../components/about-page/resume/Avatar3D.astro";
+import ResumeLanguageIsland from "../components/about-page/resume/ResumeLanguageIsland";
+import ResumeSidebarPanels from "../components/about-page/resume/ResumeSidebarPanels.astro";
+import ResumeEditorTopbar from "../components/about-page/resume/ResumeEditorTopbar.astro";
 
 const pageTitle = "";
 
@@ -100,13 +103,13 @@ const sidebarByLang = {
     },
   ],
   zh: [
-    { title: "平台", items: ["Windows", "Linux", "移动端"] },
+    { title: "骞冲彴", items: ["Windows", "Linux", "绉诲姩绔?"] },
     {
-      title: "技术栈",
+      title: "鎶€鏈爤",
       items: ["Python", "Go", "TypeScript", "JavaScript", "C#", "HTML/CSS"],
     },
     {
-      title: "工具",
+      title: "宸ュ叿",
       items: [
         "Unity3D",
         "Unreal",
@@ -118,69 +121,28 @@ const sidebarByLang = {
       ],
     },
     {
-      title: "媒体链接",
+      title: "濯掍綋閾炬帴",
       items: ["itch.io/elon", "linkedin.com/in/elon", "github.com/elon"],
     },
-    { title: "语言能力", items: ["法语: C1", "英语: B2", "波兰语: B2"] },
-    { title: "个人特质", items: ["好奇", "严谨", "协作"] },
+    { title: "璇█鑳藉姏", items: ["娉曡: C1", "鑻辫: B2", "娉㈠叞璇? B2"] },
+    { title: "涓汉鐗硅川", items: ["濂藉", "涓ヨ皑", "鍗忎綔"] },
   ],
 };
 ---
 
 <BaseLayout pageTitle={pageTitle} showElonFloat={false}>
   <section class="resume-screen">
-    <!--简历侧边栏-->
+    <!--绠€鍘嗕晶杈规爮-->
     <aside class="resume-sidebar">
       <!--3D image hover effect from Tailwind Component-->
       <div class="avatar-panel">
         <Avatar3D />
       </div>
-      {
-        Object.entries(sidebarByLang).map(([lang, sections]) => (
-          <div
-            class:list={[
-              "sidebar-lang-panel",
-              lang === "python" && "is-active",
-            ]}
-            data-lang-sidebar={lang}
-          >
-            {sections.map((section) => (
-              <section class="side-section">
-                <p class="side-title">
-                  <span class="kw">{section.title}</span>{" "}
-                  <span class="id">= [</span>
-                </p>
-                <ul>
-                  {section.items.map((item) => (
-                    <li>
-                      <span class="str">'{item}'</span>,
-                    </li>
-                  ))}
-                </ul>
-                <p class="side-tail">]</p>
-              </section>
-            ))}
-          </div>
-        ))
-      }
+      <ResumeSidebarPanels sidebarByLang={sidebarByLang} />
     </aside>
-    <!--简历主体-->
+    <!--绠€鍘嗕富浣?->
     <article class="resume-editor">
-      <div class="editor-top">
-        <span class="dot red"></span>
-        <span class="dot yellow"></span>
-        <span class="dot green"></span>
-        <span class="tab-name" id="resume-tab-name">resume.py</span>
-
-        <div class="lang-switcher">
-          <label for="resume-language">Display</label>
-          <select id="resume-language" aria-label="Select resume language">
-            <option value="python">Python</option>
-            <option value="go">Go</option>
-            <option value="zh">中文</option>
-          </select>
-        </div>
-      </div>
+      <ResumeEditorTopbar />
 
       <div class="editor-body">
         <div class="code-lang-panel is-active" data-lang-code="python">
@@ -471,50 +433,50 @@ const sidebarByLang = {
 
         <div class="code-lang-panel" data-lang-code="zh">
           <p class="code-line comment">
-            # 目标：寻找 Unity3D / Unreal Engine 相关岗位
+            # 鐩爣锛氬鎵?Unity3D / Unreal Engine 鐩稿叧宀椾綅
           </p>
           <p class="code-line comment">
-            # 工作安排：每周 4 天企业 + 1 天学校，可立即到岗
+            # 宸ヤ綔瀹夋帓锛氭瘡鍛?4 澶╀紒涓?+ 1 澶╁鏍★紝鍙珛鍗冲埌宀?
           </p>
 
           <section class="code-section">
             <h2 class="section-title">
-              <span class="id">个人信息</span>
+              <span class="id">涓汉淇℃伅</span>
               <span class="id">=</span>
             </h2>
             <p class="code-line indent brace">{"{"}</p>
             <p class="code-line indent">
-              <span class="str">"姓名"</span>: <span class="str"
+              <span class="str">"濮撳悕"</span>: <span class="str"
                 >"{profile.name}"</span
               >,
             </p>
             <p class="code-line indent">
-              <span class="str">"职位"</span>: <span class="str"
+              <span class="str">"鑱屼綅"</span>: <span class="str"
                 >"{profile.title}"</span
               >,
             </p>
             <p class="code-line indent">
-              <span class="str">"邮箱"</span>: <span class="str"
+              <span class="str">"閭"</span>: <span class="str"
                 >"{profile.email}"</span
               >,
             </p>
             <p class="code-line indent">
-              <span class="str">"电话"</span>: <span class="str"
+              <span class="str">"鐢佃瘽"</span>: <span class="str"
                 >"{profile.phone}"</span
               >,
             </p>
             <p class="code-line indent">
-              <span class="str">"地点"</span>: <span class="str"
+              <span class="str">"鍦扮偣"</span>: <span class="str"
                 >"{profile.location}"</span
               >,
             </p>
             <p class="code-line indent">
-              <span class="str">"可入职"</span>: <span class="num"
-                >{profile.availableNow ? "是" : "否"}</span
+              <span class="str">"鍙叆鑱?</span>: <span class="num"
+                >{profile.availableNow ? "鏄? : "鍚?}</span
               >,
             </p>
             <p class="code-line indent">
-              <span class="str">"年龄"</span>: <span class="num"
+              <span class="str">"骞撮緞"</span>: <span class="num"
                 >{profile.age}</span
               >,
             </p>
@@ -523,7 +485,7 @@ const sidebarByLang = {
 
           <section class="code-section">
             <h2 class="section-title">
-              <span class="id">教育经历</span>
+              <span class="id">鏁欒偛缁忓巻</span>
               <span class="id">= [</span>
             </h2>
             {
@@ -531,19 +493,19 @@ const sidebarByLang = {
                 <div class="method-block">
                   <p class="code-line indent brace">{"{"}</p>
                   <p class="code-line indent2">
-                    <span class="str">"函数名"</span>:{" "}
+                    <span class="str">"鍑芥暟鍚?</span>:{" "}
                     <span class="str">"{item.method}()"</span>,
                   </p>
                   <p class="code-line indent2">
-                    <span class="str">"学历"</span>:{" "}
+                    <span class="str">"瀛﹀巻"</span>:{" "}
                     <span class="str">"{item.level}"</span>,
                   </p>
                   <p class="code-line indent2">
-                    <span class="str">"时间"</span>:{" "}
+                    <span class="str">"鏃堕棿"</span>:{" "}
                     <span class="str">"{item.range}"</span>,
                   </p>
                   <p class="code-line indent2">
-                    <span class="str">"方向"</span>:{" "}
+                    <span class="str">"鏂瑰悜"</span>:{" "}
                     <span class="str">"{item.type}"</span>,
                   </p>
                   <p class="code-line indent brace">{"}"}</p>
@@ -555,7 +517,7 @@ const sidebarByLang = {
 
           <section class="code-section">
             <h2 class="section-title">
-              <span class="id">项目与经历</span>
+              <span class="id">椤圭洰涓庣粡鍘?/span>
               <span class="id">= [</span>
             </h2>
             {
@@ -563,19 +525,19 @@ const sidebarByLang = {
                 <div class="method-block">
                   <p class="code-line indent brace">{"{"}</p>
                   <p class="code-line indent2">
-                    <span class="str">"方法名"</span>:{" "}
+                    <span class="str">"鏂规硶鍚?</span>:{" "}
                     <span class="str">"{item.method}()"</span>,
                   </p>
                   <p class="code-line indent2">
-                    <span class="str">"角色"</span>:{" "}
+                    <span class="str">"瑙掕壊"</span>:{" "}
                     <span class="str">"{item.role}"</span>,
                   </p>
                   <p class="code-line indent2">
-                    <span class="str">"周期"</span>:{" "}
+                    <span class="str">"鍛ㄦ湡"</span>:{" "}
                     <span class="str">"{item.range}"</span>,
                   </p>
                   <p class="code-line indent2">
-                    <span class="str">"链接"</span>:{" "}
+                    <span class="str">"閾炬帴"</span>:{" "}
                     <span class="str">"{item.site}"</span>,
                   </p>
                   <p class="code-line indent2 comment"># {item.detail}</p>
@@ -590,60 +552,7 @@ const sidebarByLang = {
     </article>
   </section>
 
-  <script is:inline>
-    const languageStorageKey = "about:resume-language";
-    const languageSelect = document.getElementById("resume-language");
-    const tabName = document.getElementById("resume-tab-name");
-    const sidebarPanels = Array.from(
-      document.querySelectorAll("[data-lang-sidebar]"),
-    );
-    const codePanels = Array.from(
-      document.querySelectorAll("[data-lang-code]"),
-    );
-    const tabNameByLang = {
-      python: "resume.py",
-      go: "resume.go",
-      zh: "resume.zh-CN",
-    };
-    const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
-
-    const applyLanguage = (rawLang) => {
-      const lang = hasOwn(tabNameByLang, rawLang) ? rawLang : "python";
-      sidebarPanels.forEach((panel) => {
-        const panelLang = panel.getAttribute("data-lang-sidebar");
-        panel.classList.toggle("is-active", panelLang === lang);
-      });
-      codePanels.forEach((panel) => {
-        const panelLang = panel.getAttribute("data-lang-code");
-        panel.classList.toggle("is-active", panelLang === lang);
-      });
-      if (tabName) {
-        tabName.textContent = tabNameByLang[lang];
-      }
-      if (languageSelect) {
-        languageSelect.value = lang;
-      }
-      try {
-        localStorage.setItem(languageStorageKey, lang);
-      } catch {}
-    };
-
-    let initialLanguage = "python";
-    try {
-      const savedLanguage = localStorage.getItem(languageStorageKey);
-      if (savedLanguage && hasOwn(tabNameByLang, savedLanguage)) {
-        initialLanguage = savedLanguage;
-      }
-    } catch {}
-
-    applyLanguage(initialLanguage);
-
-    languageSelect?.addEventListener("change", (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLSelectElement)) return;
-      applyLanguage(target.value);
-    });
-  </script>
+  <ResumeLanguageIsland client:load />
 </BaseLayout>
 
 <style>
@@ -896,3 +805,5 @@ const sidebarByLang = {
     }
   }
 </style>
+
+

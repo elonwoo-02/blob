@@ -2,6 +2,7 @@
 // ArticleView.astro - Article list layout (Note style)
 import { type CollectionEntry } from 'astro:content';
 import ContentView from '../ContentView.astro';
+import TagFilterIsland from "../TagFilterIsland";
 
 interface Props {
   pinnedPosts?: CollectionEntry<'blog'>[];
@@ -144,76 +145,13 @@ const formatTime = (date: Date) => {
      <button id="article-clear-tag-filter-empty" class="btn btn-link btn-sm mt-2 text-primary">Show all</button>
   </div>
 </ContentView>
-
-<script>
-  // Filtering logic for ArticleView (same as NoteView)
-  const activeTagPanel = document.getElementById('article-active-tag-panel');
-  const activeTagName = document.getElementById('article-active-tag-name');
-  const clearFilterBtn = document.getElementById('article-clear-tag-filter');
-  const clearFilterBtnEmpty = document.getElementById('article-clear-tag-filter-empty');
-  const postCards = Array.from(document.querySelectorAll('[data-post-card]'));
-  const emptyState = document.getElementById('article-empty-state');
-  
-  const applyArticleTagFilter = (tag: string) => {
-    let visibleCount = 0;
-    
-    postCards.forEach((card) => {
-      const tags = (card.getAttribute('data-tags') || '').split('|');
-      const matched = !tag || tags.some((v) => v === tag || v.startsWith(`${tag}/`));
-      
-      if (matched) {
-         card.classList.remove('hidden');
-         visibleCount++;
-      } else {
-         card.classList.add('hidden');
-      }
-    });
-
-    if (activeTagPanel && activeTagName) {
-      if (tag) {
-         activeTagPanel.classList.remove('hidden');
-         activeTagPanel.classList.add('flex');
-         activeTagName.textContent = `#${tag}`;
-      } else {
-         activeTagPanel.classList.add('hidden');
-         activeTagPanel.classList.remove('flex');
-      }
-    }
-
-    if (emptyState) {
-       emptyState.classList.toggle('hidden', visibleCount > 0);
-       emptyState.classList.toggle('flex', visibleCount === 0);
-    }
-
-    // Update Sidebar Tag Active State
-    document.querySelectorAll('.tag-item').forEach(item => {
-      if (item.getAttribute('data-tag-group') === tag) {
-        item.classList.add('tag-active');
-        item.classList.remove('text-base-content/70', 'hover:bg-base-200/50');
-      } else {
-        item.classList.remove('tag-active');
-        item.classList.add('text-base-content/70', 'hover:bg-base-200/50');
-      }
-    });
-  };
-
-  document.querySelectorAll('.article-tag-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      applyArticleTagFilter(btn.getAttribute('data-tag') || '');
-    });
-  });
-
-  const clearFilter = () => applyArticleTagFilter('');
-  clearFilterBtn?.addEventListener('click', clearFilter);
-  clearFilterBtnEmpty?.addEventListener('click', clearFilter);
-
-  // Global event listener for sidebar
-  document.querySelectorAll('.tag-nav-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const tag = btn.getAttribute('data-tag') || '';
-      applyArticleTagFilter(tag);
-    });
-  });
-</script>
+<TagFilterIsland
+  client:load
+  tagButtonSelector=".article-tag-btn"
+  cardSelector="[data-post-card]"
+  emptyStateId="article-empty-state"
+  clearButtonIds={["article-clear-tag-filter", "article-clear-tag-filter-empty"]}
+  activeTagPanelId="article-active-tag-panel"
+  activeTagNameId="article-active-tag-name"
+  includeSidebarTagState={true}
+/>

@@ -1,0 +1,41 @@
+---
+interface SectionItem {
+  title: string;
+  items: string[];
+}
+
+interface Props {
+  sidebarByLang: Record<string, SectionItem[]>;
+}
+
+const { sidebarByLang } = Astro.props as Props;
+---
+
+{
+  Object.entries(sidebarByLang).map(([lang, sections]) => (
+    <div
+      class:list={[
+        "sidebar-lang-panel",
+        lang === "python" && "is-active",
+      ]}
+      data-lang-sidebar={lang}
+    >
+      {sections.map((section) => (
+        <section class="side-section">
+          <p class="side-title">
+            <span class="kw">{section.title}</span>{" "}
+            <span class="id">= [</span>
+          </p>
+          <ul>
+            {section.items.map((item) => (
+              <li>
+                <span class="str">'{item}'</span>,
+              </li>
+            ))}
+          </ul>
+          <p class="side-tail">]</p>
+        </section>
+      ))}
+    </div>
+  ))
+}

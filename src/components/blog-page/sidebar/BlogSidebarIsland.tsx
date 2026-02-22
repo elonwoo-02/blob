@@ -1,4 +1,5 @@
 import { useEffect } from "preact/hooks";
+import { BLOG_EVENTS } from "../events";
 
 type ViewName = "article" | "moment" | "note";
 const VIEW_NAMES: ViewName[] = ["article", "moment", "note"];
@@ -25,7 +26,7 @@ const BlogSidebarIsland = () => {
         const view = item.getAttribute("data-view") as ViewName | null;
         const isActive = view === activeView;
         item.classList.toggle("active", isActive);
-        item.classList.toggle("bg-[#5a8a9c]", isActive);
+        item.classList.toggle("bg-[var(--app-accent)]", isActive);
         item.classList.toggle("text-[var(--app-accent-contrast)]", isActive);
         item.classList.toggle("text-base-content/70", !isActive);
       });
@@ -105,7 +106,7 @@ const BlogSidebarIsland = () => {
       const nextView = view as ViewName;
       syncNavActiveState(nextView);
       window.dispatchEvent(
-        new CustomEvent("view-changed", { detail: { view: nextView } }),
+        new CustomEvent(BLOG_EVENTS.viewChanged, { detail: { view: nextView } }),
       );
       closeDrawerOnMobile();
     };

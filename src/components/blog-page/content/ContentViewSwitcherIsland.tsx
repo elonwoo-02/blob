@@ -1,4 +1,5 @@
 import { useEffect } from "preact/hooks";
+import { BLOG_EVENTS, type BlogViewChangedDetail } from "../events";
 
 type ViewName = "article" | "moment" | "note";
 
@@ -27,16 +28,16 @@ const ContentViewSwitcherIsland = ({ defaultView = "article" }: Props) => {
     applyView(defaultView);
 
     const onViewChanged = (event: Event) => {
-      const custom = event as CustomEvent<{ view?: string }>;
+      const custom = event as CustomEvent<BlogViewChangedDetail>;
       const next = custom.detail?.view;
       if (!next || !ALL_VIEWS.includes(next as ViewName)) return;
       applyView(next as ViewName);
     };
 
-    window.addEventListener("view-changed", onViewChanged as EventListener);
+    window.addEventListener(BLOG_EVENTS.viewChanged, onViewChanged as EventListener);
     return () => {
       window.removeEventListener(
-        "view-changed",
+        BLOG_EVENTS.viewChanged,
         onViewChanged as EventListener,
       );
     };

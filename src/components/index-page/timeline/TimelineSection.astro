@@ -1,5 +1,6 @@
 ---
 import type { TimelineEntry } from "../../../data/development.ts";
+import TimelineRevealIsland from "./TimelineRevealIsland";
 
 interface TimelineSectionProps {
   entries: TimelineEntry[];
@@ -24,7 +25,10 @@ const displayEntries = entries;
       <h3 class="text-2xl font-semibold">{title}</h3>
       <p class="text-sm">{subtitle}</p>
     </div>
-    <span class="ml-auto rounded-full border border-[#2E9CCA]/40 px-3 py-1 text-xs shadow-[inset_0_0_20px_rgba(46,156,202,0.15)]">
+    <span
+      class="ml-auto rounded-full border px-3 py-1 text-xs"
+      style="border-color: color-mix(in srgb, var(--app-accent) 40%, transparent); box-shadow: inset 0 0 20px color-mix(in srgb, var(--app-accent) 15%, transparent);"
+    >
       {tagLabel}
     </span>
   </div>
@@ -37,21 +41,43 @@ const displayEntries = entries;
         <article class={`reveal-entry ${padding} translate-y-8 opacity-0 transition-all duration-1000 ease-out`}>
           <div class="flex gap-4">
             <div class="flex flex-col items-center">
-              <span class="h-2 w-2 rounded-full bg-[#2E9CCA] shadow-[0_0_8px_rgba(46,156,202,0.6)]"></span>
-              {!isLast && <span class="mt-2 h-full w-px bg-[#2E9CCA]/40"></span>}
+              <span
+                class="h-2 w-2 rounded-full"
+                style="background-color: var(--app-accent); box-shadow: 0 0 8px color-mix(in srgb, var(--app-accent) 60%, transparent);"
+              ></span>
+              {!isLast && (
+                <span
+                  class="mt-2 h-full w-px"
+                  style="background-color: color-mix(in srgb, var(--app-accent) 40%, transparent);"
+                ></span>
+              )}
             </div>
 
-            <div class="flex-1 space-y-2 border-l border-[#2E9CCA]/10 pl-4">
-              <div class="flex flex-wrap items-center justify-between gap-2 text-xs uppercase tracking-[0.3em] text-[#2E9CCA]">
+            <div
+              class="flex-1 space-y-2 border-l pl-4"
+              style="border-color: color-mix(in srgb, var(--app-accent) 10%, transparent);"
+            >
+              <div
+                class="flex flex-wrap items-center justify-between gap-2 text-xs uppercase tracking-[0.3em]"
+                style="color: var(--app-accent);"
+              >
                 <span>{entry.date}</span>
-                <span class="rounded-full border border-[#2E9CCA]/40 px-3 py-1 text-[10px]">{entry.tag}</span>
+                <span
+                  class="rounded-full border px-3 py-1 text-[10px]"
+                  style="border-color: color-mix(in srgb, var(--app-accent) 40%, transparent);"
+                >
+                  {entry.tag}
+                </span>
               </div>
               <h4 class="text-lg font-semibold">{entry.title}</h4>
               <p class="text-sm">{entry.summary}</p>
               <ul class="space-y-1 text-sm">
                 {entry.details.map((detail) => (
                   <li class="flex items-start gap-2">
-                    <span class="mt-1 h-1.5 w-1.5 rounded-full bg-[#2E9CCA]"></span>
+                    <span
+                      class="mt-1 h-1.5 w-1.5 rounded-full"
+                      style="background-color: var(--app-accent);"
+                    ></span>
                     <span>{detail}</span>
                   </li>
                 ))}
@@ -63,34 +89,4 @@ const displayEntries = entries;
     })}
   </div>
 </section>
-
-<script>
-  function initRevealObserver() {
-    const observerOptions = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.15,
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.remove("opacity-0", "translate-y-8");
-          entry.target.classList.add("opacity-100", "translate-y-0");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, observerOptions);
-
-    const targets = document.querySelectorAll(".reveal-entry");
-    targets.forEach((target) => observer.observe(target));
-  }
-
-  document.addEventListener("astro:page-load", initRevealObserver);
-
-  if (document.readyState === "complete") {
-    initRevealObserver();
-  } else {
-    window.addEventListener("load", initRevealObserver);
-  }
-</script>
+<TimelineRevealIsland client:load />

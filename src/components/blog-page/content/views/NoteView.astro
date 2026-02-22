@@ -2,6 +2,7 @@
 // NoteView.astro - Micro-notes list layout
 import { notes } from '../../../../data/notes.ts';
 import ContentView from '../ContentView.astro';
+import TagFilterIsland from "../TagFilterIsland";
 
 interface Props {
   hidden?: boolean;
@@ -93,65 +94,12 @@ const formatTime = (date: Date) => {
      <button id="note-clear-tag-filter-empty" class="btn btn-link btn-sm mt-2 text-primary">Show all</button>
   </div>
 </ContentView>
-
-<script>
-  // Filtering logic for NoteView
-  const activeTagPanel = document.getElementById('note-active-tag-panel');
-  const activeTagName = document.getElementById('note-active-tag-name');
-  const clearFilterBtn = document.getElementById('note-clear-tag-filter');
-  const clearFilterBtnEmpty = document.getElementById('note-clear-tag-filter-empty');
-  const noteCards = Array.from(document.querySelectorAll('[data-note-card]'));
-  const emptyState = document.getElementById('note-empty-state');
-  
-  const applyNoteTagFilter = (tag: string) => {
-    let visibleCount = 0;
-    
-    noteCards.forEach((card) => {
-      const tags = (card.getAttribute('data-tags') || '').split('|');
-      const matched = !tag || tags.some((v) => v === tag || v.startsWith(`${tag}/`));
-      
-      if (matched) {
-         card.classList.remove('hidden');
-         visibleCount++;
-      } else {
-         card.classList.add('hidden');
-      }
-    });
-
-    if (activeTagPanel && activeTagName) {
-      if (tag) {
-         activeTagPanel.classList.remove('hidden');
-         activeTagPanel.classList.add('flex');
-         activeTagName.textContent = `#${tag}`;
-      } else {
-         activeTagPanel.classList.add('hidden');
-         activeTagPanel.classList.remove('flex');
-      }
-    }
-
-    if (emptyState) {
-       emptyState.classList.toggle('hidden', visibleCount > 0);
-       emptyState.classList.toggle('flex', visibleCount === 0);
-    }
-  };
-
-  document.querySelectorAll('.note-tag-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      applyNoteTagFilter(btn.getAttribute('data-tag') || '');
-    });
-  });
-
-  const clearFilter = () => applyNoteTagFilter('');
-  clearFilterBtn?.addEventListener('click', clearFilter);
-  clearFilterBtnEmpty?.addEventListener('click', clearFilter);
-
-  // Global event listener for sidebar
-  document.querySelectorAll('.tag-nav-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const tag = btn.getAttribute('data-tag') || '';
-      applyNoteTagFilter(tag);
-    });
-  });
-</script>
+<TagFilterIsland
+  client:load
+  tagButtonSelector=".note-tag-btn"
+  cardSelector="[data-note-card]"
+  emptyStateId="note-empty-state"
+  clearButtonIds={["note-clear-tag-filter", "note-clear-tag-filter-empty"]}
+  activeTagPanelId="note-active-tag-panel"
+  activeTagNameId="note-active-tag-name"
+/>
