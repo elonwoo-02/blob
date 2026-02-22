@@ -334,6 +334,17 @@ export const blogTimeline: TimelineEntry[] = [
       '修复 Astro 样式作用域导致的颜色失效，0 级改为中性灰块。',
     ],
   },
+  {
+    date: '2026-02-22',
+    title: '博客品牌更名为 Elon Kernel',
+    tag: 'Blog',
+    summary: '统一站内入口、RSS 与导航文案，完成博客品牌升级。',
+    details: [
+      'Blog 页面标题更新为 Elon Kernel | Blog。',
+      'RSS 与搜索入口品牌文案同步替换。',
+      'Dock、移动端导航与终端帮助统一新名称。',
+    ],
+  },
 ];
 
 export const experienceTimeline: TimelineEntry[] = [

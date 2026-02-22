@@ -11,7 +11,7 @@ export async function GET() {
 
   const items: SearchItem[] = [
     { title: 'Home', url: '/' },
-    { title: 'Blog', url: '/blog/' },
+    { title: 'Elon Kernel', url: '/blog/' },
     { title: 'About', url: '/about/' },
     { title: 'Experience', url: '/experience/' },
     { title: 'Moment', url: '/moment/' },

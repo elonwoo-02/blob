@@ -29,7 +29,7 @@ export const initTerminalCommands = ({
     pushLine('  help                 Show all commands', 'dim');
     pushLine('  help <cmd>            Show command usage', 'dim');
     pushLine('  home                 Go to Home', 'dim');
-    pushLine('  blog                 Go to Blog', 'dim');
+    pushLine('  blog                 Go to Elon Kernel', 'dim');
     pushLine('  about                Go to About', 'dim');
     pushLine('  theme dark|light|auto Switch theme', 'dim');
     pushLine('  theme toggle          Toggle theme', 'dim');
@@ -68,7 +68,7 @@ export const initTerminalCommands = ({
         pushLine('home - go to Home', 'dim');
         break;
       case 'blog':
-        pushLine('blog - go to Blog', 'dim');
+        pushLine('blog - go to Elon Kernel', 'dim');
         break;
       case 'about':
         pushLine('about - go to About', 'dim');
@@ -468,7 +468,7 @@ export const initTerminalCommands = ({
   const showLinks = () => {
     pushLine('Links:', 'dim');
     pushLine('Home -> /', 'dim');
-    pushLine('Blog -> /blog/', 'dim');
+    pushLine('Elon Kernel -> /blog/', 'dim');
     pushLine('About -> /about/', 'dim');
     pushLine('Tags -> /tags/', 'dim');
     pushLine('RSS -> /rss.xml', 'dim');
