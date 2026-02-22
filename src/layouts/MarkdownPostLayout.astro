@@ -87,7 +87,11 @@ const hasToc = tocHeadings.length > 0;
     display: block;
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #0f4c81, #1f6aa5);
+    background: linear-gradient(
+      90deg,
+      var(--app-accent-hover),
+      var(--app-accent)
+    );
     transition: width 0.1s linear;
   }
 </style>

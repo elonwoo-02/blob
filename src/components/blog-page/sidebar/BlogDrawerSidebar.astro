@@ -6,8 +6,19 @@ import BlogProfileSection from "./section/BlogProfileSection.astro";
 import NavigationSection from "./section/NavigationSection.astro";
 import SidebarHeader from "./section/SidebarHeader.astro";
 import BlogSidebarIsland from "./BlogSidebarIsland";
+import type { HeatmapMatrix } from "./heatmap/types";
 
-const { heatmap, stats } = Astro.props;
+interface Props {
+  heatmap: HeatmapMatrix;
+  initialSelectedDate: string;
+  stats: {
+    totalPosts: number;
+    totalTags: number;
+    daysActive: number;
+  };
+}
+
+const { heatmap, initialSelectedDate, stats } = Astro.props as Props;
 ---
 
 <div
@@ -27,7 +38,7 @@ const { heatmap, stats } = Astro.props;
 
     <div class="drawer-body flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
       <BlogProfileSection stats={stats} />
-      <BlogHeatmapSection heatmap={heatmap} />
+      <BlogHeatmapSection heatmap={heatmap} initialSelectedDate={initialSelectedDate} />
       <NavigationSection />
       <BlogTagSection />
     </div>

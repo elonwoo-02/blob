@@ -101,11 +101,14 @@ export const baseLayoutTimeline: TimelineEntry[] = [
     ],
   },
   {
-    date: '2026-02-13',
-    title: '统一站点背景底色',
+    date: '2026-02-21',
+    title: '确认站点颜色方案',
     tag: 'BaseLayout',
-    summary: '调整全局背景色以统一页面视觉基调。',
-    details: ['参考年度配色设置全站背景色。'],
+    summary: '确认全站采用统一配色基调，确保页面视觉一致性。',
+    details: [
+      '确认采用“云舞白”作为站点背景主色方向。',
+      '站点主色策略统一由全局主题变量驱动。',
+    ],
   },
   {
     date: '2026-02-18',

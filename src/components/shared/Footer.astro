@@ -20,14 +20,14 @@ const {
 };
 ---
 
-<footer class="w-full bg-[var(--app-bg)] border-t border-[#2E9CCA]/10 mt-16">
+<footer class="w-full bg-[var(--app-bg)] border-t border-base-300 mt-16">
   <div class="timeline-container mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
     <div class="text-center space-y-8">
       <!-- Name with dot indicator -->
       <div class="flex items-center justify-center gap-3">
-        <span class="h-2 w-2 rounded-full bg-[#2E9CCA] shadow-[0_0_8px_rgba(46,156,202,0.6)]"></span>
+        <span class="h-2 w-2 rounded-full bg-[var(--app-accent)] shadow-[0_0_8px_var(--app-focus)]"></span>
         <h2 class="vcr-font text-2xl font-bold">Elon Woo</h2>
-        <span class="h-2 w-2 rounded-full bg-[#2E9CCA] shadow-[0_0_8px_rgba(46,156,202,0.6)]"></span>
+        <span class="h-2 w-2 rounded-full bg-[var(--app-accent)] shadow-[0_0_8px_var(--app-focus)]"></span>
       </div>
       
       <!-- Tagline -->
@@ -39,7 +39,7 @@ const {
       <nav class="flex flex-wrap justify-center gap-6 text-sm">
         {primaryLinks.map((item) => (
           <a 
-            class="text-base-content/70 hover:text-[#2E9CCA] transition-colors duration-300" 
+            class="text-base-content/70 hover:text-[var(--app-accent)] transition-colors duration-300" 
             href={item.href}
           >
             {item.label}
@@ -50,10 +50,10 @@ const {
       <!-- Project button -->
       <div class="flex justify-center">
         <a 
-          class="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-[#2E9CCA]/40 text-sm text-[#2E9CCA] hover:bg-[#2E9CCA] hover:text-white transition-all duration-300 shadow-[inset_0_0_20px_rgba(46,156,202,0.15)]" 
+          class="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-[var(--app-accent)] text-sm text-[var(--app-accent)] hover:bg-[var(--app-accent)] hover:text-[var(--app-accent-contrast)] transition-all duration-300 shadow-[inset_0_0_20px_var(--app-accent-soft)]" 
           href={projectLink.href}
         >
-          <span class="h-1.5 w-1.5 rounded-full bg-[#2E9CCA]"></span>
+          <span class="h-1.5 w-1.5 rounded-full bg-[var(--app-accent)]"></span>
           {projectLink.label}
         </a>
       </div>
@@ -64,7 +64,7 @@ const {
       </div>
 
       <!-- Copyright -->
-      <div class="pt-6 border-t border-[#2E9CCA]/10">
+      <div class="pt-6 border-t border-base-300">
         <p class="text-xs text-base-content/50 vcr-font">
           © {new Date().getFullYear()} Elon Woo
         </p>

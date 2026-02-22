@@ -66,7 +66,7 @@ const formatTime = (date: Date) => {
         <!-- Tags -->
         <div class="flex flex-wrap gap-2">
           {note.tags.map((tag) => (
-            <button class="note-tag-btn text-xs text-[#3A7A8F]/80 px-1.5 rounded transition-colors" data-tag={tag}>
+            <button class="note-tag-btn text-xs text-[var(--app-accent)] hover:text-[var(--app-accent-hover)] hover:bg-[var(--app-accent-soft)] px-1.5 rounded transition-colors" data-tag={tag}>
               #{tag}
             </button>
           ))}

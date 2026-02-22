@@ -82,7 +82,7 @@ const contentWidthClass = contentWidthClassMap[contentWidth] ?? "max-w-6xl";
     <!-- Terminal entry shell: mount point only, terminal internals stay in TerminalModal -->
     <div
       id="shortcut-overlay"
-      class="shortcut-overlay rounded-xl fixed inset-0 z-40 hidden flex items-center justify-center bg-[rgba(5,8,12,0.55)] backdrop-blur-sm"
+      class="shortcut-overlay rounded-xl fixed inset-0 z-40 hidden flex items-center justify-center bg-[color-mix(in_srgb,var(--app-bg)_35%,black)] backdrop-blur-sm"
       aria-hidden="true"
     >
       <TerminalModal />

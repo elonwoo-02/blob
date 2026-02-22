@@ -26,6 +26,7 @@ const BlogSidebarIsland = () => {
         const isActive = view === activeView;
         item.classList.toggle("active", isActive);
         item.classList.toggle("bg-[#5a8a9c]", isActive);
+        item.classList.toggle("text-[var(--app-accent-contrast)]", isActive);
         item.classList.toggle("text-base-content/70", !isActive);
       });
     };
@@ -45,7 +46,7 @@ const BlogSidebarIsland = () => {
         drawer.classList.toggle("-translate-x-full", !isOpen);
         drawer.classList.toggle("pointer-events-auto", isOpen);
         drawer.classList.toggle("pointer-events-none", !isOpen);
-        drawer.classList.toggle("shadow-[8px_0_24px_rgba(0,0,0,0.14)]", isOpen);
+        drawer.classList.toggle("shadow-lg", isOpen);
         backdrop?.classList.toggle("opacity-100", isOpen);
         backdrop?.classList.toggle("pointer-events-auto", isOpen);
       } else if (isOpen) {
@@ -55,7 +56,7 @@ const BlogSidebarIsland = () => {
         drawer.style.setProperty("width", "320px");
         drawer.style.setProperty("transform", "translateX(0)");
         drawer.style.pointerEvents = "auto";
-        drawer.classList.remove("shadow-[8px_0_24px_rgba(0,0,0,0.14)]");
+        drawer.classList.remove("shadow-lg");
         backdrop?.classList.remove("opacity-100", "pointer-events-auto");
       } else {
         drawer.classList.remove("translate-x-0", "-translate-x-full");
@@ -64,7 +65,7 @@ const BlogSidebarIsland = () => {
         drawer.style.setProperty("width", "0");
         drawer.style.setProperty("transform", "translateX(0)");
         drawer.style.pointerEvents = "none";
-        drawer.classList.remove("shadow-[8px_0_24px_rgba(0,0,0,0.14)]");
+        drawer.classList.remove("shadow-lg");
         backdrop?.classList.remove("opacity-100", "pointer-events-auto");
       }
       window.dispatchEvent(

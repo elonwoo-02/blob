@@ -64,7 +64,7 @@ const formatTime = (date: Date) => {
 
         <!-- Title -->
         <div class="mb-3">
-           <h3 class="text-lg font-bold text-base-content/90 mb-2 leading-tight hover:text-[#3A7A8F] transition-colors">
+           <h3 class="text-lg font-bold text-base-content/90 mb-2 leading-tight hover:text-[var(--app-accent-hover)] transition-colors">
              <a href={`/posts/${post.id}/`} target="_blank" class="focus:outline-none">
                 {post.data.title}
              </a>
@@ -75,7 +75,7 @@ const formatTime = (date: Date) => {
         <!-- Tags -->
         <div class="flex flex-wrap gap-2">
           {post.data.tags.map((tag) => (
-            <button class="article-tag-btn text-xs text-[#3A7A8F]/80 hover:text-[#3A7A8F] hover:bg-[#3A7A8F]/5 px-1.5 py-0.5 rounded transition-colors" data-tag={tag}>
+            <button class="article-tag-btn text-xs text-[var(--app-accent)] hover:text-[var(--app-accent-hover)] hover:bg-[var(--app-accent-soft)] px-1.5 py-0.5 rounded transition-colors" data-tag={tag}>
               #{tag}
             </button>
           ))}
@@ -108,7 +108,7 @@ const formatTime = (date: Date) => {
 
         <!-- Title -->
         <div class="mb-3">
-           <h3 class="text-lg font-bold text-base-content/90 mb-2 leading-tight hover:text-[#3A7A8F] transition-colors">
+           <h3 class="text-lg font-bold text-base-content/90 mb-2 leading-tight hover:text-[var(--app-accent-hover)] transition-colors">
              <a href={`/posts/${post.id}/`} target="_blank" class="focus:outline-none">
                 {post.data.title}
              </a>
@@ -123,7 +123,7 @@ const formatTime = (date: Date) => {
         <!-- Tags -->
         <div class="flex flex-wrap gap-2">
           {post.data.tags.map((tag) => (
-            <button class="article-tag-btn text-xs text-[#3A7A8F]/80 hover:text-[#3A7A8F] hover:bg-[#3A7A8F]/5 px-1.5 py-0.5 rounded transition-colors" data-tag={tag}>
+            <button class="article-tag-btn text-xs text-[var(--app-accent)] hover:text-[var(--app-accent-hover)] hover:bg-[var(--app-accent-soft)] px-1.5 py-0.5 rounded transition-colors" data-tag={tag}>
               #{tag}
             </button>
           ))}
