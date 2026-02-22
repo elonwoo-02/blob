@@ -294,7 +294,7 @@ export const onRequestGet = async ({ env, request }: RequestContext): Promise<Re
 
   const messages = parseQueryMessages(request);
   if (!messages.length) {
-    return jsonResponse(400, { error: "Missing question in query params/history." });
+    return jsonResponse(400, { error: "Missing question/messages in request." });
   }
 
   try {

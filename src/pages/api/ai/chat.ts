@@ -216,8 +216,8 @@ const streamChat = async (
 
 const parseQueryMessages = (request: Request): ChatMessage[] => {
   const url = new URL(request.url);
-  let question = (url.searchParams.get("q") || "").trim();
-  const rawHistory = url.searchParams.get("h") || "";
+  let question = (url.searchParams.get("q") || request.headers.get("x-ai-question") || "").trim();
+  const rawHistory = url.searchParams.get("h") || request.headers.get("x-ai-history") || "";
   let history: ChatMessage[] = [];
 
   if (rawHistory) {
@@ -293,7 +293,7 @@ export const GET: APIRoute = async ({ request }) => {
 
   if (!apiKey) return jsonResponse(500, { error: "OPENAI_API_KEY is missing on server." });
   if (!messages.length) {
-    return jsonResponse(400, { error: "Missing question in query params/history." });
+    return jsonResponse(400, { error: "Missing question/messages in request." });
   }
 
   try {
