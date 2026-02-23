@@ -15,6 +15,7 @@ import ProjectList from "../components/experience-page/ProjectList.astro";
 import ResearchList from "../components/experience-page/ResearchList.astro";
 import SectionToc from "../components/experience-page/SectionToc.astro";
 import SectionTocIsland from "../components/experience-page/SectionTocIsland";
+import ScrollRevealIsland from "../components/experience-page/ScrollRevealIsland";
 
 const pageTitle = "Experience | Mr. Woo";
 ---
@@ -22,6 +23,7 @@ const pageTitle = "Experience | Mr. Woo";
 <BaseLayout pageTitle={pageTitle} showElonFloat={false}>
   <section class="pt-4 pb-8 sm:pt-6 sm:pb-12">
     <ExperienceHero profile={heroProfile} links={actionLinks} />
+    <ScrollRevealIsland client:load />
 
     <div class="mt-7 grid gap-9 lg:grid-cols-[minmax(0,1fr)_240px] lg:gap-11">
       <div class="order-2 space-y-9 lg:order-1">

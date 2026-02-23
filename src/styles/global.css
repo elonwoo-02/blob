@@ -83,3 +83,23 @@ html[data-theme="dark"] {
     display: none !important;
   }
 }
+
+/* Experience page additions: smooth scroll and reduced-motion handling for reveal animations */
+:root {
+  --toc-width: 240px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
