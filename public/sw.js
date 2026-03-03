@@ -2,7 +2,6 @@ const CACHE_NAME = "pwa-cache-v6";
 const PRECACHE_URLS = [
   "/",
   "/manifest.webmanifest",
-  "/icon_favicon32x32.png",
   "/favicon.svg",
   "/icons/icon-192.webp",
   "/icons/icon-512.webp",
