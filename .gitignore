@@ -30,3 +30,6 @@ src/pages/test.astro
 .windsurf/
 
 /docs/
+
+/_Clippings/
+.obsidian

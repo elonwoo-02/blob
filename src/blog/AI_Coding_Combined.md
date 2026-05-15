@@ -1,9 +1,11 @@
 ---
-title: "Vibe Coding Isn't Dumb - You're Just Doing It Wrong"
+title: Vibe Coding Isn't Dumb - You're Just Doing It Wrong
 pubDate: 2026-02-23
 description: "A practical guide for shipping apps with AI & minimal pain. Vibe coding gets a lot of hate, especially from 'serious' devs. But the truth is: not every project needs to be scalable, secure, or architected like it's going public on the stock market. Most of the time, you just want to turn your idea into a working app - fast. Here's how to do it without driving yourself insane. These aren't fancy tricks, just things that work."
-author: "from network"
-tags: ["vibe coding", "AI development"]
+author: from network
+tags:
+  - vibe coding
+  - AI development
 likeCount: 0
 shareCount: 0
 docked: true
