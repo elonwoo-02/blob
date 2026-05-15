@@ -32,7 +32,6 @@ src/pages/test.astro
 /docs/
 
 .gitignore: keep repository-level _Clippings ignored
-/_Clippings/
 # ignore any _Clippings folders anywhere (e.g. src/blog/_Clippings)
 **/_Clippings/
 src/blog/_Clippings/
