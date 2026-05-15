@@ -1,7 +1,7 @@
 ---
-title: Everything before Vibe Coding
+title: 在写程序之前，如何利用AI进行顶层设计？
 pubDate: 2026-05-14
-description: "A practical guide for shipping apps with AI & minimal pain. Vibe coding gets a lot of hate, especially from 'serious' devs. But the truth is: not every project needs to be scalable, secure, or architected like it's going public on the stock market. Most of the time, you just want to turn your idea into a working app - fast. Here's how to do it without driving yourself insane. These aren't fancy tricks, just things that work."
+description: "在正式写代码之前，最重要的核心原则是**绝不要在评审并批准书面计划之前让 AI 编写代码**。这种“先计划、后执行”的分离可以防止无效劳动，并确保你对架构决策拥有绝对控制权。要想清楚你要什么，不要直接说“帮我做一个XX产品”，这太模糊；要把产品边界、技术选型、运维预期全部想清楚，写进系统提示词文档（如CLAUDE.md）中，不过这部分工作也可以使用AI来辅助。"
 author: Elon Woo
 tags:
   - vibe coding
